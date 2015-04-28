@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>6478FF79-35EB-4DE6-8E90-3CD1CC2B7C1E</string>
+	<key>IDESourceControlProjectName</key>
+	<string>project</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>BCAD4A822D3E5F367FBE7AFDD7471D8FFB93684A</key>
+		<string>https://github.com/mikrohard/SloRadio.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>SloRadio.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>BCAD4A822D3E5F367FBE7AFDD7471D8FFB93684A</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/mikrohard/SloRadio.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>BCAD4A822D3E5F367FBE7AFDD7471D8FFB93684A</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>BCAD4A822D3E5F367FBE7AFDD7471D8FFB93684A</string>
+			<key>IDESourceControlWCCName</key>
+			<string>SloRadio</string>
+		</dict>
+	</array>
+</dict>
+</plist>
