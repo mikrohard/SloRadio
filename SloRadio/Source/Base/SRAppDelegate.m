@@ -1,22 +1,26 @@
 //
-//  AppDelegate.m
+//  SRAppDelegate.m
 //  SloRadio
 //
 //  Created by Jernej Fijačko on 27. 04. 15.
 //  Copyright (c) 2015 Jernej Fijačko. All rights reserved.
 //
 
-#import "AppDelegate.h"
+#import "SRAppDelegate.h"
+#import "SRMainViewController.h"
 
-@interface AppDelegate ()
+@interface SRAppDelegate ()
 
 @end
 
-@implementation AppDelegate
-
+@implementation SRAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
+    SRMainViewController *controller = [[SRMainViewController alloc] init];
+    UINavigationController *navigation = [[UINavigationController alloc] initWithRootViewController:controller];
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    self.window.rootViewController = navigation;
+    [self.window makeKeyAndVisible];
     return YES;
 }
 

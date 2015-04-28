@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  SRAppDelegate.h
 //  SloRadio
 //
 //  Created by Jernej Fijačko on 27. 04. 15.
@@ -8,7 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController
+@interface SRAppDelegate : UIResponder <UIApplicationDelegate>
+
+@property (strong, nonatomic) UIWindow *window;
 
 
 @end

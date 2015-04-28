@@ -1,21 +1,21 @@
 //
-//  ViewController.m
+//  SRMainViewController.m
 //  SloRadio
 //
 //  Created by Jernej Fijačko on 27. 04. 15.
 //  Copyright (c) 2015 Jernej Fijačko. All rights reserved.
 //
 
-#import "ViewController.h"
+#import "SRMainViewController.h"
 #import "SRRadioPlayer.h"
 
-@interface ViewController () {
+@interface SRMainViewController () {
     SRRadioPlayer *_player;
 }
 
 @end
 
-@implementation ViewController
+@implementation SRMainViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];

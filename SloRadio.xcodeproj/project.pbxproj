@@ -8,9 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		C8C8FA381AEEADAD00E5E46C /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = C8C8FA371AEEADAD00E5E46C /* main.mm */; };
-		C8C8FA3B1AEEADAD00E5E46C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C8FA3A1AEEADAD00E5E46C /* AppDelegate.m */; };
-		C8C8FA3E1AEEADAD00E5E46C /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C8FA3D1AEEADAD00E5E46C /* ViewController.m */; };
-		C8C8FA411AEEADAD00E5E46C /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8C8FA3F1AEEADAD00E5E46C /* Main.storyboard */; };
+		C8C8FA3B1AEEADAD00E5E46C /* SRAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C8FA3A1AEEADAD00E5E46C /* SRAppDelegate.m */; };
+		C8C8FA3E1AEEADAD00E5E46C /* SRMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C8FA3D1AEEADAD00E5E46C /* SRMainViewController.m */; };
 		C8C8FA431AEEADAD00E5E46C /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8C8FA421AEEADAD00E5E46C /* Images.xcassets */; };
 		C8C8FA461AEEADAD00E5E46C /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8C8FA441AEEADAD00E5E46C /* LaunchScreen.xib */; };
 		C8C8FA521AEEADAD00E5E46C /* SloRadioTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C8FA511AEEADAD00E5E46C /* SloRadioTests.m */; };
@@ -44,11 +43,10 @@
 		C8C8FA321AEEADAD00E5E46C /* SloRadio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SloRadio.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8C8FA361AEEADAD00E5E46C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C8C8FA371AEEADAD00E5E46C /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = main.mm; path = Source/Base/main.mm; sourceTree = "<group>"; };
-		C8C8FA391AEEADAD00E5E46C /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = Source/Base/AppDelegate.h; sourceTree = "<group>"; };
-		C8C8FA3A1AEEADAD00E5E46C /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = Source/Base/AppDelegate.m; sourceTree = "<group>"; };
-		C8C8FA3C1AEEADAD00E5E46C /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ViewController.h; path = Source/Controllers/ViewController.h; sourceTree = "<group>"; };
-		C8C8FA3D1AEEADAD00E5E46C /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ViewController.m; path = Source/Controllers/ViewController.m; sourceTree = "<group>"; };
-		C8C8FA401AEEADAD00E5E46C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		C8C8FA391AEEADAD00E5E46C /* SRAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SRAppDelegate.h; path = Source/Base/SRAppDelegate.h; sourceTree = "<group>"; };
+		C8C8FA3A1AEEADAD00E5E46C /* SRAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SRAppDelegate.m; path = Source/Base/SRAppDelegate.m; sourceTree = "<group>"; };
+		C8C8FA3C1AEEADAD00E5E46C /* SRMainViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SRMainViewController.h; path = Source/Controllers/SRMainViewController.h; sourceTree = "<group>"; };
+		C8C8FA3D1AEEADAD00E5E46C /* SRMainViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SRMainViewController.m; path = Source/Controllers/SRMainViewController.m; sourceTree = "<group>"; };
 		C8C8FA421AEEADAD00E5E46C /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		C8C8FA451AEEADAD00E5E46C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		C8C8FA4B1AEEADAD00E5E46C /* SloRadioTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SloRadioTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -103,6 +101,33 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C81D32F51AEF816B0076BF01 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				C8C8FA3C1AEEADAD00E5E46C /* SRMainViewController.h */,
+				C8C8FA3D1AEEADAD00E5E46C /* SRMainViewController.m */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
+		C81D32F61AEF81810076BF01 /* Application */ = {
+			isa = PBXGroup;
+			children = (
+				C8C8FA391AEEADAD00E5E46C /* SRAppDelegate.h */,
+				C8C8FA3A1AEEADAD00E5E46C /* SRAppDelegate.m */,
+			);
+			name = Application;
+			sourceTree = "<group>";
+		};
+		C81D32F71AEF81D50076BF01 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				C8C8FA421AEEADAD00E5E46C /* Images.xcassets */,
+				C8C8FA441AEEADAD00E5E46C /* LaunchScreen.xib */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
 		C8C8FA291AEEADAD00E5E46C = {
 			isa = PBXGroup;
 			children = (
@@ -125,14 +150,10 @@
 		C8C8FA341AEEADAD00E5E46C /* SloRadio */ = {
 			isa = PBXGroup;
 			children = (
+				C81D32F61AEF81810076BF01 /* Application */,
+				C81D32F51AEF816B0076BF01 /* Controllers */,
 				C8C8FA5B1AEEAF0100E5E46C /* Player */,
-				C8C8FA391AEEADAD00E5E46C /* AppDelegate.h */,
-				C8C8FA3A1AEEADAD00E5E46C /* AppDelegate.m */,
-				C8C8FA3C1AEEADAD00E5E46C /* ViewController.h */,
-				C8C8FA3D1AEEADAD00E5E46C /* ViewController.m */,
-				C8C8FA3F1AEEADAD00E5E46C /* Main.storyboard */,
-				C8C8FA421AEEADAD00E5E46C /* Images.xcassets */,
-				C8C8FA441AEEADAD00E5E46C /* LaunchScreen.xib */,
+				C81D32F71AEF81D50076BF01 /* Resources */,
 				C8C8FA351AEEADAD00E5E46C /* Supporting Files */,
 			);
 			path = SloRadio;
@@ -274,7 +295,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C8C8FA411AEEADAD00E5E46C /* Main.storyboard in Resources */,
 				C8C8FA461AEEADAD00E5E46C /* LaunchScreen.xib in Resources */,
 				C8C8FA431AEEADAD00E5E46C /* Images.xcassets in Resources */,
 			);
@@ -294,8 +314,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C8C8FA3E1AEEADAD00E5E46C /* ViewController.m in Sources */,
-				C8C8FA3B1AEEADAD00E5E46C /* AppDelegate.m in Sources */,
+				C8C8FA3E1AEEADAD00E5E46C /* SRMainViewController.m in Sources */,
+				C8C8FA3B1AEEADAD00E5E46C /* SRAppDelegate.m in Sources */,
 				C8C8FA381AEEADAD00E5E46C /* main.mm in Sources */,
 				C8C8FA5E1AEEAF5A00E5E46C /* SRRadioPlayer.m in Sources */,
 			);
@@ -320,14 +340,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		C8C8FA3F1AEEADAD00E5E46C /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				C8C8FA401AEEADAD00E5E46C /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		C8C8FA441AEEADAD00E5E46C /* LaunchScreen.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -520,6 +532,7 @@
 				C8C8FA571AEEADAD00E5E46C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		C8C8FA581AEEADAD00E5E46C /* Build configuration list for PBXNativeTarget "SloRadioTests" */ = {
 			isa = XCConfigurationList;
@@ -528,6 +541,7 @@
 				C8C8FA5A1AEEADAD00E5E46C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
