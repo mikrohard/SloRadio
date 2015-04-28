@@ -7,27 +7,31 @@
 //
 
 #import "SRMainViewController.h"
-#import "SRRadioPlayer.h"
+#import "SRLeftMenuViewController.h"
 
-@interface SRMainViewController () {
-    SRRadioPlayer *_player;
-}
+@interface SRMainViewController ()
 
 @end
 
 @implementation SRMainViewController
 
+#pragma mark - Lifecycle
+
 - (void)viewDidLoad {
+    [self setupMenus];
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    NSURL *url = [NSURL URLWithString:@"http://iphone.jernej.org/sloradio/playlist.php?radio=radio_student"];
-    _player = [[SRRadioPlayer alloc] init];
-    [_player playStreamAtUrl:url];
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - Setup
+
+- (void)setupMenus {
+    self.leftMenu = [[SRLeftMenuViewController alloc] initWithStyle:UITableViewStylePlain];
 }
 
 @end
