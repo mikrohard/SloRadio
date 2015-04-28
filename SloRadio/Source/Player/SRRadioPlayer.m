@@ -7,6 +7,7 @@
 //
 
 #import "SRRadioPlayer.h"
+#import "SRRadioStation.h"
 #import <MobileVLCKit/MobileVLCKit.h>
 
 @interface SRRadioPlayer () <VLCMediaDelegate, VLCMediaPlayerDelegate>
@@ -20,6 +21,7 @@
 @implementation SRRadioPlayer
 
 @synthesize state = _state;
+@synthesize currentRadioStation = _currentRadioStation;
 @synthesize delegate = _delegate;
 
 #pragma mark - Singleton
@@ -35,6 +37,11 @@
 
 #pragma mark - Playback control
 
+- (void)playRadioStation:(SRRadioStation *)station {
+    _currentRadioStation = station;
+    [self playStreamAtUrl:station.url];
+}
+
 - (void)playStreamAtUrl:(NSURL *)url {
     self.listPlayer = [[VLCMediaListPlayer alloc] init];
     self.player = self.listPlayer.mediaPlayer;
@@ -43,6 +50,7 @@
     [self registerMedia:media];
     [self.listPlayer setRootMedia:media];
     [self.listPlayer playMedia:media];
+    [self updatePlayerState];
 }
 
 - (void)stop {
@@ -50,6 +58,8 @@
     self.player = nil;
     self.listPlayer = nil;
     [self registerMedia:nil];
+    [self updatePlayerState];
+    _currentRadioStation = nil;
 }
 
 #pragma mark - Register media

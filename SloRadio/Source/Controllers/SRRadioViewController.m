@@ -98,7 +98,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     SRRadioStation *station = [[self stations] objectAtIndex:indexPath.row];
-    [[SRRadioPlayer sharedPlayer] playStreamAtUrl:station.url];
+    [[SRRadioPlayer sharedPlayer] playRadioStation:station];
 }
 
 @end
