@@ -22,6 +22,17 @@
 @synthesize state = _state;
 @synthesize delegate = _delegate;
 
+#pragma mark - Singleton
+
++ (SRRadioPlayer *)sharedPlayer {
+    static SRRadioPlayer *sharedRadioPlayer;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedRadioPlayer = [[self alloc] init];
+    });
+    return sharedRadioPlayer;
+}
+
 #pragma mark - Playback control
 
 - (void)playStreamAtUrl:(NSURL *)url {

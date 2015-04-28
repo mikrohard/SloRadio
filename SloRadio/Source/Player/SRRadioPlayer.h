@@ -24,6 +24,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, readonly) SRRadioPlayerState state;
 @property (nonatomic, weak) id <SRRadioPlayerDelegate> delegate;
 
++ (SRRadioPlayer *)sharedPlayer;
 - (void)playStreamAtUrl:(NSURL *)url;
 - (void)stop;
 
