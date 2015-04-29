@@ -109,8 +109,8 @@
 
 #pragma mark - VLCMediaDelegate
 
-- (void)media:(VLCMedia *)aMedia metaValueChangedFrom:(id)oldValue forKey:(NSString *)key {
-    NSLog(@"metadata changed %@", [aMedia.metaDictionary objectForKey:key]);
+- (void)mediaMetaDataDidChange:(VLCMedia *)aMedia {
+    NSLog(@"metadata changed %@", aMedia.metaDictionary);
 }
 
 - (void)mediaDidFinishParsing:(VLCMedia *)aMedia {
