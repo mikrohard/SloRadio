@@ -34,4 +34,13 @@
     self.leftMenu = [[SRLeftMenuViewController alloc] initWithStyle:UITableViewStylePlain];
 }
 
+- (void)configureLeftMenuButton:(UIButton *)button {
+    UIImage *menuIcon = [[UIImage imageNamed:@"MenuIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    CGRect frame = button.frame;
+    frame.origin = CGPointMake(0, 0);
+    frame.size = menuIcon.size;
+    button.frame = frame;
+    [button setImage:menuIcon forState:UIControlStateNormal];
+}
+
 @end

@@ -28,6 +28,7 @@
     self = [super initWithStyle:style];
     if (self) {
         [self registerForNotifications];
+        self.title = @"Radio stations";
     }
     return self;
 }
@@ -36,6 +37,8 @@
     [super loadView];
     [self setupNavigationBar];
     [self setupToolbar];
+    self.tableView.separatorInset = UIEdgeInsetsMake(0, 15.f, 0, 0);
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
 }
 
 - (void)viewDidLoad {
@@ -76,6 +79,8 @@
 - (void)setupNavigationBar {
     [self.navigationController.navigationBar setBarTintColor:[SRAppearance mainColor]];
     [self.navigationController.navigationBar setTintColor:[SRAppearance navigationBarContentColor]];
+    [self.navigationController.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName: [SRAppearance navigationBarContentColor]}];
+    [self updateNavigationButtons];
 }
 
 #pragma mark - Audio session
@@ -108,41 +113,62 @@
     }
 }
 
-#pragma mark - Toolbar
+#pragma mark - Toolbar & navigation items
 
 - (void)updateToolbarItems {
     UIBarButtonItem *middleItem = nil;
-    switch ([[SRRadioPlayer sharedPlayer] state]) {
-        case SRRadioPlayerStateStopped:
-        case SRRadioPlayerStateError:
-        case SRRadioPlayerStatePaused:
-        {
-            // play button
-            middleItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay target:self action:@selector(playButtonPressed:)];
-            break;
+    if (self.tableView.editing) {
+        middleItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed:)];
+    }
+    else {
+        switch ([[SRRadioPlayer sharedPlayer] state]) {
+            case SRRadioPlayerStateStopped:
+            case SRRadioPlayerStateError:
+            case SRRadioPlayerStatePaused:
+            {
+                // play button
+                middleItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay target:self action:@selector(playButtonPressed:)];
+                break;
+            }
+            case SRRadioPlayerStateOpening:
+            case SRRadioPlayerStateBuffering:
+            {
+                // loading indicator
+                UIActivityIndicatorView *loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+                [loadingIndicator setColor:[SRAppearance mainColor]];
+                [loadingIndicator startAnimating];
+                middleItem = [[UIBarButtonItem alloc] initWithCustomView:loadingIndicator];
+                break;
+            }
+            case SRRadioPlayerStatePlaying:
+            {
+                // pause button
+                middleItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:self action:@selector(pauseButtonPressed:)];
+                break;
+            }
+            default:
+                break;
         }
-        case SRRadioPlayerStateOpening:
-        case SRRadioPlayerStateBuffering:
-        {
-            // loading indicator
-            UIActivityIndicatorView *loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-            [loadingIndicator setColor:[SRAppearance mainColor]];
-            [loadingIndicator startAnimating];
-            middleItem = [[UIBarButtonItem alloc] initWithCustomView:loadingIndicator];
-            break;
-        }
-        case SRRadioPlayerStatePlaying:
-        {
-            // pause button
-            middleItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:self action:@selector(pauseButtonPressed:)];
-            break;
-        }
-        default:
-            break;
     }
     UIBarButtonItem *flexibleItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     NSArray *items = @[flexibleItem, middleItem, flexibleItem];
     [self setToolbarItems:items];
+}
+
+- (void)updateNavigationButtons {
+    if (self.tableView.editing) {
+        UIBarButtonItem *doneItem = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(doneButtonPressed:)];
+        self.navigationItem.rightBarButtonItem = doneItem;
+    }
+    else {
+        UIImage *editIcon = [[UIImage imageNamed:@"EditIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+        UIButton *editButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        [editButton setImage:editIcon forState:UIControlStateNormal];
+        [editButton addTarget:self action:@selector(editButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+        editButton.frame = CGRectMake(0, 0, editIcon.size.width, editIcon.size.height);
+        UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithCustomView:editButton];
+        self.navigationItem.rightBarButtonItem = item;
+    }
 }
 
 #pragma mark - Notifications
@@ -226,6 +252,22 @@
     return cell;
 }
 
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
+    return YES;
+}
+
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
+    return YES;
+}
+
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
+
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+
+}
+
 #pragma mark - TableView Delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -248,6 +290,27 @@
 
 - (void)pauseButtonPressed:(id)sender {
     [self stopAction];
+}
+
+- (void)editButtonPressed:(id)sender {
+    if (!self.tableView.editing) {
+        [self.tableView setEditing:YES animated:YES];
+    }
+    [self stopAction];
+    [self updateNavigationButtons];
+    [self updateToolbarItems];
+}
+
+- (void)doneButtonPressed:(id)sender {
+    if (self.tableView.editing) {
+        [self.tableView setEditing:NO animated:YES];
+    }
+    [self updateNavigationButtons];
+    [self updateToolbarItems];
+}
+
+- (void)addButtonPressed:(id)sender {
+
 }
 
 #pragma mark - Common actions
