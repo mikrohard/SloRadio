@@ -272,10 +272,10 @@
     NSString *nowPlaying = [player.metaData objectForKey:SRRadioPlayerMetaDataNowPlayingKey];
     NSString *title = [player.metaData objectForKey:SRRadioPlayerMetaDataTitleKey];
     NSString *artist = [player.metaData objectForKey:SRRadioPlayerMetaDataArtistKey];
-    if (!nowPlaying && title && artist) {
+    if (!nowPlaying.length && title.length && artist.length) {
         nowPlaying = [NSString stringWithFormat:@"%@ - %@", [artist capitalizedString], [title capitalizedString]];
     }
-    if (nowPlaying) {
+    if (nowPlaying.length) {
         [nowPlayingInfo setObject:[nowPlaying capitalizedString] forKey:MPMediaItemPropertyTitle];
     }
     [infoCenter setNowPlayingInfo:nowPlayingInfo];
