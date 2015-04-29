@@ -182,6 +182,17 @@
 
 - (void)radioPlayer:(SRRadioPlayer *)player didChangeState:(SRRadioPlayerState)state {
     [self updateToolbarItems];
+    if (state == SRRadioPlayerStateError) {
+        // display error
+        NSString *message = [NSString stringWithFormat:@"Unable to play \"%@\"", [[[SRRadioPlayer sharedPlayer] currentRadioStation] name]];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
+                                                        message:message
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
+        [[SRRadioPlayer sharedPlayer] stop];
+    }
 }
 
 @end
