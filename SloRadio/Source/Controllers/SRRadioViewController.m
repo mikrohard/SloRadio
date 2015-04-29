@@ -10,7 +10,9 @@
 #import "SRDataManager.h"
 #import "SRRadioPlayer.h"
 #import "SRRadioStation.h"
-#import <AVFoundation/AVFoundation.h>
+
+@import AVFoundation;
+@import MediaPlayer;
 
 @interface SRRadioViewController () <SRRadioPlayerDelegate> {
     SRRadioPlayer *_player;
@@ -259,6 +261,26 @@
     [[SRRadioPlayer sharedPlayer] stop];
 }
 
+- (void)updateNowPlayingInfo {
+    MPNowPlayingInfoCenter *infoCenter = [MPNowPlayingInfoCenter defaultCenter];
+    NSMutableDictionary *nowPlayingInfo = [NSMutableDictionary dictionary];
+    SRRadioPlayer *player = [SRRadioPlayer sharedPlayer];
+    SRRadioStation *playingRadioStation = [player currentRadioStation];
+    if (playingRadioStation.name) {
+        [nowPlayingInfo setObject:playingRadioStation.name forKey:MPMediaItemPropertyArtist];
+    }
+    NSString *nowPlaying = [player.metaData objectForKey:SRRadioPlayerMetaDataNowPlayingKey];
+    NSString *title = [player.metaData objectForKey:SRRadioPlayerMetaDataTitleKey];
+    NSString *artist = [player.metaData objectForKey:SRRadioPlayerMetaDataArtistKey];
+    if (!nowPlaying && title && artist) {
+        nowPlaying = [NSString stringWithFormat:@"%@ - %@", [artist capitalizedString], [title capitalizedString]];
+    }
+    if (nowPlaying) {
+        [nowPlayingInfo setObject:[nowPlaying capitalizedString] forKey:MPMediaItemPropertyTitle];
+    }
+    [infoCenter setNowPlayingInfo:nowPlayingInfo];
+}
+
 #pragma mark - SRRadioPlayerDelegate
 
 - (void)radioPlayer:(SRRadioPlayer *)player didChangeState:(SRRadioPlayerState)state {
@@ -274,6 +296,10 @@
         [alert show];
         [self stopAction];
     }
+}
+
+- (void)radioPlayer:(SRRadioPlayer *)player didChangeMetaData:(NSDictionary *)metadata {
+    [self updateNowPlayingInfo];
 }
 
 #pragma mark - Remote control events

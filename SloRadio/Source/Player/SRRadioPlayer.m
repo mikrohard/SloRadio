@@ -10,6 +10,11 @@
 #import "SRRadioStation.h"
 #import <MobileVLCKit/MobileVLCKit.h>
 
+NSString * const SRRadioPlayerMetaDataArtistKey = @"SRRadioPlayerMetaDataArtistKey";
+NSString * const SRRadioPlayerMetaDataTitleKey = @"SRRadioPlayerMetaDataTitleKey";
+NSString * const SRRadioPlayerMetaDataGenreKey = @"SRRadioPlayerMetaDataGenreKey";
+NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNowPlayingKey";
+
 @interface SRRadioPlayer () <VLCMediaDelegate, VLCMediaPlayerDelegate>
 
 @property (nonatomic, strong) VLCMediaListPlayer *listPlayer;
@@ -22,6 +27,7 @@
 
 @synthesize state = _state;
 @synthesize currentRadioStation = _currentRadioStation;
+@synthesize metaData = _metaData;
 @synthesize delegate = _delegate;
 
 #pragma mark - Singleton
@@ -60,6 +66,34 @@
     [self registerMedia:nil];
     [self updatePlayerState];
     _currentRadioStation = nil;
+    [self updateMetaData];
+}
+
+#pragma mark - Meta data
+
+- (void)updateMetaData {
+    NSDictionary *mediaMetaData = self.media.metaDictionary;
+    NSString *genre = [mediaMetaData objectForKey:VLCMetaInformationGenre];
+    NSString *title = [mediaMetaData objectForKey:VLCMetaInformationTitle];
+    NSString *artist = [mediaMetaData objectForKey:VLCMetaInformationArtist];
+    NSString *nowPlaying = [mediaMetaData objectForKey:VLCMetaInformationNowPlaying];
+    NSMutableDictionary *metaData = [NSMutableDictionary dictionary];
+    if (genre) {
+        [metaData setObject:genre forKey:SRRadioPlayerMetaDataGenreKey];
+    }
+    if (title) {
+        [metaData setObject:title forKey:SRRadioPlayerMetaDataTitleKey];
+    }
+    if (artist) {
+        [metaData setObject:artist forKey:SRRadioPlayerMetaDataArtistKey];
+    }
+    if (nowPlaying) {
+        [metaData setObject:nowPlaying forKey:SRRadioPlayerMetaDataNowPlayingKey];
+    }
+    _metaData = [NSDictionary dictionaryWithDictionary:metaData];
+    if ([self.delegate respondsToSelector:@selector(radioPlayer:didChangeMetaData:)]) {
+        [self.delegate radioPlayer:self didChangeMetaData:self.metaData];
+    }
 }
 
 #pragma mark - Register media
@@ -91,8 +125,9 @@
     if (object == self.media && [keyPath isEqualToString:@"state"]) {
         VLCMediaState oldMediaState = [[change objectForKey:NSKeyValueChangeOldKey] integerValue];
         VLCMediaState newMediaState = [[change objectForKey:NSKeyValueChangeNewKey] integerValue];
-        NSLog(@"Media state changed from %ld to %ld", oldMediaState, newMediaState);
-        [self updatePlayerState];
+        if (oldMediaState != newMediaState) {
+            [self updatePlayerState];
+        }
     }
 }
 
@@ -110,12 +145,11 @@
 #pragma mark - VLCMediaDelegate
 
 - (void)mediaMetaDataDidChange:(VLCMedia *)aMedia {
-    NSLog(@"metadata changed %@", aMedia.metaDictionary);
+    [self updateMetaData];
 }
 
 - (void)mediaDidFinishParsing:(VLCMedia *)aMedia {
-    NSLog(@"finished parsing media");
-    NSLog(@"metadata dict %@", self.player.media.metaDictionary);
+    [self updateMetaData];
 }
 
 #pragma mark - Player state handling

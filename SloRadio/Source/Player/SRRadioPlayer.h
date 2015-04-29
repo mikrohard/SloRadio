@@ -17,6 +17,11 @@ typedef enum : NSUInteger {
     SRRadioPlayerStateError,
 } SRRadioPlayerState;
 
+extern NSString * const SRRadioPlayerMetaDataArtistKey;
+extern NSString * const SRRadioPlayerMetaDataTitleKey;
+extern NSString * const SRRadioPlayerMetaDataGenreKey;
+extern NSString * const SRRadioPlayerMetaDataNowPlayingKey;
+
 @protocol SRRadioPlayerDelegate;
 
 @class SRRadioStation;
@@ -25,6 +30,7 @@ typedef enum : NSUInteger {
 
 @property (nonatomic, readonly) SRRadioPlayerState state;
 @property (nonatomic, readonly) SRRadioStation *currentRadioStation;
+@property (nonatomic, readonly) NSDictionary *metaData;
 @property (nonatomic, weak) id <SRRadioPlayerDelegate> delegate;
 
 + (SRRadioPlayer *)sharedPlayer;
@@ -39,5 +45,6 @@ typedef enum : NSUInteger {
 @optional
 
 - (void)radioPlayer:(SRRadioPlayer *)player didChangeState:(SRRadioPlayerState)state;
+- (void)radioPlayer:(SRRadioPlayer *)player didChangeMetaData:(NSDictionary *)metadata;
 
 @end
