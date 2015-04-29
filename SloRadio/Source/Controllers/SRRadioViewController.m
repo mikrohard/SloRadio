@@ -327,11 +327,11 @@
 - (void)updateNowPlayingInfo {
     MPNowPlayingInfoCenter *infoCenter = [MPNowPlayingInfoCenter defaultCenter];
     NSMutableDictionary *nowPlayingInfo = [NSMutableDictionary dictionary];
-    SRRadioPlayer *player = [SRRadioPlayer sharedPlayer];
-    SRRadioStation *playingRadioStation = [player currentRadioStation];
-    if (playingRadioStation.name) {
-        [nowPlayingInfo setObject:playingRadioStation.name forKey:MPMediaItemPropertyArtist];
+    SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
+    if (selectedStation.name) {
+        [nowPlayingInfo setObject:selectedStation.name forKey:MPMediaItemPropertyArtist];
     }
+    SRRadioPlayer *player = [SRRadioPlayer sharedPlayer];
     NSString *nowPlaying = [player.metaData objectForKey:SRRadioPlayerMetaDataNowPlayingKey];
     NSString *title = [player.metaData objectForKey:SRRadioPlayerMetaDataTitleKey];
     NSString *artist = [player.metaData objectForKey:SRRadioPlayerMetaDataArtistKey];
