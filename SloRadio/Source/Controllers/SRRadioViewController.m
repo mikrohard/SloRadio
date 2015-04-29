@@ -10,6 +10,7 @@
 #import "SRDataManager.h"
 #import "SRRadioPlayer.h"
 #import "SRRadioStation.h"
+#import <AVFoundation/AVFoundation.h>
 
 @interface SRRadioViewController () <SRRadioPlayerDelegate> {
     SRRadioPlayer *_player;
@@ -43,11 +44,15 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    [self setupAudioSession];
+    [self startRemoteControlTracking];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [[SRRadioPlayer sharedPlayer] stop];
+    [self endRemoteControlTracking];
+    [self endAudioSession];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -69,6 +74,36 @@
 - (void)setupNavigationBar {
     [self.navigationController.navigationBar setBarTintColor:[SRAppearance mainColor]];
     [self.navigationController.navigationBar setTintColor:[SRAppearance navigationBarContentColor]];
+}
+
+#pragma mark - Audio session
+
+- (void)setupAudioSession
+{
+    NSError *error = nil;
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+    BOOL ok = [session setCategory:AVAudioSessionCategoryPlayback error:&error];
+    if (!ok) {
+        NSLog(@"Could not set audiosession category. Error: %@", error);
+    }
+    ok = [session setActive:YES error:&error];
+    if (!ok) {
+        NSLog(@"Could not set audiosession active. Error: %@", error);
+    }
+}
+
+- (void)endAudioSession
+{
+    NSError *error = nil;
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+    BOOL ok = [session setCategory:AVAudioSessionCategoryAmbient error:&error];
+    if (!ok) {
+        NSLog(@"Could not set audiosession category. Error: %@", error);
+    }
+    ok = [session setActive:YES error:&error];
+    if (!ok) {
+        NSLog(@"Could not set audiosession active. Error: %@", error);
+    }
 }
 
 #pragma mark - Toolbar
@@ -128,6 +163,42 @@
     return [[SRDataManager sharedManager] stations];
 }
 
+- (void)selectStationWithOffset:(NSInteger)offset {
+    SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
+    NSInteger currentIndex = NSNotFound;
+    NSArray *stations = [self stations];
+    for (SRRadioStation *station in stations) {
+        if (station.stationId == selectedStation.stationId) {
+            currentIndex = [stations indexOfObject:station];
+            break;
+        }
+    }
+    SRRadioStation *nextStation = nil;
+    if (currentIndex != NSNotFound) {
+        NSInteger nextIndex = currentIndex + offset;
+        if (nextIndex < 0) {
+            nextIndex += stations.count;
+        }
+        else if (nextIndex >= stations.count) {
+            nextIndex -= stations.count;
+        }
+        nextStation = stations[nextIndex];
+    }
+    else if (stations.count > 0) {
+        nextStation = stations[0];
+    }
+    [[SRDataManager sharedManager] selectRadioStation:nextStation];
+    [self.tableView reloadData];
+}
+
+- (void)selectNextStation {
+    [self selectStationWithOffset:1];
+}
+
+- (void)selectPreviousStation {
+    [self selectStationWithOffset:-1];
+}
+
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -170,11 +241,21 @@
 #pragma mark - Button actions
 
 - (void)playButtonPressed:(id)sender {
+    [self playAction];
+}
+
+- (void)pauseButtonPressed:(id)sender {
+    [self stopAction];
+}
+
+#pragma mark - Common actions
+
+- (void)playAction {
     SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
     [[SRRadioPlayer sharedPlayer] playRadioStation:selectedStation];
 }
 
-- (void)pauseButtonPressed:(id)sender {
+- (void)stopAction {
     [[SRRadioPlayer sharedPlayer] stop];
 }
 
@@ -191,8 +272,79 @@
                                               cancelButtonTitle:@"OK"
                                               otherButtonTitles:nil];
         [alert show];
-        [[SRRadioPlayer sharedPlayer] stop];
+        [self stopAction];
     }
+}
+
+#pragma mark - Remote control events
+
+- (void)startRemoteControlTracking {
+    [self becomeFirstResponder];
+    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+}
+
+- (void)endRemoteControlTracking {
+    [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
+    [self resignFirstResponder];
+}
+
+- (BOOL)canBecomeFirstResponder {
+    return YES;
+}
+
+- (void)remoteControlReceivedWithEvent:(UIEvent *)event {
+    if (event.type == UIEventTypeRemoteControl) {
+        switch (event.subtype) {
+            case UIEventSubtypeRemoteControlPlay:
+                [self remotePlay];
+                break;
+            case UIEventSubtypeRemoteControlPause:
+            case UIEventSubtypeRemoteControlStop:
+                [self remoteStop];
+                break;
+            case UIEventSubtypeRemoteControlTogglePlayPause:
+                [self remoteTogglePlayPause];
+                break;
+            case UIEventSubtypeRemoteControlNextTrack:
+                [self remotePlayNext];
+                break;
+            case UIEventSubtypeRemoteControlPreviousTrack:
+                [self remotePlayPrevious];
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+- (void)remotePlay {
+    [self playAction];
+}
+
+- (void)remoteStop {
+    [self stopAction];
+}
+
+- (void)remoteTogglePlayPause {
+    SRRadioPlayerState state = [[SRRadioPlayer sharedPlayer] state];
+    if (state == SRRadioPlayerStateBuffering ||
+        state == SRRadioPlayerStateOpening ||
+        state == SRRadioPlayerStatePlaying) {
+        [self stopAction];
+    }
+    else {
+        [self playAction];
+    }
+}
+
+- (void)remotePlayNext {
+    [self selectNextStation];
+    [self playAction];
+}
+
+- (void)remotePlayPrevious {
+    [self selectPreviousStation];
+    [self playAction];
 }
 
 @end
