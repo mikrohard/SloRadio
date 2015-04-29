@@ -19,6 +19,7 @@
     SRMainViewController *controller = [[SRMainViewController alloc] init];
     UINavigationController *navigation = [[UINavigationController alloc] initWithRootViewController:controller];
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    self.window.tintColor = [SRAppearance mainColor];
     self.window.rootViewController = navigation;
     [self.window makeKeyAndVisible];
     return YES;

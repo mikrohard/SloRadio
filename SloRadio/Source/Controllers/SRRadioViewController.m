@@ -11,7 +11,7 @@
 #import "SRRadioPlayer.h"
 #import "SRRadioStation.h"
 
-@interface SRRadioViewController () {
+@interface SRRadioViewController () <SRRadioPlayerDelegate> {
     SRRadioPlayer *_player;
 }
 
@@ -29,9 +29,16 @@
     return self;
 }
 
+- (void)loadView {
+    [super loadView];
+    [self setupNavigationBar];
+    [self setupToolbar];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     [[SRDataManager sharedManager] loadStations];
+    [[SRRadioPlayer sharedPlayer] setDelegate:self];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -50,6 +57,55 @@
 
 - (void)dealloc {
     [self unregisterFromNotifications];
+}
+
+#pragma mark - Setup
+
+- (void)setupToolbar {
+    self.navigationController.toolbarHidden = NO;
+    [self updateToolbarItems];
+}
+
+- (void)setupNavigationBar {
+    [self.navigationController.navigationBar setBarTintColor:[SRAppearance mainColor]];
+    [self.navigationController.navigationBar setTintColor:[SRAppearance navigationBarContentColor]];
+}
+
+#pragma mark - Toolbar
+
+- (void)updateToolbarItems {
+    UIBarButtonItem *middleItem = nil;
+    switch ([[SRRadioPlayer sharedPlayer] state]) {
+        case SRRadioPlayerStateStopped:
+        case SRRadioPlayerStateError:
+        case SRRadioPlayerStatePaused:
+        {
+            // play button
+            middleItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay target:self action:@selector(playButtonPressed:)];
+            break;
+        }
+        case SRRadioPlayerStateOpening:
+        case SRRadioPlayerStateBuffering:
+        {
+            // loading indicator
+            UIActivityIndicatorView *loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+            [loadingIndicator setColor:[SRAppearance mainColor]];
+            [loadingIndicator startAnimating];
+            middleItem = [[UIBarButtonItem alloc] initWithCustomView:loadingIndicator];
+            break;
+        }
+        case SRRadioPlayerStatePlaying:
+        {
+            // pause button
+            middleItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:self action:@selector(pauseButtonPressed:)];
+            break;
+        }
+        default:
+            break;
+    }
+    UIBarButtonItem *flexibleItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    NSArray *items = @[flexibleItem, middleItem, flexibleItem];
+    [self setToolbarItems:items];
 }
 
 #pragma mark - Notifications
@@ -90,15 +146,42 @@
     if (!cell) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
     }
-    cell.textLabel.text = [[[self stations] objectAtIndex:indexPath.row] name];
+    SRRadioStation *station = [[self stations] objectAtIndex:indexPath.row];
+    SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
+    cell.textLabel.text = station.name;
+    cell.accessoryType = station.stationId == selectedStation.stationId ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
     return cell;
 }
 
 #pragma mark - TableView Delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    for (UITableViewCell *cell in tableView.visibleCells) {
+        cell.accessoryType = [tableView indexPathForCell:cell].row == indexPath.row ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    }
     SRRadioStation *station = [[self stations] objectAtIndex:indexPath.row];
-    [[SRRadioPlayer sharedPlayer] playRadioStation:station];
+    [[SRDataManager sharedManager] selectRadioStation:station];
+    if ([[SRRadioPlayer sharedPlayer] currentRadioStation] != nil) {
+        [[SRRadioPlayer sharedPlayer] playRadioStation:station];
+    }
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+#pragma mark - Button actions
+
+- (void)playButtonPressed:(id)sender {
+    SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
+    [[SRRadioPlayer sharedPlayer] playRadioStation:selectedStation];
+}
+
+- (void)pauseButtonPressed:(id)sender {
+    [[SRRadioPlayer sharedPlayer] stop];
+}
+
+#pragma mark - SRRadioPlayerDelegate
+
+- (void)radioPlayer:(SRRadioPlayer *)player didChangeState:(SRRadioPlayerState)state {
+    [self updateToolbarItems];
 }
 
 @end

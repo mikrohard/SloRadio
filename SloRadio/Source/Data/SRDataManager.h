@@ -10,11 +10,16 @@
 
 extern NSString * const SRDataManagerDidLoadStations;
 
+@class SRRadioStation;
+
 @interface SRDataManager : NSObject
 
 @property (nonatomic, readonly) NSArray *stations;
+@property (nonatomic, readonly) SRRadioStation *selectedRadioStation;
 
 + (SRDataManager *)sharedManager;
+
+- (void)selectRadioStation:(SRRadioStation *)station;
 - (void)loadStations;
 
 @end

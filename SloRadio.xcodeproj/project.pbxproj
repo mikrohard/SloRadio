@@ -16,6 +16,7 @@
 		C81D330F1AEF83920076BF01 /* UIViewController+AMSlideMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D33081AEF83920076BF01 /* UIViewController+AMSlideMenu.m */; };
 		C81D33121AEF83CE0076BF01 /* SRLeftMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D33111AEF83CE0076BF01 /* SRLeftMenuViewController.m */; };
 		C81D33171AEF84900076BF01 /* SRRadioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D33161AEF84900076BF01 /* SRRadioViewController.m */; };
+		C837454E1AF11715002EBB84 /* SRAppearance.m in Sources */ = {isa = PBXBuildFile; fileRef = C837454D1AF11715002EBB84 /* SRAppearance.m */; };
 		C8B1D3901AEFF17300A5E0A0 /* MBBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */; };
 		C8B1D3911AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3751AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m */; };
 		C8B1D3921AEFF17300A5E0A0 /* MBHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3771AEFF17300A5E0A0 /* MBHTTPRequest.m */; };
@@ -84,6 +85,8 @@
 		C81D33151AEF84900076BF01 /* SRRadioViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRRadioViewController.h; path = Source/Controllers/SRRadioViewController.h; sourceTree = "<group>"; };
 		C81D33161AEF84900076BF01 /* SRRadioViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRRadioViewController.m; path = Source/Controllers/SRRadioViewController.m; sourceTree = "<group>"; };
 		C81D33181AEF86D20076BF01 /* SRPrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SRPrefixHeader.pch; path = Source/Base/SRPrefixHeader.pch; sourceTree = "<group>"; };
+		C837454C1AF11715002EBB84 /* SRAppearance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRAppearance.h; path = Source/Appearance/SRAppearance.h; sourceTree = "<group>"; };
+		C837454D1AF11715002EBB84 /* SRAppearance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRAppearance.m; path = Source/Appearance/SRAppearance.m; sourceTree = "<group>"; };
 		C8B1D3711AEFF17300A5E0A0 /* MBBaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequest.h; path = Libraries/MBRequest/MBBaseRequest.h; sourceTree = "<group>"; };
 		C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBBaseRequest.m; path = Libraries/MBRequest/MBBaseRequest.m; sourceTree = "<group>"; };
 		C8B1D3731AEFF17300A5E0A0 /* MBBaseRequestSubclass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequestSubclass.h; path = Libraries/MBRequest/MBBaseRequestSubclass.h; sourceTree = "<group>"; };
@@ -259,6 +262,15 @@
 			name = Radio;
 			sourceTree = "<group>";
 		};
+		C837454B1AF116D1002EBB84 /* Appearance */ = {
+			isa = PBXGroup;
+			children = (
+				C837454C1AF11715002EBB84 /* SRAppearance.h */,
+				C837454D1AF11715002EBB84 /* SRAppearance.m */,
+			);
+			name = Appearance;
+			sourceTree = "<group>";
+		};
 		C8B1D3701AEFF16700A5E0A0 /* MBRequest */ = {
 			isa = PBXGroup;
 			children = (
@@ -332,6 +344,7 @@
 			isa = PBXGroup;
 			children = (
 				C81D32F61AEF81810076BF01 /* Application */,
+				C837454B1AF116D1002EBB84 /* Appearance */,
 				C81D32F51AEF816B0076BF01 /* Controllers */,
 				C8C8FA5B1AEEAF0100E5E46C /* Player */,
 				C8B1D39D1AEFF1F300A5E0A0 /* Data */,
@@ -511,6 +524,7 @@
 				C8B1D3961AEFF17300A5E0A0 /* MBNetworkActivityIndicatorManager.m in Sources */,
 				C8C8FA3E1AEEADAD00E5E46C /* SRMainViewController.m in Sources */,
 				C81D330E1AEF83920076BF01 /* AMSlideMenuRightTableViewController.m in Sources */,
+				C837454E1AF11715002EBB84 /* SRAppearance.m in Sources */,
 				C8B1D3931AEFF17300A5E0A0 /* MBImageRequest.m in Sources */,
 				C8B1D39A1AEFF17300A5E0A0 /* NSDictionary+MBRequest.m in Sources */,
 				C81D33121AEF83CE0076BF01 /* SRLeftMenuViewController.m in Sources */,

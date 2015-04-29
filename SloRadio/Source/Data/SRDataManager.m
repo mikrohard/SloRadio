@@ -15,6 +15,7 @@ NSString * const SRDataManagerDidLoadStations = @"SRDataManagerDidLoadStations";
 @implementation SRDataManager
 
 @synthesize stations = _stations;
+@synthesize selectedRadioStation = _selectedRadioStation;
 
 #pragma mark - Singleton
 
@@ -47,9 +48,18 @@ NSString * const SRDataManagerDidLoadStations = @"SRDataManagerDidLoadStations";
                 [array addObject:station];
             }
             _stations = [NSArray arrayWithArray:array];
+            if (!_selectedRadioStation && _stations.count > 0) {
+                [self selectRadioStation:_stations[0]];
+            }
             [[NSNotificationCenter defaultCenter] postNotificationName:SRDataManagerDidLoadStations object:self];
         }
     }];
+}
+
+#pragma mark - Selected station
+
+- (void)selectRadioStation:(SRRadioStation *)station {
+    _selectedRadioStation = station;
 }
 
 @end
