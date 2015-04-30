@@ -211,7 +211,7 @@ static NSString * const SRLegacyStationNameKey = @"ime";
 
 - (void)deleteRadioStation:(SRRadioStation *)station {
     BOOL isCustomStation = station.stationId >= SRDataManagerCustomStationIdOffset;
-    NSMutableArray *array = [NSMutableArray arrayWithArray:self.stations];
+    NSMutableArray *array = [NSMutableArray arrayWithArray:self.allStations];
     SRRadioStation *stationToDelete = nil;
     for (SRRadioStation *existingStation in array) {
         if (existingStation.stationId == station.stationId) {
