@@ -228,6 +228,9 @@ static NSString * const SRLegacyStationNameKey = @"ime";
         stationToDelete.hidden = YES;
     }
     self.allStations = array;
+    if (self.selectedRadioStation.stationId == station.stationId) {
+        [self selectInitialRadioStation];
+    }
     [self setStationsCustomized:YES];
 }
 

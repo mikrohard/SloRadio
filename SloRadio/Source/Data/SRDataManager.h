@@ -25,5 +25,4 @@ extern NSString * const SRDataManagerDidLoadStations;
 - (void)selectRadioStation:(SRRadioStation *)station;
 - (void)loadStations;
 
-
 @end

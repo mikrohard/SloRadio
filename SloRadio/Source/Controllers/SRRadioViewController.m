@@ -269,8 +269,31 @@
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         @synchronized(self) {
             SRRadioStation *station = [[self stations] objectAtIndex:indexPath.row];
+            BOOL stationWasSelected = station.stationId == [[SRDataManager sharedManager] selectedRadioStation].stationId;
             [[SRDataManager sharedManager] deleteRadioStation:station];
             [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+            if (station.stationId == [[SRRadioPlayer sharedPlayer] currentRadioStation].stationId) {
+                // deleted station currently playing... stop it
+                [self stopAction];
+            }
+            if (stationWasSelected) {
+                SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
+                if (selectedStation) {
+                    NSIndexPath *selectedIndexPath = nil;
+                    NSArray *stations = [self stations];
+                    for (SRRadioStation *existingStation in stations) {
+                        if (existingStation.stationId == selectedStation.stationId) {
+                            selectedIndexPath = [NSIndexPath indexPathForRow:[stations indexOfObject:existingStation] inSection:0];
+                            break;
+                        }
+                    }
+                    if (selectedIndexPath) {
+                        for (UITableViewCell *cell in tableView.visibleCells) {
+                            cell.accessoryType = [tableView indexPathForCell:cell].row == selectedIndexPath.row ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+                        }
+                    }
+                }
+            }
         }
     }
 }
