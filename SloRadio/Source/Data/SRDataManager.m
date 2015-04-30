@@ -11,6 +11,7 @@
 #import "SRRadioStation.h"
 
 NSString * const SRDataManagerDidLoadStations = @"SRDataManagerDidLoadStations";
+NSString * const SRDataManagerDidChangeStations = @"SRDataManagerDidChangeStations";
 
 static NSInteger const SRDataManagerCustomStationIdOffset = 1000000;
 
@@ -81,7 +82,7 @@ static NSString * const SRLegacyStationNameKey = @"ime";
         NSMutableArray *allStations = [NSMutableArray arrayWithArray:self.allStations];
         for (SRRadioStation *station in allStations) {
             // leave custom stations as they are
-            BOOL isCustomStation = station.stationId >= SRDataManagerCustomStationIdOffset;
+            BOOL isCustomStation = [self isCustomRadioStation:station];
             // leave hidden stations hidden (even if removed)
             BOOL remove = !station.hidden && !isCustomStation;
             for (SRRadioStation *existingStation in stations) {
@@ -203,14 +204,16 @@ static NSString * const SRLegacyStationNameKey = @"ime";
 }
 
 - (void)addRadioStation:(SRRadioStation *)station {
-    NSMutableArray *array = [NSMutableArray arrayWithArray:self.stations];
+    station.stationId = [self nextCustomRadioStationId];
+    NSMutableArray *array = [NSMutableArray arrayWithArray:self.allStations];
     [array addObject:station];
     self.allStations = array;
     [self setStationsCustomized:YES];
+    [[NSNotificationCenter defaultCenter] postNotificationName:SRDataManagerDidChangeStations object:self];
 }
 
 - (void)deleteRadioStation:(SRRadioStation *)station {
-    BOOL isCustomStation = station.stationId >= SRDataManagerCustomStationIdOffset;
+    BOOL isCustomStation = [self isCustomRadioStation:station];
     NSMutableArray *array = [NSMutableArray arrayWithArray:self.allStations];
     SRRadioStation *stationToDelete = nil;
     for (SRRadioStation *existingStation in array) {
@@ -245,6 +248,13 @@ static NSString * const SRLegacyStationNameKey = @"ime";
     }
     [array removeObject:stationToMove];
     [array insertObject:stationToMove atIndex:index];
+    // don't forget about hidden stations otherwise they'll get visible again
+    NSArray *allStations = [self.allStations copy];
+    for (SRRadioStation *hiddenStation in allStations) {
+        if (hiddenStation.hidden) {
+            [array insertObject:hiddenStation atIndex:[allStations indexOfObject:hiddenStation]];
+        }
+    }
     self.allStations = array;
     [self setStationsCustomized:YES];
 }
@@ -258,6 +268,22 @@ static NSString * const SRLegacyStationNameKey = @"ime";
 - (BOOL)areStationsCustomized {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     return [defaults boolForKey:SRDataManagerStationsCustomizedKey];
+}
+
+#pragma mark - Custom radio stations
+
+- (NSInteger)nextCustomRadioStationId {
+    NSInteger stationId = SRDataManagerCustomStationIdOffset;
+    for (SRRadioStation *station in self.allStations) {
+        if ([self isCustomRadioStation:station]) {
+            stationId = MAX(station.stationId + 1, stationId);
+        }
+    }
+    return stationId;
+}
+
+- (BOOL)isCustomRadioStation:(SRRadioStation *)station {
+    return station.stationId >= SRDataManagerCustomStationIdOffset;
 }
 
 #pragma mark - Selected station

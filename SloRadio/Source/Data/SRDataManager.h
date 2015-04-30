@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 
 extern NSString * const SRDataManagerDidLoadStations;
+extern NSString * const SRDataManagerDidChangeStations;
 
 @class SRRadioStation;
 
@@ -24,5 +25,6 @@ extern NSString * const SRDataManagerDidLoadStations;
 - (void)moveRadioStation:(SRRadioStation *)station atIndex:(NSInteger)index;
 - (void)selectRadioStation:(SRRadioStation *)station;
 - (void)loadStations;
+- (BOOL)isCustomRadioStation:(SRRadioStation *)station;
 
 @end

@@ -10,13 +10,12 @@
 #import "SRDataManager.h"
 #import "SRRadioPlayer.h"
 #import "SRRadioStation.h"
+#import "SRAddRadioViewController.h"
 
 @import AVFoundation;
 @import MediaPlayer;
 
-@interface SRRadioViewController () <SRRadioPlayerDelegate> {
-    SRRadioPlayer *_player;
-}
+@interface SRRadioViewController () <SRRadioPlayerDelegate>
 
 @end
 
@@ -174,7 +173,9 @@
 #pragma mark - Notifications
 
 - (void)registerForNotifications {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stationsLoaded:) name:SRDataManagerDidLoadStations object:nil];
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    [nc addObserver:self selector:@selector(stationsLoaded:) name:SRDataManagerDidLoadStations object:nil];
+    [nc addObserver:self selector:@selector(stationsChanged:) name:SRDataManagerDidChangeStations object:nil];
 }
 
 - (void)unregisterFromNotifications {
@@ -182,6 +183,10 @@
 }
 
 - (void)stationsLoaded:(NSNotification *)notification {
+    [self.tableView reloadData];
+}
+
+- (void)stationsChanged:(NSNotification *)notification {
     [self.tableView reloadData];
 }
 
@@ -340,7 +345,7 @@
 }
 
 - (void)addButtonPressed:(id)sender {
-
+    [self presentAddRadioController];
 }
 
 #pragma mark - Common actions
@@ -372,6 +377,14 @@
         [nowPlayingInfo setObject:[nowPlaying capitalizedString] forKey:MPMediaItemPropertyTitle];
     }
     [infoCenter setNowPlayingInfo:nowPlayingInfo];
+}
+
+#pragma mark - Presentation
+
+- (void)presentAddRadioController {
+    SRAddRadioViewController *controller = [[SRAddRadioViewController alloc] initEmpty];
+    UINavigationController *navigation = [[UINavigationController alloc] initWithRootViewController:controller];
+    [self presentViewController:navigation animated:YES completion:NULL];
 }
 
 #pragma mark - SRRadioPlayerDelegate
