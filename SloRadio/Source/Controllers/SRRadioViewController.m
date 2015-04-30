@@ -402,6 +402,7 @@
 - (void)presentAddRadioController {
     SRAddRadioViewController *controller = [[SRAddRadioViewController alloc] initEmpty];
     UINavigationController *navigation = [[UINavigationController alloc] initWithRootViewController:controller];
+    navigation.modalPresentationStyle = UIModalPresentationFormSheet;
     [self presentViewController:navigation animated:YES completion:NULL];
 }
 
