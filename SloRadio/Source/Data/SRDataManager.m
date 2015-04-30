@@ -55,7 +55,7 @@ static NSString * const SRLegacyStationNameKey = @"ime";
 
 #pragma mark - Network
 
-- (void)loadStations {
+- (void)loadStationsWithCompletionHandler:(SRDataManagerCompletionHandler)completion {
     NSURL *url = [NSURL URLWithString:SRDataManagerStationsApiUrl];
     NSURLRequest *urlRequest = [NSURLRequest requestWithURL:url];
     MBJSONRequest *jsonRequest = [[MBJSONRequest alloc] init];
@@ -71,6 +71,9 @@ static NSString * const SRLegacyStationNameKey = @"ime";
             else {
                 [self setupStations:array];
             }
+        }
+        if (completion) {
+            completion(error);
         }
     }];
 }

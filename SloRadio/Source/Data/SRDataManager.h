@@ -11,6 +11,8 @@
 extern NSString * const SRDataManagerDidLoadStations;
 extern NSString * const SRDataManagerDidChangeStations;
 
+typedef void (^SRDataManagerCompletionHandler)(NSError *error);
+
 @class SRRadioStation;
 
 @interface SRDataManager : NSObject
@@ -24,7 +26,7 @@ extern NSString * const SRDataManagerDidChangeStations;
 - (void)deleteRadioStation:(SRRadioStation *)station;
 - (void)moveRadioStation:(SRRadioStation *)station atIndex:(NSInteger)index;
 - (void)selectRadioStation:(SRRadioStation *)station;
-- (void)loadStations;
+- (void)loadStationsWithCompletionHandler:(SRDataManagerCompletionHandler)completion;
 - (BOOL)isCustomRadioStation:(SRRadioStation *)station;
 
 @end

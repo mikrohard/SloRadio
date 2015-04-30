@@ -11,6 +11,8 @@
 #import "SRRadioPlayer.h"
 #import "SRRadioStation.h"
 #import "SRAddRadioViewController.h"
+#import "MBProgressHUD.h"
+#import "UIAlertView+Blocks.h"
 
 @import AVFoundation;
 @import MediaPlayer;
@@ -42,7 +44,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [[SRDataManager sharedManager] loadStations];
+    [self loadRadioStations];
     [[SRRadioPlayer sharedPlayer] setDelegate:self];
 }
 
@@ -188,6 +190,22 @@
 
 - (void)stationsChanged:(NSNotification *)notification {
     [self.tableView reloadData];
+}
+
+#pragma mark - Network
+
+- (void)loadRadioStations {
+    if ([self stations].count == 0) {
+        [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    }
+    __weak SRRadioViewController *weakSelf = self;
+    [[SRDataManager sharedManager] loadStationsWithCompletionHandler:^(NSError *error) {
+        [MBProgressHUD hideHUDForView:weakSelf.view animated:YES];
+        if (error && [weakSelf stations].count == 0) {
+            // could not load radio stations
+            [self handleStationsLoadError];
+        }
+    }];
 }
 
 #pragma mark - Stations
@@ -392,14 +410,7 @@
 - (void)radioPlayer:(SRRadioPlayer *)player didChangeState:(SRRadioPlayerState)state {
     [self updateToolbarItems];
     if (state == SRRadioPlayerStateError) {
-        // display error
-        NSString *message = [NSString stringWithFormat:@"Unable to play \"%@\"", [[[SRRadioPlayer sharedPlayer] currentRadioStation] name]];
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
-                                                        message:message
-                                                       delegate:nil
-                                              cancelButtonTitle:@"OK"
-                                              otherButtonTitles:nil];
-        [alert show];
+        [self handlePlaybackError];
         [self stopAction];
     }
 }
@@ -477,6 +488,30 @@
 - (void)remotePlayPrevious {
     [self selectPreviousStation];
     [self playAction];
+}
+
+#pragma mark - Error handling
+
+- (void)handleStationsLoadError {
+    __weak SRRadioViewController *weakSelf = self;
+    [UIAlertView showWithTitle:@"Oops!"
+                       message:@"Could not load radio stations."
+             cancelButtonTitle:@"Retry"
+             otherButtonTitles:nil
+                      tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
+                          [weakSelf loadRadioStations];
+                      }];
+}
+
+- (void)handlePlaybackError {
+    // display error
+    NSString *message = [NSString stringWithFormat:@"Unable to play \"%@\"", [[[SRRadioPlayer sharedPlayer] currentRadioStation] name]];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Oops!"
+                                                    message:message
+                                                   delegate:nil
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil];
+    [alert show];
 }
 
 @end
