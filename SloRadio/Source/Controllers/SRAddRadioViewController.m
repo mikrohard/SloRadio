@@ -12,6 +12,7 @@
 #import "SRDataManager.h"
 #import "SRRadioStation.h"
 #import "MBProgressHUD.h"
+#import "UIAlertView+Blocks.h"
 
 @interface SRAddRadioViewController () <UITextFieldDelegate, SRRadioPlayerDelegate>
 
@@ -237,13 +238,15 @@
 #pragma mark - Alert
 
 - (void)showAlertWithTitle:(NSString *)title message:(NSString *)message dismissCallback:(dispatch_block_t)callback {
-    UIAlertController *controller = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:UIAlertControllerStyleAlert];
-    [controller addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-        if (callback) {
-            callback();
-        }
-    }]];
-    [self presentViewController:controller animated:YES completion:NULL];
+    [UIAlertView showWithTitle:title
+                       message:message
+             cancelButtonTitle:@"OK"
+             otherButtonTitles:nil
+                      tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
+                          if (callback) {
+                              callback();
+                          }
+                      }];
 }
 
 @end
