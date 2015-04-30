@@ -22,6 +22,7 @@
 		C83745681AF26E58002EBB84 /* SRTextInputCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745671AF26E58002EBB84 /* SRTextInputCell.m */; };
 		C837456C1AF28016002EBB84 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = C837456B1AF28016002EBB84 /* MBProgressHUD.m */; };
 		C83745701AF292DF002EBB84 /* UIAlertView+Blocks.m in Sources */ = {isa = PBXBuildFile; fileRef = C837456F1AF292DF002EBB84 /* UIAlertView+Blocks.m */; };
+		C83745741AF2BEEB002EBB84 /* SRVolumeView.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745731AF2BEEB002EBB84 /* SRVolumeView.m */; };
 		C8B1D3901AEFF17300A5E0A0 /* MBBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */; };
 		C8B1D3911AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3751AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m */; };
 		C8B1D3921AEFF17300A5E0A0 /* MBHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3771AEFF17300A5E0A0 /* MBHTTPRequest.m */; };
@@ -102,6 +103,8 @@
 		C837456B1AF28016002EBB84 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBProgressHUD.m; path = Libraries/MBProgressHud/MBProgressHUD.m; sourceTree = "<group>"; };
 		C837456E1AF292DF002EBB84 /* UIAlertView+Blocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIAlertView+Blocks.h"; path = "Source/Categories/UIAlertView+Blocks.h"; sourceTree = "<group>"; };
 		C837456F1AF292DF002EBB84 /* UIAlertView+Blocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIAlertView+Blocks.m"; path = "Source/Categories/UIAlertView+Blocks.m"; sourceTree = "<group>"; };
+		C83745721AF2BEEB002EBB84 /* SRVolumeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRVolumeView.h; path = Source/View/SRVolumeView.h; sourceTree = "<group>"; };
+		C83745731AF2BEEB002EBB84 /* SRVolumeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRVolumeView.m; path = Source/View/SRVolumeView.m; sourceTree = "<group>"; };
 		C8B1D3711AEFF17300A5E0A0 /* MBBaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequest.h; path = Libraries/MBRequest/MBBaseRequest.h; sourceTree = "<group>"; };
 		C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBBaseRequest.m; path = Libraries/MBRequest/MBBaseRequest.m; sourceTree = "<group>"; };
 		C8B1D3731AEFF17300A5E0A0 /* MBBaseRequestSubclass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequestSubclass.h; path = Libraries/MBRequest/MBBaseRequestSubclass.h; sourceTree = "<group>"; };
@@ -317,6 +320,15 @@
 			name = Categories;
 			sourceTree = "<group>";
 		};
+		C83745711AF2BEAB002EBB84 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C83745721AF2BEEB002EBB84 /* SRVolumeView.h */,
+				C83745731AF2BEEB002EBB84 /* SRVolumeView.m */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
 		C8B1D3701AEFF16700A5E0A0 /* MBRequest */ = {
 			isa = PBXGroup;
 			children = (
@@ -393,8 +405,9 @@
 				C837454B1AF116D1002EBB84 /* Appearance */,
 				C837456D1AF292CE002EBB84 /* Categories */,
 				C81D32F51AEF816B0076BF01 /* Controllers */,
-				C8C8FA5B1AEEAF0100E5E46C /* Player */,
 				C8B1D39D1AEFF1F300A5E0A0 /* Data */,
+				C8C8FA5B1AEEAF0100E5E46C /* Player */,
+				C83745711AF2BEAB002EBB84 /* Views */,
 				C81D32F71AEF81D50076BF01 /* Resources */,
 				C8C8FA351AEEADAD00E5E46C /* Supporting Files */,
 			);
@@ -561,6 +574,7 @@
 				C8B1D3981AEFF17300A5E0A0 /* MBURLConnectionOperation.m in Sources */,
 				C8B1D3911AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m in Sources */,
 				C8B1D3951AEFF17300A5E0A0 /* MBMultipartFormData.m in Sources */,
+				C83745741AF2BEEB002EBB84 /* SRVolumeView.m in Sources */,
 				C8B1D39C1AEFF17300A5E0A0 /* NSURL+MBRequest.m in Sources */,
 				C837456C1AF28016002EBB84 /* MBProgressHUD.m in Sources */,
 				C81D330F1AEF83920076BF01 /* UIViewController+AMSlideMenu.m in Sources */,

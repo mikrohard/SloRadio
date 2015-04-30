@@ -13,6 +13,7 @@
 #import "SRAddRadioViewController.h"
 #import "MBProgressHUD.h"
 #import "UIAlertView+Blocks.h"
+#import "SRVolumeView.h"
 
 @import AVFoundation;
 @import MediaPlayer;
@@ -117,7 +118,9 @@
 #pragma mark - Toolbar & navigation items
 
 - (void)updateToolbarItems {
+    UIBarButtonItem *leftItem = nil;
     UIBarButtonItem *middleItem = nil;
+    UIBarButtonItem *rightItem = nil;
     if (self.tableView.editing) {
         middleItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed:)];
     }
@@ -145,6 +148,12 @@
             {
                 // pause button
                 middleItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:self action:@selector(pauseButtonPressed:)];
+                UIView *redView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 120, 44.f)];
+                redView.backgroundColor = [UIColor redColor];
+                leftItem = [[UIBarButtonItem alloc] initWithCustomView:redView];
+                
+                SRVolumeView *volumeView = [[SRVolumeView alloc] initWithFrame:CGRectMake(0, 0, 240.f, 44.f)];
+                rightItem = [[UIBarButtonItem alloc] initWithCustomView:volumeView];
                 break;
             }
             default:
@@ -152,7 +161,14 @@
         }
     }
     UIBarButtonItem *flexibleItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    NSArray *items = @[flexibleItem, middleItem, flexibleItem];
+    NSMutableArray *items = [NSMutableArray array];
+    if (leftItem) {
+        [items addObject:leftItem];
+    }
+    [items addObjectsFromArray:@[flexibleItem, middleItem, flexibleItem]];
+    if (rightItem) {
+        [items addObject:rightItem];
+    }
     [self setToolbarItems:items];
 }
 
