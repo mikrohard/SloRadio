@@ -19,7 +19,11 @@ extern NSString * const SRDataManagerDidLoadStations;
 
 + (SRDataManager *)sharedManager;
 
+- (void)addRadioStation:(SRRadioStation *)station;
+- (void)deleteRadioStation:(SRRadioStation *)station;
+- (void)moveRadioStation:(SRRadioStation *)station atIndex:(NSInteger)index;
 - (void)selectRadioStation:(SRRadioStation *)station;
 - (void)loadStations;
+
 
 @end

@@ -261,11 +261,18 @@
 }
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
-
+    SRRadioStation *station = [[self stations] objectAtIndex:sourceIndexPath.row];
+    [[SRDataManager sharedManager] moveRadioStation:station atIndex:destinationIndexPath.row];
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        @synchronized(self) {
+            SRRadioStation *station = [[self stations] objectAtIndex:indexPath.row];
+            [[SRDataManager sharedManager] deleteRadioStation:station];
+            [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+        }
+    }
 }
 
 #pragma mark - TableView Delegate
