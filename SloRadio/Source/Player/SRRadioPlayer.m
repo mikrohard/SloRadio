@@ -28,6 +28,7 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 @synthesize state = _state;
 @synthesize currentRadioStation = _currentRadioStation;
 @synthesize metaData = _metaData;
+@synthesize timePlaying = _timePlaying;
 @synthesize delegate = _delegate;
 
 #pragma mark - Singleton
@@ -44,11 +45,13 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 #pragma mark - Playback control
 
 - (void)playRadioStation:(SRRadioStation *)station {
+    [self stopIfPlaying];
     _currentRadioStation = station;
     [self playStreamAtUrl:station.url];
 }
 
 - (void)playStreamAtUrl:(NSURL *)url {
+    [self stopIfPlaying];
     self.listPlayer = [[VLCMediaListPlayer alloc] init];
     self.player = self.listPlayer.mediaPlayer;
     self.player.delegate = self;
@@ -59,6 +62,12 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
     [self updatePlayerState];
 }
 
+- (void)stopIfPlaying {
+    if (self.player) {
+        [self stop];
+    }
+}
+
 - (void)stop {
     [self.player stop];
     self.player = nil;
@@ -66,6 +75,7 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
     [self registerMedia:nil];
     [self updatePlayerState];
     _currentRadioStation = nil;
+    _timePlaying = 0.0;
     [self updateMetaData];
 }
 
@@ -134,7 +144,10 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 #pragma mark - VLCMediaPlayerDelegate
 
 - (void)mediaPlayerTimeChanged:(NSNotification *)aNotification {
-    NSLog(@"time changed %.2f", self.player.time.numberValue.doubleValue);
+    _timePlaying = self.player.time.numberValue.doubleValue / 1000.0;
+    if (self.state != SRRadioPlayerStatePlaying && self.timePlaying > 0) {
+        [self updatePlayerState];
+    }
 }
 
 - (void)mediaPlayerStateChanged:(NSNotification *)aNotification {
@@ -162,7 +175,7 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
                 state = SRRadioPlayerStateBuffering;
                 break;
             case VLCMediaPlayerStatePlaying:
-                state = SRRadioPlayerStatePlaying;
+                state = self.timePlaying > 0 ? SRRadioPlayerStatePlaying : SRRadioPlayerStateBuffering;
                 break;
             case VLCMediaPlayerStatePaused:
                 state = SRRadioPlayerStatePaused;
@@ -182,7 +195,7 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
                 state = SRRadioPlayerStateBuffering;
                 break;
             case VLCMediaStatePlaying:
-                state = SRRadioPlayerStatePlaying;
+                state = self.timePlaying > 0 ? SRRadioPlayerStatePlaying : SRRadioPlayerStateBuffering;
                 break;
             case VLCMediaStateError:
                 state = SRRadioPlayerStateError;

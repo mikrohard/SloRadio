@@ -31,6 +31,7 @@ extern NSString * const SRRadioPlayerMetaDataNowPlayingKey;
 @property (nonatomic, readonly) SRRadioPlayerState state;
 @property (nonatomic, readonly) SRRadioStation *currentRadioStation;
 @property (nonatomic, readonly) NSDictionary *metaData;
+@property (nonatomic, readonly) NSTimeInterval timePlaying;
 @property (nonatomic, weak) id <SRRadioPlayerDelegate> delegate;
 
 + (SRRadioPlayer *)sharedPlayer;
