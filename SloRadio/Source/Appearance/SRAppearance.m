@@ -27,6 +27,14 @@
     return [UIColor colorWithWhite:1.f alpha:0.6f];
 }
 
++ (UIColor *)cellActionColor {
+    return [self mainColor];
+}
+
++ (UIColor *)cellReportColor {
+    return [UIColor redColor];
+}
+
 + (UIFont *)applicationFontWithSize:(CGFloat)size {
     return [UIFont fontWithName:@"HelveticaNeue" size:size];
 }

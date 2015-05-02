@@ -15,6 +15,7 @@
 #import "UIAlertView+Blocks.h"
 #import "UITableView+Separators.h"
 #import "SRNowPlayingView.h"
+#import "SRRadioTableViewCell.h"
 
 @import AVFoundation;
 @import MediaPlayer;
@@ -288,10 +289,22 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString *cellIdentifier = @"RadioStationCell";
-    UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    SRRadioTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+        cell = [[SRRadioTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
     }
+    UIView *clockView = [self viewWithImageName:@"Clock"];
+    UIColor *clockColor = [SRAppearance cellActionColor];
+    [cell setSwipeGestureWithView:clockView color:clockColor mode:MCSwipeTableViewCellModeSwitch state:MCSwipeTableViewCellState1 completionBlock:^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
+        NSLog(@"Did swipe \"Clock\" cell");
+    }];
+    
+    UIView *reportView = [self viewWithImageName:@"Warning"];
+    UIColor *reportColor = [SRAppearance cellReportColor];
+    [cell setSwipeGestureWithView:reportView color:reportColor mode:MCSwipeTableViewCellModeSwitch state:MCSwipeTableViewCellState2 completionBlock:^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
+        NSLog(@"Did swipe \"Report\" cell");
+    }];
+    
     SRRadioStation *station = [[self stations] objectAtIndex:indexPath.row];
     SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
     cell.textLabel.text = station.name;
@@ -562,6 +575,16 @@
 
 - (BOOL)showErrorPopup {
     return [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive;
+}
+
+#pragma mark - Utils
+
+- (UIView *)viewWithImageName:(NSString *)imageName {
+    UIImage *image = [[UIImage imageNamed:imageName] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
+    imageView.tintColor = [UIColor whiteColor];
+    imageView.contentMode = UIViewContentModeCenter;
+    return imageView;
 }
 
 @end

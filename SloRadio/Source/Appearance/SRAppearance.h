@@ -15,6 +15,9 @@
 + (UIColor *)menuBackgroundColor;
 + (UIColor *)menuContentColor;
 
++ (UIColor *)cellActionColor;
++ (UIColor *)cellReportColor;
+
 + (UIFont *)applicationFontWithSize:(CGFloat)size;
 + (UIFont *)boldApplicationFontWithSize:(CGFloat)size;
 + (UIFont *)mediumApplicationFontWithSize:(CGFloat)size;

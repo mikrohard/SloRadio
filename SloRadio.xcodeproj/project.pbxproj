@@ -26,6 +26,8 @@
 		C837457B1AF50C83002EBB84 /* SRSeparatorView.m in Sources */ = {isa = PBXBuildFile; fileRef = C837457A1AF50C83002EBB84 /* SRSeparatorView.m */; };
 		C837457E1AF51C93002EBB84 /* SRNowPlayingView.m in Sources */ = {isa = PBXBuildFile; fileRef = C837457D1AF51C93002EBB84 /* SRNowPlayingView.m */; };
 		C83745821AF51D9B002EBB84 /* CBAutoScrollLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745811AF51D9B002EBB84 /* CBAutoScrollLabel.m */; };
+		C83745981AF554FD002EBB84 /* SRRadioTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745971AF554FD002EBB84 /* SRRadioTableViewCell.m */; };
+		C837459C1AF56613002EBB84 /* MCSwipeTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C837459B1AF56613002EBB84 /* MCSwipeTableViewCell.m */; };
 		C8B1D3901AEFF17300A5E0A0 /* MBBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */; };
 		C8B1D3911AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3751AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m */; };
 		C8B1D3921AEFF17300A5E0A0 /* MBHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3771AEFF17300A5E0A0 /* MBHTTPRequest.m */; };
@@ -114,6 +116,10 @@
 		C837457D1AF51C93002EBB84 /* SRNowPlayingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRNowPlayingView.m; path = Source/Views/SRNowPlayingView.m; sourceTree = "<group>"; };
 		C83745801AF51D9B002EBB84 /* CBAutoScrollLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CBAutoScrollLabel.h; path = Libraries/CBAutoScrollLabel/CBAutoScrollLabel.h; sourceTree = "<group>"; };
 		C83745811AF51D9B002EBB84 /* CBAutoScrollLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CBAutoScrollLabel.m; path = Libraries/CBAutoScrollLabel/CBAutoScrollLabel.m; sourceTree = "<group>"; };
+		C83745961AF554FD002EBB84 /* SRRadioTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRRadioTableViewCell.h; path = Source/Cells/SRRadioTableViewCell.h; sourceTree = "<group>"; };
+		C83745971AF554FD002EBB84 /* SRRadioTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRRadioTableViewCell.m; path = Source/Cells/SRRadioTableViewCell.m; sourceTree = "<group>"; };
+		C837459A1AF56613002EBB84 /* MCSwipeTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MCSwipeTableViewCell.h; path = Libraries/MCSwipeTableViewCell/MCSwipeTableViewCell.h; sourceTree = "<group>"; };
+		C837459B1AF56613002EBB84 /* MCSwipeTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MCSwipeTableViewCell.m; path = Libraries/MCSwipeTableViewCell/MCSwipeTableViewCell.m; sourceTree = "<group>"; };
 		C8B1D3711AEFF17300A5E0A0 /* MBBaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequest.h; path = Libraries/MBRequest/MBBaseRequest.h; sourceTree = "<group>"; };
 		C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBBaseRequest.m; path = Libraries/MBRequest/MBBaseRequest.m; sourceTree = "<group>"; };
 		C8B1D3731AEFF17300A5E0A0 /* MBBaseRequestSubclass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequestSubclass.h; path = Libraries/MBRequest/MBBaseRequestSubclass.h; sourceTree = "<group>"; };
@@ -245,6 +251,7 @@
 				C837457F1AF51D89002EBB84 /* CBAutoScrollLabel */,
 				C83745691AF27FFA002EBB84 /* MBProgressHud */,
 				C8B1D3701AEFF16700A5E0A0 /* MBRequest */,
+				C83745991AF56606002EBB84 /* MCSwipeTableViewCell */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -308,6 +315,8 @@
 			children = (
 				C83745661AF26E58002EBB84 /* SRTextInputCell.h */,
 				C83745671AF26E58002EBB84 /* SRTextInputCell.m */,
+				C83745961AF554FD002EBB84 /* SRRadioTableViewCell.h */,
+				C83745971AF554FD002EBB84 /* SRRadioTableViewCell.m */,
 			);
 			name = Cells;
 			sourceTree = "<group>";
@@ -350,6 +359,15 @@
 				C83745811AF51D9B002EBB84 /* CBAutoScrollLabel.m */,
 			);
 			name = CBAutoScrollLabel;
+			sourceTree = "<group>";
+		};
+		C83745991AF56606002EBB84 /* MCSwipeTableViewCell */ = {
+			isa = PBXGroup;
+			children = (
+				C837459A1AF56613002EBB84 /* MCSwipeTableViewCell.h */,
+				C837459B1AF56613002EBB84 /* MCSwipeTableViewCell.m */,
+			);
+			name = MCSwipeTableViewCell;
 			sourceTree = "<group>";
 		};
 		C8B1D3701AEFF16700A5E0A0 /* MBRequest */ = {
@@ -611,6 +629,7 @@
 				C83745641AF24FAF002EBB84 /* SRAddRadioViewController.m in Sources */,
 				C8B1D3A01AEFF20E00A5E0A0 /* SRDataManager.m in Sources */,
 				C81D330D1AEF83920076BF01 /* AMSlideMenuRightMenuSegue.m in Sources */,
+				C837459C1AF56613002EBB84 /* MCSwipeTableViewCell.m in Sources */,
 				C81D33091AEF83920076BF01 /* AMSlideMenuContentSegue.m in Sources */,
 				C837457E1AF51C93002EBB84 /* SRNowPlayingView.m in Sources */,
 				C8B1D3961AEFF17300A5E0A0 /* MBNetworkActivityIndicatorManager.m in Sources */,
@@ -620,6 +639,7 @@
 				C837454E1AF11715002EBB84 /* SRAppearance.m in Sources */,
 				C8B1D3931AEFF17300A5E0A0 /* MBImageRequest.m in Sources */,
 				C8B1D39A1AEFF17300A5E0A0 /* NSDictionary+MBRequest.m in Sources */,
+				C83745981AF554FD002EBB84 /* SRRadioTableViewCell.m in Sources */,
 				C81D33121AEF83CE0076BF01 /* SRLeftMenuViewController.m in Sources */,
 				C81D330C1AEF83920076BF01 /* AMSlideMenuMainViewController.m in Sources */,
 				C8C8FA3B1AEEADAD00E5E46C /* SRAppDelegate.m in Sources */,
