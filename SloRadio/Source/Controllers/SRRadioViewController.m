@@ -17,7 +17,9 @@
 @import AVFoundation;
 @import MediaPlayer;
 
-@interface SRRadioViewController () <SRRadioPlayerDelegate>
+@interface SRRadioViewController () <SRRadioPlayerDelegate> {
+    BOOL _playbackInterrupted;
+}
 
 @end
 
@@ -178,6 +180,7 @@
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc addObserver:self selector:@selector(stationsLoaded:) name:SRDataManagerDidLoadStations object:nil];
     [nc addObserver:self selector:@selector(stationsChanged:) name:SRDataManagerDidChangeStations object:nil];
+    [nc addObserver:self selector:@selector(audioSessionInterruption:) name:AVAudioSessionInterruptionNotification object:nil];
 }
 
 - (void)unregisterFromNotifications {
@@ -190,6 +193,23 @@
 
 - (void)stationsChanged:(NSNotification *)notification {
     [self.tableView reloadData];
+}
+
+- (void)audioSessionInterruption:(NSNotification *)notification {
+    AVAudioSessionInterruptionType interruptionType = [[notification.userInfo objectForKey:AVAudioSessionInterruptionTypeKey] integerValue];
+    if (interruptionType == AVAudioSessionInterruptionTypeBegan) {
+        if ([[SRRadioPlayer sharedPlayer] state] != SRRadioPlayerStateStopped) {
+            _playbackInterrupted = YES;
+            [self performSelectorOnMainThread:@selector(stopAction) withObject:nil waitUntilDone:NO];
+        }
+    }
+    else if (interruptionType == AVAudioSessionInterruptionTypeEnded) {
+        AVAudioSessionInterruptionOptions interruptionOption = [[notification.userInfo objectForKey:AVAudioSessionInterruptionOptionKey] integerValue];
+        if (_playbackInterrupted && interruptionOption == AVAudioSessionInterruptionOptionShouldResume) {
+            // resume playback
+            [self performSelectorOnMainThread:@selector(playAction) withObject:nil waitUntilDone:NO];
+        }
+    }
 }
 
 #pragma mark - Network
@@ -369,6 +389,7 @@
 #pragma mark - Common actions
 
 - (void)playAction {
+    _playbackInterrupted = NO;
     SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
     [[SRRadioPlayer sharedPlayer] playRadioStation:selectedStation];
 }
