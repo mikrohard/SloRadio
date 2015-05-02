@@ -548,14 +548,20 @@
 }
 
 - (void)handlePlaybackError {
-    // display error
-    NSString *message = [NSString stringWithFormat:@"Unable to play \"%@\"", [[[SRRadioPlayer sharedPlayer] currentRadioStation] name]];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Oops!"
-                                                    message:message
-                                                   delegate:nil
-                                          cancelButtonTitle:@"OK"
-                                          otherButtonTitles:nil];
-    [alert show];
+    if ([self showErrorPopup]) {
+        // display error
+        NSString *message = [NSString stringWithFormat:@"Unable to play \"%@\"", [[[SRRadioPlayer sharedPlayer] currentRadioStation] name]];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Oops!"
+                                                        message:message
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
+    }
+}
+
+- (BOOL)showErrorPopup {
+    return [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive;
 }
 
 @end
