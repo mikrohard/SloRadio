@@ -26,4 +26,20 @@
     return [UIColor colorWithWhite:1.f alpha:0.6f];
 }
 
++ (UIFont *)applicationFontWithSize:(CGFloat)size {
+    return [UIFont fontWithName:@"HelveticaNeue" size:size];
+}
+
++ (UIFont *)boldApplicationFontWithSize:(CGFloat)size {
+    return [UIFont fontWithName:@"HelveticaNeue-Bold" size:size];
+}
+
++ (UIFont *)mediumApplicationFontWithSize:(CGFloat)size {
+    return [UIFont fontWithName:@"HelveticaNeue-Medium" size:size];
+}
+
++ (UIFont *)lightApplicationFontWithSize:(CGFloat)size {
+    return [UIFont fontWithName:@"HelveticaNeue-Light" size:size];
+}
+
 @end

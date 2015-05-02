@@ -24,6 +24,8 @@
 		C83745701AF292DF002EBB84 /* UIAlertView+Blocks.m in Sources */ = {isa = PBXBuildFile; fileRef = C837456F1AF292DF002EBB84 /* UIAlertView+Blocks.m */; };
 		C83745771AF50BC5002EBB84 /* UITableView+Separators.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745761AF50BC5002EBB84 /* UITableView+Separators.m */; };
 		C837457B1AF50C83002EBB84 /* SRSeparatorView.m in Sources */ = {isa = PBXBuildFile; fileRef = C837457A1AF50C83002EBB84 /* SRSeparatorView.m */; };
+		C837457E1AF51C93002EBB84 /* SRNowPlayingView.m in Sources */ = {isa = PBXBuildFile; fileRef = C837457D1AF51C93002EBB84 /* SRNowPlayingView.m */; };
+		C83745821AF51D9B002EBB84 /* CBAutoScrollLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745811AF51D9B002EBB84 /* CBAutoScrollLabel.m */; };
 		C8B1D3901AEFF17300A5E0A0 /* MBBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */; };
 		C8B1D3911AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3751AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m */; };
 		C8B1D3921AEFF17300A5E0A0 /* MBHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3771AEFF17300A5E0A0 /* MBHTTPRequest.m */; };
@@ -108,6 +110,10 @@
 		C83745761AF50BC5002EBB84 /* UITableView+Separators.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UITableView+Separators.m"; path = "Source/Categories/UITableView+Separators.m"; sourceTree = "<group>"; };
 		C83745791AF50C83002EBB84 /* SRSeparatorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSeparatorView.h; path = Source/Views/SRSeparatorView.h; sourceTree = "<group>"; };
 		C837457A1AF50C83002EBB84 /* SRSeparatorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSeparatorView.m; path = Source/Views/SRSeparatorView.m; sourceTree = "<group>"; };
+		C837457C1AF51C93002EBB84 /* SRNowPlayingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRNowPlayingView.h; path = Source/Views/SRNowPlayingView.h; sourceTree = "<group>"; };
+		C837457D1AF51C93002EBB84 /* SRNowPlayingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRNowPlayingView.m; path = Source/Views/SRNowPlayingView.m; sourceTree = "<group>"; };
+		C83745801AF51D9B002EBB84 /* CBAutoScrollLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CBAutoScrollLabel.h; path = Libraries/CBAutoScrollLabel/CBAutoScrollLabel.h; sourceTree = "<group>"; };
+		C83745811AF51D9B002EBB84 /* CBAutoScrollLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CBAutoScrollLabel.m; path = Libraries/CBAutoScrollLabel/CBAutoScrollLabel.m; sourceTree = "<group>"; };
 		C8B1D3711AEFF17300A5E0A0 /* MBBaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequest.h; path = Libraries/MBRequest/MBBaseRequest.h; sourceTree = "<group>"; };
 		C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBBaseRequest.m; path = Libraries/MBRequest/MBBaseRequest.m; sourceTree = "<group>"; };
 		C8B1D3731AEFF17300A5E0A0 /* MBBaseRequestSubclass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequestSubclass.h; path = Libraries/MBRequest/MBBaseRequestSubclass.h; sourceTree = "<group>"; };
@@ -235,9 +241,10 @@
 		C81D32F81AEF83680076BF01 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				C81D32F91AEF83810076BF01 /* AMSlideMenu */,
+				C837457F1AF51D89002EBB84 /* CBAutoScrollLabel */,
 				C83745691AF27FFA002EBB84 /* MBProgressHud */,
 				C8B1D3701AEFF16700A5E0A0 /* MBRequest */,
-				C81D32F91AEF83810076BF01 /* AMSlideMenu */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -330,8 +337,19 @@
 			children = (
 				C83745791AF50C83002EBB84 /* SRSeparatorView.h */,
 				C837457A1AF50C83002EBB84 /* SRSeparatorView.m */,
+				C837457C1AF51C93002EBB84 /* SRNowPlayingView.h */,
+				C837457D1AF51C93002EBB84 /* SRNowPlayingView.m */,
 			);
 			name = Views;
+			sourceTree = "<group>";
+		};
+		C837457F1AF51D89002EBB84 /* CBAutoScrollLabel */ = {
+			isa = PBXGroup;
+			children = (
+				C83745801AF51D9B002EBB84 /* CBAutoScrollLabel.h */,
+				C83745811AF51D9B002EBB84 /* CBAutoScrollLabel.m */,
+			);
+			name = CBAutoScrollLabel;
 			sourceTree = "<group>";
 		};
 		C8B1D3701AEFF16700A5E0A0 /* MBRequest */ = {
@@ -577,6 +595,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8B1D3981AEFF17300A5E0A0 /* MBURLConnectionOperation.m in Sources */,
+				C83745821AF51D9B002EBB84 /* CBAutoScrollLabel.m in Sources */,
 				C8B1D3911AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m in Sources */,
 				C8B1D3951AEFF17300A5E0A0 /* MBMultipartFormData.m in Sources */,
 				C8B1D39C1AEFF17300A5E0A0 /* NSURL+MBRequest.m in Sources */,
@@ -593,6 +612,7 @@
 				C8B1D3A01AEFF20E00A5E0A0 /* SRDataManager.m in Sources */,
 				C81D330D1AEF83920076BF01 /* AMSlideMenuRightMenuSegue.m in Sources */,
 				C81D33091AEF83920076BF01 /* AMSlideMenuContentSegue.m in Sources */,
+				C837457E1AF51C93002EBB84 /* SRNowPlayingView.m in Sources */,
 				C8B1D3961AEFF17300A5E0A0 /* MBNetworkActivityIndicatorManager.m in Sources */,
 				C8C8FA3E1AEEADAD00E5E46C /* SRMainViewController.m in Sources */,
 				C83745701AF292DF002EBB84 /* UIAlertView+Blocks.m in Sources */,

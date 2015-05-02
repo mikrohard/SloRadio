@@ -15,4 +15,9 @@
 + (UIColor *)menuBackgroundColor;
 + (UIColor *)menuContentColor;
 
++ (UIFont *)applicationFontWithSize:(CGFloat)size;
++ (UIFont *)boldApplicationFontWithSize:(CGFloat)size;
++ (UIFont *)mediumApplicationFontWithSize:(CGFloat)size;
++ (UIFont *)lightApplicationFontWithSize:(CGFloat)size;
+
 @end

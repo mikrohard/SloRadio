@@ -14,6 +14,7 @@
 #import "MBProgressHUD.h"
 #import "UIAlertView+Blocks.h"
 #import "UITableView+Separators.h"
+#import "SRNowPlayingView.h"
 
 @import AVFoundation;
 @import MediaPlayer;
@@ -22,9 +23,13 @@
     BOOL _playbackInterrupted;
 }
 
+@property (nonatomic, strong) SRNowPlayingView *nowPlayingTitleView;
+
 @end
 
 @implementation SRRadioViewController
+
+@synthesize nowPlayingTitleView = _nowPlayingTitleView;
 
 #pragma mark - Lifecycle
 
@@ -419,6 +424,20 @@
         [nowPlayingInfo setObject:[nowPlaying capitalizedString] forKey:MPMediaItemPropertyTitle];
     }
     [infoCenter setNowPlayingInfo:nowPlayingInfo];
+    
+    // update title view
+    if ([[SRRadioPlayer sharedPlayer] currentRadioStation]) {
+        if (!self.nowPlayingTitleView) {
+            self.nowPlayingTitleView = [[SRNowPlayingView alloc] initWithFrame:CGRectMake(0, 0, 240.f, 44.f)];
+            self.nowPlayingTitleView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        }
+        self.nowPlayingTitleView.titleString = selectedStation.name;
+        self.nowPlayingTitleView.subtitleString = [nowPlaying capitalizedString];
+        self.navigationItem.titleView = self.nowPlayingTitleView;
+    }
+    else {
+        self.navigationItem.titleView = nil;
+    }
 }
 
 #pragma mark - Presentation
