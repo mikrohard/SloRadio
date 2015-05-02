@@ -11,7 +11,8 @@
 @implementation SRAppearance
 
 + (UIColor *)mainColor {
-    return [UIColor orangeColor];
+    // #ff9600
+    return [UIColor colorWithRed:255.0/255.0 green:150.0/255.0 blue:0.0/255.0 alpha:1.0];
 }
 
 + (UIColor *)navigationBarContentColor {
