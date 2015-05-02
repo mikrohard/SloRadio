@@ -9,26 +9,87 @@
 #import "SRLeftMenuViewController.h"
 #import "SRRadioViewController.h"
 #import "AMSlideMenuMainViewController.h"
+#import "UITableView+Separators.h"
+
+static NSString * const SRMenuControllersTitleKey = @"SRMenuControllersTitleKey";
+static NSString * const SRMenuControllersIconKey = @"SRMenuControllersIconKey";
+static NSString * const SRMenuControllersSelectedIconKey = @"SRMenuControllersSelectedIconKey";
+static NSString * const SRMenuControllersClassKey = @"SRMenuControllersClassKey";
+static NSString * const SRMenuControllersCachedKey = @"SRMenuControllersCachedKey";
 
 @interface SRLeftMenuViewController ()
+
+@property (nonatomic, strong) NSArray *controllers;
+@property (nonatomic, strong) NSIndexPath *selectedControllerIndexPath;
 
 @end
 
 @implementation SRLeftMenuViewController
 
+@synthesize controllers = _controllers;
+@synthesize selectedControllerIndexPath = _selectedControllerIndexPath;
+
+#pragma mark - Lifecycle
+
+- (void)loadView {
+    [super loadView];
+    self.tableView.backgroundColor = [SRAppearance menuBackgroundColor];
+    self.tableView.separatorColor = [SRAppearance menuContentColor];
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, 44.f)];
+    self.tableView.tableFooterView.backgroundColor = [UIColor clearColor];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
-    
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    [self setupMenuData];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self highlightSelectedController];
+    });
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - Menu data
+
+- (void)setupMenuData {
+    // radio controller
+    NSMutableDictionary *radioController = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                            @"Radio stations", SRMenuControllersTitleKey,
+                                            [SRRadioViewController class], SRMenuControllersClassKey, nil];
+    // settings controller
+    NSMutableDictionary *settingsController = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                               @"Settings", SRMenuControllersTitleKey,
+                                               [UIViewController class], SRMenuControllersClassKey, nil];
+    // about controller
+    NSMutableDictionary *aboutController = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                                            @"About", SRMenuControllersTitleKey,
+                                            [UIViewController class], SRMenuControllersClassKey, nil];
+    self.controllers = @[radioController, settingsController, aboutController];
+}
+
+- (UIViewController *)controllerForIndexPath:(NSIndexPath *)indexPath {
+    NSMutableDictionary *controllerDict = [self.controllers objectAtIndex:indexPath.row];
+    UIViewController *controller = [controllerDict objectForKey:SRMenuControllersCachedKey];
+    if (!controller) {
+        Class controllerClass = [controllerDict objectForKey:SRMenuControllersClassKey];
+        controller = [[controllerClass alloc] init];
+        [controllerDict setObject:controller forKey:SRMenuControllersCachedKey];
+    }
+    return controller;
+}
+
+- (void)highlightSelectedController {
+    [self.tableView selectRowAtIndexPath:self.selectedControllerIndexPath
+                                animated:NO
+                          scrollPosition:UITableViewScrollPositionNone];
 }
 
 #pragma mark - Table view data source
@@ -40,7 +101,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     // Return the number of rows in the section.
-    return 1;
+    return self.controllers.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -48,8 +109,13 @@
     UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (!cell) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+        cell.backgroundColor = [UIColor clearColor];
+        cell.selectedBackgroundView = [[UIView alloc] initWithFrame:cell.bounds];
+        cell.selectedBackgroundView.backgroundColor = [UIColor clearColor];
     }
-    cell.textLabel.text = @"Radio";
+    cell.textLabel.textColor = [SRAppearance menuContentColor];
+    cell.textLabel.highlightedTextColor = [SRAppearance mainColor];
+    cell.textLabel.text = [[self.controllers objectAtIndex:indexPath.row] objectForKey:SRMenuControllersTitleKey];
     return cell;
 }
 
@@ -57,15 +123,23 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (self.mainVC.currentActiveNVC) {
+    NSIndexPath *selectedPath = [self selectedControllerIndexPath];
+    if (selectedPath && selectedPath.row == indexPath.row) {
         [self.mainVC closeLeftMenu];
     }
     else {
-        SRRadioViewController *radioController = [[SRRadioViewController alloc] initWithStyle:UITableViewStylePlain];
-        UINavigationController *navigation = [[UINavigationController alloc] initWithRootViewController:radioController];
-        
+        UIViewController *controller = [self controllerForIndexPath:indexPath];
+        UINavigationController *navigation = [[UINavigationController alloc] initWithRootViewController:controller];
+        [navigation.navigationBar setBarTintColor:[SRAppearance mainColor]];
+        [navigation.navigationBar setTintColor:[SRAppearance navigationBarContentColor]];
+        [navigation.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName: [SRAppearance navigationBarContentColor]}];
         [self openContentNavigationController:navigation];
+        self.selectedControllerIndexPath = indexPath;
     }
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView configureSeparatorForCell:cell];
 }
 
 @end

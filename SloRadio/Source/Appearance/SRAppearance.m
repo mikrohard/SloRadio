@@ -18,4 +18,12 @@
     return [UIColor whiteColor];
 }
 
++ (UIColor *)menuBackgroundColor {
+    return [UIColor blackColor];
+}
+
++ (UIColor *)menuContentColor {
+    return [UIColor colorWithWhite:1.f alpha:0.6f];
+}
+
 @end

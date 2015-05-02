@@ -12,5 +12,7 @@
 
 + (UIColor *)mainColor;
 + (UIColor *)navigationBarContentColor;
++ (UIColor *)menuBackgroundColor;
++ (UIColor *)menuContentColor;
 
 @end

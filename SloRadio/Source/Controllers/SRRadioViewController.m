@@ -27,8 +27,8 @@
 
 #pragma mark - Lifecycle
 
-- (instancetype)initWithStyle:(UITableViewStyle)style {
-    self = [super initWithStyle:style];
+- (instancetype)init {
+    self = [super initWithStyle:UITableViewStylePlain];
     if (self) {
         [self registerForNotifications];
         self.title = @"Radio stations";
@@ -38,8 +38,6 @@
 
 - (void)loadView {
     [super loadView];
-    [self setupNavigationBar];
-    [self setupToolbar];
     self.tableView.separatorInset = UIEdgeInsetsMake(0, 15.f, 0, 0);
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
 }
@@ -52,6 +50,8 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    [self setupNavigationBar];
+    [self setupToolbar];
     [self setupAudioSession];
     [self startRemoteControlTracking];
 }
@@ -80,9 +80,6 @@
 }
 
 - (void)setupNavigationBar {
-    [self.navigationController.navigationBar setBarTintColor:[SRAppearance mainColor]];
-    [self.navigationController.navigationBar setTintColor:[SRAppearance navigationBarContentColor]];
-    [self.navigationController.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName: [SRAppearance navigationBarContentColor]}];
     [self updateNavigationButtons];
 }
 

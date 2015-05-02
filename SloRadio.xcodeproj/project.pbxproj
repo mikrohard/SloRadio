@@ -22,6 +22,8 @@
 		C83745681AF26E58002EBB84 /* SRTextInputCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745671AF26E58002EBB84 /* SRTextInputCell.m */; };
 		C837456C1AF28016002EBB84 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = C837456B1AF28016002EBB84 /* MBProgressHUD.m */; };
 		C83745701AF292DF002EBB84 /* UIAlertView+Blocks.m in Sources */ = {isa = PBXBuildFile; fileRef = C837456F1AF292DF002EBB84 /* UIAlertView+Blocks.m */; };
+		C83745771AF50BC5002EBB84 /* UITableView+Separators.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745761AF50BC5002EBB84 /* UITableView+Separators.m */; };
+		C837457B1AF50C83002EBB84 /* SRSeparatorView.m in Sources */ = {isa = PBXBuildFile; fileRef = C837457A1AF50C83002EBB84 /* SRSeparatorView.m */; };
 		C8B1D3901AEFF17300A5E0A0 /* MBBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */; };
 		C8B1D3911AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3751AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m */; };
 		C8B1D3921AEFF17300A5E0A0 /* MBHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3771AEFF17300A5E0A0 /* MBHTTPRequest.m */; };
@@ -102,6 +104,10 @@
 		C837456B1AF28016002EBB84 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBProgressHUD.m; path = Libraries/MBProgressHud/MBProgressHUD.m; sourceTree = "<group>"; };
 		C837456E1AF292DF002EBB84 /* UIAlertView+Blocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIAlertView+Blocks.h"; path = "Source/Categories/UIAlertView+Blocks.h"; sourceTree = "<group>"; };
 		C837456F1AF292DF002EBB84 /* UIAlertView+Blocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIAlertView+Blocks.m"; path = "Source/Categories/UIAlertView+Blocks.m"; sourceTree = "<group>"; };
+		C83745751AF50BC5002EBB84 /* UITableView+Separators.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UITableView+Separators.h"; path = "Source/Categories/UITableView+Separators.h"; sourceTree = "<group>"; };
+		C83745761AF50BC5002EBB84 /* UITableView+Separators.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UITableView+Separators.m"; path = "Source/Categories/UITableView+Separators.m"; sourceTree = "<group>"; };
+		C83745791AF50C83002EBB84 /* SRSeparatorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSeparatorView.h; path = Source/Views/SRSeparatorView.h; sourceTree = "<group>"; };
+		C837457A1AF50C83002EBB84 /* SRSeparatorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSeparatorView.m; path = Source/Views/SRSeparatorView.m; sourceTree = "<group>"; };
 		C8B1D3711AEFF17300A5E0A0 /* MBBaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequest.h; path = Libraries/MBRequest/MBBaseRequest.h; sourceTree = "<group>"; };
 		C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBBaseRequest.m; path = Libraries/MBRequest/MBBaseRequest.m; sourceTree = "<group>"; };
 		C8B1D3731AEFF17300A5E0A0 /* MBBaseRequestSubclass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequestSubclass.h; path = Libraries/MBRequest/MBBaseRequestSubclass.h; sourceTree = "<group>"; };
@@ -313,8 +319,19 @@
 			children = (
 				C837456E1AF292DF002EBB84 /* UIAlertView+Blocks.h */,
 				C837456F1AF292DF002EBB84 /* UIAlertView+Blocks.m */,
+				C83745751AF50BC5002EBB84 /* UITableView+Separators.h */,
+				C83745761AF50BC5002EBB84 /* UITableView+Separators.m */,
 			);
 			name = Categories;
+			sourceTree = "<group>";
+		};
+		C83745781AF50C4B002EBB84 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C83745791AF50C83002EBB84 /* SRSeparatorView.h */,
+				C837457A1AF50C83002EBB84 /* SRSeparatorView.m */,
+			);
+			name = Views;
 			sourceTree = "<group>";
 		};
 		C8B1D3701AEFF16700A5E0A0 /* MBRequest */ = {
@@ -395,6 +412,7 @@
 				C81D32F51AEF816B0076BF01 /* Controllers */,
 				C8C8FA5B1AEEAF0100E5E46C /* Player */,
 				C8B1D39D1AEFF1F300A5E0A0 /* Data */,
+				C83745781AF50C4B002EBB84 /* Views */,
 				C81D32F71AEF81D50076BF01 /* Resources */,
 				C8C8FA351AEEADAD00E5E46C /* Supporting Files */,
 			);
@@ -567,6 +585,8 @@
 				C8B1D3921AEFF17300A5E0A0 /* MBHTTPRequest.m in Sources */,
 				C83745681AF26E58002EBB84 /* SRTextInputCell.m in Sources */,
 				C81D33171AEF84900076BF01 /* SRRadioViewController.m in Sources */,
+				C837457B1AF50C83002EBB84 /* SRSeparatorView.m in Sources */,
+				C83745771AF50BC5002EBB84 /* UITableView+Separators.m in Sources */,
 				C8B1D39B1AEFF17300A5E0A0 /* NSString+MBRequest.m in Sources */,
 				C8B1D3941AEFF17300A5E0A0 /* MBJSONRequest.m in Sources */,
 				C83745641AF24FAF002EBB84 /* SRAddRadioViewController.m in Sources */,

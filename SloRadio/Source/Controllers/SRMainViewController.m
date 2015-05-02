@@ -43,4 +43,10 @@
     [button setImage:menuIcon forState:UIControlStateNormal];
 }
 
+#pragma mark - Status bar
+
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
+}
+
 @end
