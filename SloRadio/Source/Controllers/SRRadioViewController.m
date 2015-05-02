@@ -13,6 +13,7 @@
 #import "SRAddRadioViewController.h"
 #import "MBProgressHUD.h"
 #import "UIAlertView+Blocks.h"
+#import "UITableView+Separators.h"
 
 @import AVFoundation;
 @import MediaPlayer;
@@ -39,7 +40,8 @@
 - (void)loadView {
     [super loadView];
     self.tableView.separatorInset = UIEdgeInsetsMake(0, 15.f, 0, 0);
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, 44.f)];
 }
 
 - (void)viewDidLoad {
@@ -350,6 +352,10 @@
         [[SRRadioPlayer sharedPlayer] playRadioStation:station];
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    [tableView configureSeparatorForCell:cell];
 }
 
 #pragma mark - Button actions
