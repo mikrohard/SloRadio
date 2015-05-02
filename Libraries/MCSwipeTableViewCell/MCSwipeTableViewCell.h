@@ -151,6 +151,12 @@ typedef void (^MCSwipeCompletionBlock)(MCSwipeTableViewCell *cell, MCSwipeTableV
 /** Boolean to enable/disable the animation of the view during the swipe.  */
 @property (nonatomic, assign, readwrite) BOOL shouldAnimateIcons;
 
+/** Boolean to enable/disable ignoring of touches at left screen edge (e.g. for left menu).  */
+@property (nonatomic, assign, readwrite) BOOL shouldIgnoreTouchesAtLeftScreenEdge;
+
+/** Boolean to enable/disable ignoring of touches at right screen edge (e.g. for right menu).  */
+@property (nonatomic, assign, readwrite) BOOL shouldIgnoreTouchesAtRightScreenEdge;
+
 /**
  *  Configures the properties of a cell.
  *

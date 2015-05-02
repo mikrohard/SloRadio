@@ -9,7 +9,7 @@
 #import "MCSwipeTableViewCell.h"
 
 static CGFloat const kMCStop1                       = 0.25; // Percentage limit to trigger the first action
-static CGFloat const kMCStop2                       = 0.75; // Percentage limit to trigger the second action
+static CGFloat const kMCStop2                       = 0.65; // Percentage limit to trigger the second action
 static CGFloat const kMCBounceAmplitude             = 20.0; // Maximum bounce amplitude when using the MCSwipeTableViewCellModeSwitch mode
 static CGFloat const kMCDamping                     = 0.6;  // Damping of the spring animation
 static CGFloat const kMCVelocity                    = 0.9;  // Velocity of the spring animation
@@ -18,6 +18,7 @@ static NSTimeInterval const kMCBounceDuration1      = 0.2;  // Duration of the f
 static NSTimeInterval const kMCBounceDuration2      = 0.1;  // Duration of the second part of the bounce animation
 static NSTimeInterval const kMCDurationLowLimit     = 0.25; // Lowest duration when swiping the cell because we try to simulate velocity
 static NSTimeInterval const kMCDurationHighLimit    = 0.1;  // Highest duration when swiping the cell because we try to simulate velocity
+static CGFloat const kMCScreenEdgeIgnore            = 44.f; // Ignore 44px at screen edge
 
 typedef NS_ENUM(NSUInteger, MCSwipeTableViewCellDirection) {
     MCSwipeTableViewCellDirectionLeft = 0,
@@ -332,6 +333,19 @@ typedef NS_ENUM(NSUInteger, MCSwipeTableViewCellDirection) {
         
         UIPanGestureRecognizer *g = (UIPanGestureRecognizer *)gestureRecognizer;
         CGPoint point = [g velocityInView:self];
+        CGPoint location = [g locationInView:self];
+        
+        if (self.shouldIgnoreTouchesAtLeftScreenEdge &&
+            !_modeForState3 && !_modeForState4 &&
+            location.x < kMCScreenEdgeIgnore) {
+            return NO;
+        }
+        
+        if (self.shouldIgnoreTouchesAtRightScreenEdge &&
+            !_modeForState1 && !_modeForState2 &&
+            location.x > CGRectGetWidth(self.bounds) - kMCScreenEdgeIgnore) {
+            return NO;
+        }
         
         if (fabs(point.x) > fabs(point.y) ) {
             if (point.x < 0 && !_modeForState3 && !_modeForState4) {
