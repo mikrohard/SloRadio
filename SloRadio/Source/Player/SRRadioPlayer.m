@@ -45,13 +45,13 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 #pragma mark - Playback control
 
 - (void)playRadioStation:(SRRadioStation *)station {
-    [self stopIfPlaying];
     _currentRadioStation = station;
+    [self stopIfPlayingAndClearStation:NO];
     [self playStreamAtUrl:station.url];
 }
 
 - (void)playStreamAtUrl:(NSURL *)url {
-    [self stopIfPlaying];
+    [self stopIfPlayingAndClearStation:YES];
     self.listPlayer = [[VLCMediaListPlayer alloc] init];
     self.player = self.listPlayer.mediaPlayer;
     self.player.delegate = self;
@@ -62,9 +62,18 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
     [self updatePlayerState];
 }
 
-- (void)stopIfPlaying {
+- (void)stopIfPlayingAndClearStation:(BOOL)clearStation {
     if (self.player) {
-        [self stop];
+        [self.player stop];
+        self.player = nil;
+        self.listPlayer = nil;
+        [self registerMedia:nil];
+        [self updatePlayerState];
+        if (clearStation) {
+            _currentRadioStation = nil;
+        }
+        _timePlaying = 0.0;
+        [self updateMetaData];
     }
 }
 
