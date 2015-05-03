@@ -43,6 +43,10 @@
     [button setImage:menuIcon forState:UIControlStateNormal];
 }
 
+- (BOOL)deepnessForLeftMenu {
+    return YES;
+}
+
 #pragma mark - Status bar
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
