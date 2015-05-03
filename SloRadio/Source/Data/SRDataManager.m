@@ -249,8 +249,10 @@ static NSString * const SRLegacyStationNameKey = @"ime";
             break;
         }
     }
-    [array removeObject:stationToMove];
-    [array insertObject:stationToMove atIndex:index];
+    if (stationToMove) {
+        [array removeObject:stationToMove];
+        [array insertObject:stationToMove atIndex:index];
+    }
     // don't forget about hidden stations otherwise they'll get visible again
     NSArray *allStations = [self.allStations copy];
     for (SRRadioStation *hiddenStation in allStations) {
