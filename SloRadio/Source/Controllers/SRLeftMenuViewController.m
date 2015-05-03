@@ -10,10 +10,10 @@
 #import "SRRadioViewController.h"
 #import "AMSlideMenuMainViewController.h"
 #import "UITableView+Separators.h"
+#import "UIImage+Color.h"
 
 static NSString * const SRMenuControllersTitleKey = @"SRMenuControllersTitleKey";
 static NSString * const SRMenuControllersIconKey = @"SRMenuControllersIconKey";
-static NSString * const SRMenuControllersSelectedIconKey = @"SRMenuControllersSelectedIconKey";
 static NSString * const SRMenuControllersClassKey = @"SRMenuControllersClassKey";
 static NSString * const SRMenuControllersCachedKey = @"SRMenuControllersCachedKey";
 
@@ -63,14 +63,17 @@ static NSString * const SRMenuControllersCachedKey = @"SRMenuControllersCachedKe
     // radio controller
     NSMutableDictionary *radioController = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                             @"Radio stations", SRMenuControllersTitleKey,
+                                            [UIImage imageNamed:@"Radio"], SRMenuControllersIconKey,
                                             [SRRadioViewController class], SRMenuControllersClassKey, nil];
     // settings controller
     NSMutableDictionary *settingsController = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                                @"Settings", SRMenuControllersTitleKey,
+                                               [UIImage imageNamed:@"Settings"], SRMenuControllersIconKey,
                                                [UIViewController class], SRMenuControllersClassKey, nil];
     // about controller
     NSMutableDictionary *aboutController = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                             @"About", SRMenuControllersTitleKey,
+                                            [UIImage imageNamed:@"Info"], SRMenuControllersIconKey,
                                             [UIViewController class], SRMenuControllersClassKey, nil];
     self.controllers = @[radioController, settingsController, aboutController];
 }
@@ -115,6 +118,9 @@ static NSString * const SRMenuControllersCachedKey = @"SRMenuControllersCachedKe
     }
     cell.textLabel.textColor = [SRAppearance menuContentColor];
     cell.textLabel.highlightedTextColor = [SRAppearance mainColor];
+    UIImage *icon = [[self.controllers objectAtIndex:indexPath.row] objectForKey:SRMenuControllersIconKey];
+    cell.imageView.image = [icon imageWithColor:[SRAppearance menuContentColor]];
+    cell.imageView.highlightedImage = [icon imageWithColor:[SRAppearance mainColor]];
     cell.textLabel.text = [[self.controllers objectAtIndex:indexPath.row] objectForKey:SRMenuControllersTitleKey];
     return cell;
 }

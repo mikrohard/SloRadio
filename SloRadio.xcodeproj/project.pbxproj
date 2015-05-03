@@ -28,6 +28,7 @@
 		C83745821AF51D9B002EBB84 /* CBAutoScrollLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745811AF51D9B002EBB84 /* CBAutoScrollLabel.m */; };
 		C83745981AF554FD002EBB84 /* SRRadioTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745971AF554FD002EBB84 /* SRRadioTableViewCell.m */; };
 		C837459C1AF56613002EBB84 /* MCSwipeTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C837459B1AF56613002EBB84 /* MCSwipeTableViewCell.m */; };
+		C837459F1AF61B0C002EBB84 /* UIImage+Color.m in Sources */ = {isa = PBXBuildFile; fileRef = C837459E1AF61B0C002EBB84 /* UIImage+Color.m */; };
 		C8B1D3901AEFF17300A5E0A0 /* MBBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */; };
 		C8B1D3911AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3751AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m */; };
 		C8B1D3921AEFF17300A5E0A0 /* MBHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3771AEFF17300A5E0A0 /* MBHTTPRequest.m */; };
@@ -120,6 +121,8 @@
 		C83745971AF554FD002EBB84 /* SRRadioTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRRadioTableViewCell.m; path = Source/Cells/SRRadioTableViewCell.m; sourceTree = "<group>"; };
 		C837459A1AF56613002EBB84 /* MCSwipeTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MCSwipeTableViewCell.h; path = Libraries/MCSwipeTableViewCell/MCSwipeTableViewCell.h; sourceTree = "<group>"; };
 		C837459B1AF56613002EBB84 /* MCSwipeTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MCSwipeTableViewCell.m; path = Libraries/MCSwipeTableViewCell/MCSwipeTableViewCell.m; sourceTree = "<group>"; };
+		C837459D1AF61B0C002EBB84 /* UIImage+Color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+Color.h"; path = "Source/Categories/UIImage+Color.h"; sourceTree = "<group>"; };
+		C837459E1AF61B0C002EBB84 /* UIImage+Color.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+Color.m"; path = "Source/Categories/UIImage+Color.m"; sourceTree = "<group>"; };
 		C8B1D3711AEFF17300A5E0A0 /* MBBaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequest.h; path = Libraries/MBRequest/MBBaseRequest.h; sourceTree = "<group>"; };
 		C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBBaseRequest.m; path = Libraries/MBRequest/MBBaseRequest.m; sourceTree = "<group>"; };
 		C8B1D3731AEFF17300A5E0A0 /* MBBaseRequestSubclass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequestSubclass.h; path = Libraries/MBRequest/MBBaseRequestSubclass.h; sourceTree = "<group>"; };
@@ -337,6 +340,8 @@
 				C837456F1AF292DF002EBB84 /* UIAlertView+Blocks.m */,
 				C83745751AF50BC5002EBB84 /* UITableView+Separators.h */,
 				C83745761AF50BC5002EBB84 /* UITableView+Separators.m */,
+				C837459D1AF61B0C002EBB84 /* UIImage+Color.h */,
+				C837459E1AF61B0C002EBB84 /* UIImage+Color.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -628,6 +633,7 @@
 				C8B1D3941AEFF17300A5E0A0 /* MBJSONRequest.m in Sources */,
 				C83745641AF24FAF002EBB84 /* SRAddRadioViewController.m in Sources */,
 				C8B1D3A01AEFF20E00A5E0A0 /* SRDataManager.m in Sources */,
+				C837459F1AF61B0C002EBB84 /* UIImage+Color.m in Sources */,
 				C81D330D1AEF83920076BF01 /* AMSlideMenuRightMenuSegue.m in Sources */,
 				C837459C1AF56613002EBB84 /* MCSwipeTableViewCell.m in Sources */,
 				C81D33091AEF83920076BF01 /* AMSlideMenuContentSegue.m in Sources */,
