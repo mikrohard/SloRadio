@@ -8,7 +8,7 @@
 
 #import "SRSleepTimerView.h"
 
-static CGFloat const kButtonSize = 44.f;
+static CGFloat const kButtonSize = 54.f;
 static CGFloat const kDefaultHorizontalPadding = 15.f;
 
 static NSString *formatHHmmss;
@@ -58,7 +58,7 @@ static NSString *formatHHmmss;
     
     // setup button
     UIButton *cancelButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    UIImage *buttonImage = [UIImage imageNamed:@"Cancel"];
+    UIImage *buttonImage = [[UIImage imageNamed:@"Cancel"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     [cancelButton setImage:buttonImage forState:UIControlStateNormal];
     [cancelButton addTarget:self action:@selector(cancelButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:cancelButton];
