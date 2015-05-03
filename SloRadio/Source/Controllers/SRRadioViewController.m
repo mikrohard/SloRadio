@@ -670,7 +670,7 @@
         [UIAlertView showWithTitle:@"Oops!"
                            message:message
                  cancelButtonTitle:@"OK"
-                 otherButtonTitles:canReportProblem ? @[@"Report problem"] : nil
+                 otherButtonTitles:canReportProblem ? @[@"Report"] : nil
                           tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
                               if (buttonIndex != alertView.cancelButtonIndex) {
                                   [weakSelf reportProblemWithRadioStation:station];
