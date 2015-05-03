@@ -24,12 +24,13 @@
 @import MediaPlayer;
 @import MessageUI;
 
-@interface SRRadioViewController () <SRRadioPlayerDelegate, SRSleepTimerDelegate, MFMailComposeViewControllerDelegate> {
+@interface SRRadioViewController () <SRRadioPlayerDelegate, SRSleepTimerDelegate, MFMailComposeViewControllerDelegate, UITableViewDataSource, UITableViewDelegate> {
     BOOL _playbackInterrupted;
 }
 
 @property (nonatomic, strong) SRNowPlayingView *nowPlayingTitleView;
 @property (nonatomic, strong) SRSleepTimer *sleepTimer;
+@property (nonatomic, strong) UITableView *tableView;
 
 @end
 
@@ -37,11 +38,12 @@
 
 @synthesize nowPlayingTitleView = _nowPlayingTitleView;
 @synthesize sleepTimer = _sleepTimer;
+@synthesize tableView = _tableView;
 
 #pragma mark - Lifecycle
 
 - (instancetype)init {
-    self = [super initWithStyle:UITableViewStylePlain];
+    self = [super init];
     if (self) {
         [self registerForNotifications];
         self.title = @"Radio stations";
@@ -51,9 +53,7 @@
 
 - (void)loadView {
     [super loadView];
-    self.tableView.separatorInset = UIEdgeInsetsMake(0, 15.f, 0, 0);
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, 44.f)];
+    [self setupTableView];
 }
 
 - (void)viewDidLoad {
@@ -87,6 +87,21 @@
 }
 
 #pragma mark - Setup
+
+- (void)setupTableView {
+    UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
+    tableView.separatorInset = UIEdgeInsetsMake(0, 15.f, 0, 0);
+    tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    tableView.dataSource = self;
+    tableView.delegate = self;
+    tableView.alwaysBounceVertical = YES;
+    tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, 44.f)];
+    [self.view addSubview:tableView];
+    self.tableView = tableView;
+}
+
 
 - (void)setupToolbar {
     self.navigationController.toolbarHidden = NO;

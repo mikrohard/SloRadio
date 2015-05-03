@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface SRRadioViewController : UITableViewController
+@interface SRRadioViewController : UIViewController
 
 @end
