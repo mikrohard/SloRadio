@@ -66,6 +66,7 @@
 		C8C8FA771AEEB89900E5E46C /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C8FA761AEEB89900E5E46C /* libxml2.dylib */; };
 		C8C8FA791AEEB8B000E5E46C /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C8FA781AEEB8B000E5E46C /* Security.framework */; };
 		C8C8FA7B1AEEBCB600E5E46C /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C8FA7A1AEEBCB600E5E46C /* libiconv.dylib */; };
+		C8FCC27E1AF69F9F00DE77EC /* SRSleepTimerView.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FCC27D1AF69F9F00DE77EC /* SRSleepTimerView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -192,6 +193,8 @@
 		C8C8FA761AEEB89900E5E46C /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
 		C8C8FA781AEEB8B000E5E46C /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		C8C8FA7A1AEEBCB600E5E46C /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = usr/lib/libiconv.dylib; sourceTree = SDKROOT; };
+		C8FCC27C1AF69F9F00DE77EC /* SRSleepTimerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSleepTimerView.h; path = Source/Views/SRSleepTimerView.h; sourceTree = "<group>"; };
+		C8FCC27D1AF69F9F00DE77EC /* SRSleepTimerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSleepTimerView.m; path = Source/Views/SRSleepTimerView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -360,6 +363,8 @@
 				C837457A1AF50C83002EBB84 /* SRSeparatorView.m */,
 				C837457C1AF51C93002EBB84 /* SRNowPlayingView.h */,
 				C837457D1AF51C93002EBB84 /* SRNowPlayingView.m */,
+				C8FCC27C1AF69F9F00DE77EC /* SRSleepTimerView.h */,
+				C8FCC27D1AF69F9F00DE77EC /* SRSleepTimerView.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -646,6 +651,7 @@
 				C8B1D3921AEFF17300A5E0A0 /* MBHTTPRequest.m in Sources */,
 				C83745681AF26E58002EBB84 /* SRTextInputCell.m in Sources */,
 				C81D33171AEF84900076BF01 /* SRRadioViewController.m in Sources */,
+				C8FCC27E1AF69F9F00DE77EC /* SRSleepTimerView.m in Sources */,
 				C83745A31AF634C4002EBB84 /* Reachability.m in Sources */,
 				C837457B1AF50C83002EBB84 /* SRSeparatorView.m in Sources */,
 				C83745771AF50BC5002EBB84 /* UITableView+Separators.m in Sources */,

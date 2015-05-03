@@ -11,6 +11,7 @@
 #import "SRRadioPlayer.h"
 #import "SRRadioStation.h"
 #import "SRSleepTimer.h"
+#import "SRSleepTimerView.h"
 #import "SRAddRadioViewController.h"
 #import "MBProgressHUD.h"
 #import "UIAlertView+Blocks.h"
@@ -24,12 +25,13 @@
 @import MediaPlayer;
 @import MessageUI;
 
-@interface SRRadioViewController () <SRRadioPlayerDelegate, SRSleepTimerDelegate, MFMailComposeViewControllerDelegate, UITableViewDataSource, UITableViewDelegate> {
+@interface SRRadioViewController () <SRRadioPlayerDelegate, SRSleepTimerDelegate, SRSleepTimerViewDelegate, MFMailComposeViewControllerDelegate, UITableViewDataSource, UITableViewDelegate> {
     BOOL _playbackInterrupted;
 }
 
 @property (nonatomic, strong) SRNowPlayingView *nowPlayingTitleView;
 @property (nonatomic, strong) SRSleepTimer *sleepTimer;
+@property (nonatomic, strong) SRSleepTimerView *sleepTimerView;
 @property (nonatomic, strong) UITableView *tableView;
 
 @end
@@ -38,6 +40,7 @@
 
 @synthesize nowPlayingTitleView = _nowPlayingTitleView;
 @synthesize sleepTimer = _sleepTimer;
+@synthesize sleepTimerView = _sleepTimerView;
 @synthesize tableView = _tableView;
 
 #pragma mark - Lifecycle
@@ -47,6 +50,7 @@
     if (self) {
         [self registerForNotifications];
         self.title = @"Radio stations";
+        self.automaticallyAdjustsScrollViewInsets = NO;
     }
     return self;
 }
@@ -68,6 +72,7 @@
     [self setupToolbar];
     [self setupAudioSession];
     [self startRemoteControlTracking];
+    [self setupTableViewInsets];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -110,6 +115,30 @@
 
 - (void)setupNavigationBar {
     [self updateNavigationButtons];
+}
+
+- (void)setupTableViewInsets {
+    CGFloat topInset = 0.f;
+    CGFloat bottomInset = 0.f;
+    CGFloat previousTopInset = self.tableView.contentInset.top;
+    CGFloat previousTopOffset = self.tableView.contentOffset.y;
+    if (self.sleepTimerView) {
+        topInset = CGRectGetMaxY(self.sleepTimerView.frame);
+    }
+    else {
+        UINavigationBar *bar = self.navigationController.navigationBar;
+        topInset = CGRectGetMaxY(bar.frame);
+    }
+    if (!self.navigationController.toolbarHidden) {
+        UIToolbar *toolbar = self.navigationController.toolbar;
+        bottomInset = CGRectGetHeight(toolbar.frame);
+    }
+    self.tableView.contentInset = UIEdgeInsetsMake(topInset, 0, bottomInset, 0);
+    self.tableView.scrollIndicatorInsets = self.tableView.contentInset;
+    CGFloat newTopOffset = previousTopOffset + previousTopInset - topInset;
+    CGPoint contentOffset = self.tableView.contentOffset;
+    contentOffset.y = newTopOffset;
+    self.tableView.contentOffset = contentOffset;
 }
 
 #pragma mark - Audio session
@@ -533,11 +562,18 @@
 }
 
 - (void)sleepTimer:(SRSleepTimer *)timer timeRemaining:(NSTimeInterval)timeRemaining {
-    NSLog(@"Sleep timer time remaining: %.2f", timeRemaining);
+    self.sleepTimerView.timeRemaining = timeRemaining;
 }
 
 - (void)sleepTimerDidEnd:(SRSleepTimer *)timer {
     [self stopAction];
+}
+
+#pragma mark - SRSleepTimerViewDelegate
+
+- (void)sleepTimerViewCancelButtonPressed:(SRSleepTimerView *)view {
+    [self clearSleepTimer];
+    [[SRRadioPlayer sharedPlayer] setVolume:100];
 }
 
 #pragma mark - Remote control events
@@ -653,6 +689,7 @@
     [self.sleepTimer invalidate];
     NSTimeInterval interval = [SRDataManager sharedManager].sleepTimerInterval;
     self.sleepTimer = [[SRSleepTimer alloc] initWithInterval:interval delegate:self];
+    [self showSleepTimerViewAnimated:YES];
 }
 
 - (void)startSleepTimer {
@@ -662,6 +699,55 @@
 - (void)clearSleepTimer {
     [self.sleepTimer invalidate];
     self.sleepTimer = nil;
+    [self hideSleepTimerViewAnimated:YES];
+}
+
+- (void)layoutSleepTimerView {
+    if (self.sleepTimerView) {
+        UINavigationBar *bar = self.navigationController.navigationBar;
+        CGRect navigationBarFrame = [bar.superview convertRect:bar.frame toView:self.view];
+        CGFloat height = CGRectGetHeight(navigationBarFrame);
+        self.sleepTimerView.frame = CGRectMake(0,
+                                               CGRectGetMaxY(navigationBarFrame),
+                                               CGRectGetWidth(self.view.frame),
+                                               height);
+        self.sleepTimerView.horizontalPadding = self.tableView.separatorInset.left;
+    }
+}
+
+- (void)showSleepTimerViewAnimated:(BOOL)animated {
+    if (!self.sleepTimerView) {
+        self.sleepTimerView = [[SRSleepTimerView alloc] init];
+        self.sleepTimerView.timeRemaining = self.sleepTimer.timeRemaining;
+        self.sleepTimerView.delegate = self;
+        self.sleepTimerView.alpha = 0.f;
+        [self layoutSleepTimerView];
+        CGRect sleepTimerViewFrame = self.sleepTimerView.frame;
+        sleepTimerViewFrame.size.height = 0.f;
+        self.sleepTimerView.frame = sleepTimerViewFrame;
+        [self.view addSubview:self.sleepTimerView];
+    }
+    
+    [UIView animateWithDuration:animated ? 0.3f : 0.f animations:^{
+        self.sleepTimerView.alpha = 1.f;
+        [self layoutSleepTimerView];
+        [self setupTableViewInsets];
+    }];
+}
+
+- (void)hideSleepTimerViewAnimated:(BOOL)animated {
+    if (self.sleepTimerView) {
+        UIView *sleepTimerView = self.sleepTimerView;
+        self.sleepTimerView = nil;
+        [UIView animateWithDuration:animated ? 0.3f : 0.f
+                         animations:^{
+                             sleepTimerView.alpha = 0.f;
+                             [self setupTableViewInsets];
+                         }
+                         completion:^(BOOL finished) {
+                             [sleepTimerView removeFromSuperview];
+                         }];
+    }
 }
 
 #pragma mark - Report problem
@@ -683,6 +769,13 @@
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
     [self dismissViewControllerAnimated:YES completion:NULL];
+}
+
+#pragma mark - Screen rotation
+
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    [self layoutSleepTimerView];
+    [self setupTableViewInsets];
 }
 
 #pragma mark - Utils
