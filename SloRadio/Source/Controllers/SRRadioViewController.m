@@ -16,6 +16,7 @@
 #import "UITableView+Separators.h"
 #import "SRNowPlayingView.h"
 #import "SRRadioTableViewCell.h"
+#import "UIImage+Color.h"
 
 @import AVFoundation;
 @import MediaPlayer;
@@ -580,9 +581,8 @@
 #pragma mark - Utils
 
 - (UIView *)viewWithImageName:(NSString *)imageName {
-    UIImage *image = [[UIImage imageNamed:imageName] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    UIImage *image = [[UIImage imageNamed:imageName] imageWithColor:[UIColor whiteColor]];
     UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-    imageView.tintColor = [UIColor whiteColor];
     imageView.contentMode = UIViewContentModeCenter;
     return imageView;
 }
