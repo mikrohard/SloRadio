@@ -34,7 +34,7 @@ static NSString * const SRMenuControllersCachedKey = @"SRMenuControllersCachedKe
 - (void)loadView {
     [super loadView];
     self.tableView.backgroundColor = [SRAppearance menuBackgroundColor];
-    self.tableView.separatorColor = [SRAppearance menuContentColor];
+    self.tableView.separatorColor = [SRAppearance menuSeparatorColor];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, 44.f)];
     self.tableView.tableFooterView.backgroundColor = [UIColor clearColor];

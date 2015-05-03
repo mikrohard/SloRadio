@@ -27,6 +27,10 @@
     return [UIColor colorWithWhite:1.f alpha:0.6f];
 }
 
++ (UIColor *)menuSeparatorColor {
+    return [UIColor colorWithWhite:1.f alpha:0.2f];
+}
+
 + (UIColor *)cellActionColor {
     return [self mainColor];
 }
