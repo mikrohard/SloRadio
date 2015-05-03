@@ -40,6 +40,8 @@ static NSString * const SRLegacyStationNameKey = @"ime";
 @synthesize allStations = _allStations;
 @synthesize stations = _stations;
 @synthesize selectedRadioStation = _selectedRadioStation;
+@synthesize sleepTimerInterval = _sleepTimerInterval;
+@synthesize sleepTimerEnabledByDefault = _sleepTimerEnabledByDefault;
 
 #pragma mark - Singleton
 
@@ -48,9 +50,16 @@ static NSString * const SRLegacyStationNameKey = @"ime";
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedDataManager = [[self alloc] init];
-        [sharedDataManager loadLocalStations];
+        [sharedDataManager loadInitialData];
     });
     return sharedDataManager;
+}
+
+#pragma mark - Initial load
+
+- (void)loadInitialData {
+    [self loadInitialSleepTimerSettings];
+    [self loadLocalStations];
 }
 
 #pragma mark - Network
@@ -314,6 +323,13 @@ static NSString * const SRLegacyStationNameKey = @"ime";
         selectedStation = self.stations[0];
     }
     [self selectRadioStation:selectedStation];
+}
+
+#pragma mark - Sleep timer
+
+- (void)loadInitialSleepTimerSettings {
+    _sleepTimerInterval = 60.0;
+    _sleepTimerEnabledByDefault = NO;
 }
 
 #pragma mark - Data migration from old version

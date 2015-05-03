@@ -39,6 +39,8 @@ extern NSString * const SRRadioPlayerMetaDataNowPlayingKey;
 - (void)playStreamAtUrl:(NSURL *)url;
 - (void)stop;
 
+- (void)setVolume:(int)volume;
+
 @end
 
 @protocol SRRadioPlayerDelegate <NSObject>

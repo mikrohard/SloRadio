@@ -19,6 +19,8 @@ typedef void (^SRDataManagerCompletionHandler)(NSError *error);
 
 @property (nonatomic, readonly) NSArray *stations;
 @property (nonatomic, readonly) SRRadioStation *selectedRadioStation;
+@property (nonatomic, readonly) NSTimeInterval sleepTimerInterval;
+@property (nonatomic, readonly) BOOL sleepTimerEnabledByDefault;
 
 + (SRDataManager *)sharedManager;
 

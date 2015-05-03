@@ -88,6 +88,10 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
     [self updateMetaData];
 }
 
+- (void)setVolume:(int)volume {
+    self.player.audio.volume = volume;
+}
+
 #pragma mark - Meta data
 
 - (void)updateMetaData {

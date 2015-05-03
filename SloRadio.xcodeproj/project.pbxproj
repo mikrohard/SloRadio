@@ -30,6 +30,7 @@
 		C837459C1AF56613002EBB84 /* MCSwipeTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C837459B1AF56613002EBB84 /* MCSwipeTableViewCell.m */; };
 		C837459F1AF61B0C002EBB84 /* UIImage+Color.m in Sources */ = {isa = PBXBuildFile; fileRef = C837459E1AF61B0C002EBB84 /* UIImage+Color.m */; };
 		C83745A31AF634C4002EBB84 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745A21AF634C4002EBB84 /* Reachability.m */; };
+		C83745A61AF6426D002EBB84 /* SRSleepTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745A51AF6426D002EBB84 /* SRSleepTimer.m */; };
 		C8B1D3901AEFF17300A5E0A0 /* MBBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */; };
 		C8B1D3911AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3751AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m */; };
 		C8B1D3921AEFF17300A5E0A0 /* MBHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3771AEFF17300A5E0A0 /* MBHTTPRequest.m */; };
@@ -126,6 +127,8 @@
 		C837459E1AF61B0C002EBB84 /* UIImage+Color.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+Color.m"; path = "Source/Categories/UIImage+Color.m"; sourceTree = "<group>"; };
 		C83745A11AF634C4002EBB84 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = Libraries/Reachability/Reachability.h; sourceTree = "<group>"; };
 		C83745A21AF634C4002EBB84 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = Libraries/Reachability/Reachability.m; sourceTree = "<group>"; };
+		C83745A41AF6426D002EBB84 /* SRSleepTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSleepTimer.h; path = Source/Player/SRSleepTimer.h; sourceTree = "<group>"; };
+		C83745A51AF6426D002EBB84 /* SRSleepTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSleepTimer.m; path = Source/Player/SRSleepTimer.m; sourceTree = "<group>"; };
 		C8B1D3711AEFF17300A5E0A0 /* MBBaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequest.h; path = Libraries/MBRequest/MBBaseRequest.h; sourceTree = "<group>"; };
 		C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBBaseRequest.m; path = Libraries/MBRequest/MBBaseRequest.m; sourceTree = "<group>"; };
 		C8B1D3731AEFF17300A5E0A0 /* MBBaseRequestSubclass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequestSubclass.h; path = Libraries/MBRequest/MBBaseRequestSubclass.h; sourceTree = "<group>"; };
@@ -506,6 +509,8 @@
 				C83745501AF11BA9002EBB84 /* VLCDialogDisplayer+Suppress.m */,
 				C8C8FA5C1AEEAF5A00E5E46C /* SRRadioPlayer.h */,
 				C8C8FA5D1AEEAF5A00E5E46C /* SRRadioPlayer.m */,
+				C83745A41AF6426D002EBB84 /* SRSleepTimer.h */,
+				C83745A51AF6426D002EBB84 /* SRSleepTimer.m */,
 			);
 			name = Player;
 			sourceTree = "<group>";
@@ -636,6 +641,7 @@
 				C8B1D3951AEFF17300A5E0A0 /* MBMultipartFormData.m in Sources */,
 				C8B1D39C1AEFF17300A5E0A0 /* NSURL+MBRequest.m in Sources */,
 				C837456C1AF28016002EBB84 /* MBProgressHUD.m in Sources */,
+				C83745A61AF6426D002EBB84 /* SRSleepTimer.m in Sources */,
 				C81D330F1AEF83920076BF01 /* UIViewController+AMSlideMenu.m in Sources */,
 				C8B1D3921AEFF17300A5E0A0 /* MBHTTPRequest.m in Sources */,
 				C83745681AF26E58002EBB84 /* SRTextInputCell.m in Sources */,

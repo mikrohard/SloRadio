@@ -10,6 +10,7 @@
 #import "SRDataManager.h"
 #import "SRRadioPlayer.h"
 #import "SRRadioStation.h"
+#import "SRSleepTimer.h"
 #import "SRAddRadioViewController.h"
 #import "MBProgressHUD.h"
 #import "UIAlertView+Blocks.h"
@@ -23,17 +24,19 @@
 @import MediaPlayer;
 @import MessageUI;
 
-@interface SRRadioViewController () <SRRadioPlayerDelegate, MFMailComposeViewControllerDelegate> {
+@interface SRRadioViewController () <SRRadioPlayerDelegate, SRSleepTimerDelegate, MFMailComposeViewControllerDelegate> {
     BOOL _playbackInterrupted;
 }
 
 @property (nonatomic, strong) SRNowPlayingView *nowPlayingTitleView;
+@property (nonatomic, strong) SRSleepTimer *sleepTimer;
 
 @end
 
 @implementation SRRadioViewController
 
 @synthesize nowPlayingTitleView = _nowPlayingTitleView;
+@synthesize sleepTimer = _sleepTimer;
 
 #pragma mark - Lifecycle
 
@@ -278,6 +281,26 @@
     [self selectStationWithOffset:-1];
 }
 
+- (void)markSelectedRadioStation {
+    SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
+    if (selectedStation) {
+        NSIndexPath *selectedIndexPath = nil;
+        NSArray *stations = [self stations];
+        for (SRRadioStation *existingStation in stations) {
+            if (existingStation.stationId == selectedStation.stationId) {
+                selectedIndexPath = [NSIndexPath indexPathForRow:[stations indexOfObject:existingStation] inSection:0];
+                break;
+            }
+        }
+        if (selectedIndexPath) {
+            UITableView *tableView = self.tableView;
+            for (UITableViewCell *cell in tableView.visibleCells) {
+                cell.accessoryType = [tableView indexPathForCell:cell].row == selectedIndexPath.row ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+            }
+        }
+    }
+}
+
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -299,10 +322,13 @@
     SRRadioStation *station = [[self stations] objectAtIndex:indexPath.row];
     __weak SRRadioViewController *weakSelf = self;
     
-    UIView *clockView = [self viewWithImageName:@"Clock"];
+    BOOL sleepTimerByDefault = [SRDataManager sharedManager].sleepTimerEnabledByDefault;
+    UIView *iconView = sleepTimerByDefault ? [self viewWithImageName:@"Play"] : [self viewWithImageName:@"Clock"];
     UIColor *clockColor = [SRAppearance cellActionColor];
-    [cell setSwipeGestureWithView:clockView color:clockColor mode:MCSwipeTableViewCellModeSwitch state:MCSwipeTableViewCellState1 completionBlock:^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
-        NSLog(@"Did swipe \"Clock\" cell");
+    [cell setSwipeGestureWithView:iconView color:clockColor mode:MCSwipeTableViewCellModeSwitch state:MCSwipeTableViewCellState1 completionBlock:^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
+        [[SRDataManager sharedManager] selectRadioStation:station];
+        [weakSelf markSelectedRadioStation];
+        [weakSelf playActionWithSleepTimer:!sleepTimerByDefault];
     }];
     
     if ([self canReportProblemForRadioStation:station]) {
@@ -344,22 +370,7 @@
                 [self stopAction];
             }
             if (stationWasSelected) {
-                SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
-                if (selectedStation) {
-                    NSIndexPath *selectedIndexPath = nil;
-                    NSArray *stations = [self stations];
-                    for (SRRadioStation *existingStation in stations) {
-                        if (existingStation.stationId == selectedStation.stationId) {
-                            selectedIndexPath = [NSIndexPath indexPathForRow:[stations indexOfObject:existingStation] inSection:0];
-                            break;
-                        }
-                    }
-                    if (selectedIndexPath) {
-                        for (UITableViewCell *cell in tableView.visibleCells) {
-                            cell.accessoryType = [tableView indexPathForCell:cell].row == selectedIndexPath.row ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
-                        }
-                    }
-                }
+                [self markSelectedRadioStation];
             }
         }
     }
@@ -374,7 +385,7 @@
     SRRadioStation *station = [[self stations] objectAtIndex:indexPath.row];
     [[SRDataManager sharedManager] selectRadioStation:station];
     if ([[SRRadioPlayer sharedPlayer] currentRadioStation] != nil) {
-        [[SRRadioPlayer sharedPlayer] playRadioStation:station];
+        [self playAction];
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
@@ -417,6 +428,17 @@
 #pragma mark - Common actions
 
 - (void)playAction {
+    BOOL sleepTimer = [SRDataManager sharedManager].sleepTimerEnabledByDefault;
+    [self playActionWithSleepTimer:sleepTimer];
+}
+
+- (void)playActionWithSleepTimer:(BOOL)sleepTimer {
+    if (sleepTimer) {
+        [self setupSleepTimer];
+    }
+    else {
+        [self clearSleepTimer];
+    }
     _playbackInterrupted = NO;
     SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
     [[SRRadioPlayer sharedPlayer] playRadioStation:selectedStation];
@@ -424,6 +446,7 @@
 
 - (void)stopAction {
     [[SRRadioPlayer sharedPlayer] stop];
+    [self clearSleepTimer];
 }
 
 - (void)updateNowPlayingInfo {
@@ -477,10 +500,29 @@
         [self handlePlaybackError];
         [self stopAction];
     }
+    if (state == SRRadioPlayerStatePlaying &&
+        self.sleepTimer && !self.sleepTimer.isRunning) {
+        [self startSleepTimer];
+    }
 }
 
 - (void)radioPlayer:(SRRadioPlayer *)player didChangeMetaData:(NSDictionary *)metadata {
     [self updateNowPlayingInfo];
+}
+
+#pragma mark - SRSleepTimerDelegate
+
+- (void)sleepTimer:(SRSleepTimer *)timer changeVolumeLevel:(float)volume {
+    int playerVolume = (int)(volume * 100.0);
+    [[SRRadioPlayer sharedPlayer] setVolume:playerVolume];
+}
+
+- (void)sleepTimer:(SRSleepTimer *)timer timeRemaining:(NSTimeInterval)timeRemaining {
+    NSLog(@"Sleep timer time remaining: %.2f", timeRemaining);
+}
+
+- (void)sleepTimerDidEnd:(SRSleepTimer *)timer {
+    [self stopAction];
 }
 
 #pragma mark - Remote control events
@@ -588,6 +630,23 @@
 
 - (BOOL)showErrorPopup {
     return [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive;
+}
+
+#pragma mark - Sleep timer
+
+- (void)setupSleepTimer {
+    [self.sleepTimer invalidate];
+    NSTimeInterval interval = [SRDataManager sharedManager].sleepTimerInterval;
+    self.sleepTimer = [[SRSleepTimer alloc] initWithInterval:interval delegate:self];
+}
+
+- (void)startSleepTimer {
+    [self.sleepTimer startTimer];
+}
+
+- (void)clearSleepTimer {
+    [self.sleepTimer invalidate];
+    self.sleepTimer = nil;
 }
 
 #pragma mark - Report problem
