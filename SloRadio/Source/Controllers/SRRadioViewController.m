@@ -17,11 +17,13 @@
 #import "SRNowPlayingView.h"
 #import "SRRadioTableViewCell.h"
 #import "UIImage+Color.h"
+#import "Reachability.h"
 
 @import AVFoundation;
 @import MediaPlayer;
+@import MessageUI;
 
-@interface SRRadioViewController () <SRRadioPlayerDelegate> {
+@interface SRRadioViewController () <SRRadioPlayerDelegate, MFMailComposeViewControllerDelegate> {
     BOOL _playbackInterrupted;
 }
 
@@ -294,19 +296,23 @@
     if (!cell) {
         cell = [[SRRadioTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
     }
+    SRRadioStation *station = [[self stations] objectAtIndex:indexPath.row];
+    __weak SRRadioViewController *weakSelf = self;
+    
     UIView *clockView = [self viewWithImageName:@"Clock"];
     UIColor *clockColor = [SRAppearance cellActionColor];
     [cell setSwipeGestureWithView:clockView color:clockColor mode:MCSwipeTableViewCellModeSwitch state:MCSwipeTableViewCellState1 completionBlock:^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
         NSLog(@"Did swipe \"Clock\" cell");
     }];
     
-    UIView *reportView = [self viewWithImageName:@"Warning"];
-    UIColor *reportColor = [SRAppearance cellReportColor];
-    [cell setSwipeGestureWithView:reportView color:reportColor mode:MCSwipeTableViewCellModeSwitch state:MCSwipeTableViewCellState2 completionBlock:^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
-        NSLog(@"Did swipe \"Report\" cell");
-    }];
+    if ([self canReportProblemForRadioStation:station]) {
+        UIView *reportView = [self viewWithImageName:@"Warning"];
+        UIColor *reportColor = [SRAppearance cellReportColor];
+        [cell setSwipeGestureWithView:reportView color:reportColor mode:MCSwipeTableViewCellModeSwitch state:MCSwipeTableViewCellState2 completionBlock:^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
+            [weakSelf reportProblemWithRadioStation:station];
+        }];
+    }
     
-    SRRadioStation *station = [[self stations] objectAtIndex:indexPath.row];
     SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
     cell.textLabel.text = station.name;
     cell.accessoryType = station.stationId == selectedStation.stationId ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
@@ -564,18 +570,45 @@
 - (void)handlePlaybackError {
     if ([self showErrorPopup]) {
         // display error
-        NSString *message = [NSString stringWithFormat:@"Unable to play \"%@\"", [[[SRRadioPlayer sharedPlayer] currentRadioStation] name]];
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Oops!"
-                                                        message:message
-                                                       delegate:nil
-                                              cancelButtonTitle:@"OK"
-                                              otherButtonTitles:nil];
-        [alert show];
+        SRRadioStation *station = [[SRRadioPlayer sharedPlayer] currentRadioStation];
+        BOOL canReportProblem = [self isInternetReachable] && [self canReportProblemForRadioStation:station];
+        NSString *message = [NSString stringWithFormat:@"Unable to play \"%@\"", station.name];
+        __weak SRRadioViewController *weakSelf = self;
+        [UIAlertView showWithTitle:@"Oops!"
+                           message:message
+                 cancelButtonTitle:@"OK"
+                 otherButtonTitles:canReportProblem ? @[@"Report problem"] : nil
+                          tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
+                              if (buttonIndex != alertView.cancelButtonIndex) {
+                                  [weakSelf reportProblemWithRadioStation:station];
+                              }
+                          }];
     }
 }
 
 - (BOOL)showErrorPopup {
     return [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive;
+}
+
+#pragma mark - Report problem
+
+- (BOOL)canReportProblemForRadioStation:(SRRadioStation *)station {
+    return [MFMailComposeViewController canSendMail] && ![[SRDataManager sharedManager] isCustomRadioStation:station];
+}
+
+- (void)reportProblemWithRadioStation:(SRRadioStation *)station {
+    MFMailComposeViewController *mailController = [[MFMailComposeViewController alloc] init];
+    mailController.modalPresentationStyle = UIModalPresentationFormSheet;
+    mailController.mailComposeDelegate = self;
+    [mailController setSubject:[NSString stringWithFormat:@"Report problem [%@]", station.name]];
+    [mailController setToRecipients:@[@"sloradio@jernej.org"]];
+    NSString *message = [NSString stringWithFormat:@"There is a problem with the following radio station.\n\nID: %ld\nName: %@\nURL: %@", (long)station.stationId, station.name, station.url];
+    [mailController setMessageBody:message isHTML:NO];
+    [self presentViewController:mailController animated:YES completion:NULL];
+}
+
+- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
+    [self dismissViewControllerAnimated:YES completion:NULL];
 }
 
 #pragma mark - Utils
@@ -585,6 +618,10 @@
     UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
     imageView.contentMode = UIViewContentModeCenter;
     return imageView;
+}
+
+- (BOOL)isInternetReachable {
+    return [[Reachability reachabilityForInternetConnection] currentReachabilityStatus] != NotReachable;
 }
 
 @end

@@ -29,6 +29,7 @@
 		C83745981AF554FD002EBB84 /* SRRadioTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745971AF554FD002EBB84 /* SRRadioTableViewCell.m */; };
 		C837459C1AF56613002EBB84 /* MCSwipeTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C837459B1AF56613002EBB84 /* MCSwipeTableViewCell.m */; };
 		C837459F1AF61B0C002EBB84 /* UIImage+Color.m in Sources */ = {isa = PBXBuildFile; fileRef = C837459E1AF61B0C002EBB84 /* UIImage+Color.m */; };
+		C83745A31AF634C4002EBB84 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745A21AF634C4002EBB84 /* Reachability.m */; };
 		C8B1D3901AEFF17300A5E0A0 /* MBBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */; };
 		C8B1D3911AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3751AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m */; };
 		C8B1D3921AEFF17300A5E0A0 /* MBHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3771AEFF17300A5E0A0 /* MBHTTPRequest.m */; };
@@ -123,6 +124,8 @@
 		C837459B1AF56613002EBB84 /* MCSwipeTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MCSwipeTableViewCell.m; path = Libraries/MCSwipeTableViewCell/MCSwipeTableViewCell.m; sourceTree = "<group>"; };
 		C837459D1AF61B0C002EBB84 /* UIImage+Color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+Color.h"; path = "Source/Categories/UIImage+Color.h"; sourceTree = "<group>"; };
 		C837459E1AF61B0C002EBB84 /* UIImage+Color.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+Color.m"; path = "Source/Categories/UIImage+Color.m"; sourceTree = "<group>"; };
+		C83745A11AF634C4002EBB84 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = Libraries/Reachability/Reachability.h; sourceTree = "<group>"; };
+		C83745A21AF634C4002EBB84 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = Libraries/Reachability/Reachability.m; sourceTree = "<group>"; };
 		C8B1D3711AEFF17300A5E0A0 /* MBBaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequest.h; path = Libraries/MBRequest/MBBaseRequest.h; sourceTree = "<group>"; };
 		C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBBaseRequest.m; path = Libraries/MBRequest/MBBaseRequest.m; sourceTree = "<group>"; };
 		C8B1D3731AEFF17300A5E0A0 /* MBBaseRequestSubclass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequestSubclass.h; path = Libraries/MBRequest/MBBaseRequestSubclass.h; sourceTree = "<group>"; };
@@ -255,6 +258,7 @@
 				C83745691AF27FFA002EBB84 /* MBProgressHud */,
 				C8B1D3701AEFF16700A5E0A0 /* MBRequest */,
 				C83745991AF56606002EBB84 /* MCSwipeTableViewCell */,
+				C83745A01AF634B1002EBB84 /* Reachability */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -373,6 +377,15 @@
 				C837459B1AF56613002EBB84 /* MCSwipeTableViewCell.m */,
 			);
 			name = MCSwipeTableViewCell;
+			sourceTree = "<group>";
+		};
+		C83745A01AF634B1002EBB84 /* Reachability */ = {
+			isa = PBXGroup;
+			children = (
+				C83745A11AF634C4002EBB84 /* Reachability.h */,
+				C83745A21AF634C4002EBB84 /* Reachability.m */,
+			);
+			name = Reachability;
 			sourceTree = "<group>";
 		};
 		C8B1D3701AEFF16700A5E0A0 /* MBRequest */ = {
@@ -627,6 +640,7 @@
 				C8B1D3921AEFF17300A5E0A0 /* MBHTTPRequest.m in Sources */,
 				C83745681AF26E58002EBB84 /* SRTextInputCell.m in Sources */,
 				C81D33171AEF84900076BF01 /* SRRadioViewController.m in Sources */,
+				C83745A31AF634C4002EBB84 /* Reachability.m in Sources */,
 				C837457B1AF50C83002EBB84 /* SRSeparatorView.m in Sources */,
 				C83745771AF50BC5002EBB84 /* UITableView+Separators.m in Sources */,
 				C8B1D39B1AEFF17300A5E0A0 /* NSString+MBRequest.m in Sources */,
