@@ -273,6 +273,23 @@ static NSString * const SRLegacyStationNameKey = @"ime";
     [self setStationsCustomized:YES];
 }
 
+- (void)updateRadioStation:(SRRadioStation *)station {
+    if ([self isCustomRadioStation:station]) {
+        NSMutableArray *array = [NSMutableArray arrayWithArray:self.allStations];
+        SRRadioStation *stationToUpdate = nil;
+        for (SRRadioStation *existingStation in array) {
+            if (existingStation.stationId == station.stationId) {
+                stationToUpdate = existingStation;
+                break;
+            }
+        }
+        stationToUpdate.name = station.name;
+        stationToUpdate.url = station.url;
+        self.allStations = array;
+        [[NSNotificationCenter defaultCenter] postNotificationName:SRDataManagerDidChangeStations object:self];
+    }
+}
+
 - (void)setStationsCustomized:(BOOL)customized {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [defaults setBool:customized forKey:SRDataManagerStationsCustomizedKey];

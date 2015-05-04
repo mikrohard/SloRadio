@@ -98,6 +98,7 @@
 
 - (void)setupTableView {
     UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
+    tableView.allowsSelectionDuringEditing = YES;
     tableView.separatorInset = UIEdgeInsetsMake(0, 15.f, 0, 0);
     tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -452,13 +453,18 @@
 #pragma mark - TableView Delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    for (UITableViewCell *cell in tableView.visibleCells) {
-        cell.accessoryType = [tableView indexPathForCell:cell].row == indexPath.row ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
-    }
     SRRadioStation *station = [[self stations] objectAtIndex:indexPath.row];
-    [[SRDataManager sharedManager] selectRadioStation:station];
-    if ([[SRRadioPlayer sharedPlayer] currentRadioStation] != nil) {
-        [self playAction];
+    if (tableView.editing) {
+        [self presentEditRadioControllerForStation:station];
+    }
+    else {
+        for (UITableViewCell *cell in tableView.visibleCells) {
+            cell.accessoryType = [tableView indexPathForCell:cell].row == indexPath.row ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+        }
+        [[SRDataManager sharedManager] selectRadioStation:station];
+        if ([[SRRadioPlayer sharedPlayer] currentRadioStation] != nil) {
+            [self playAction];
+        }
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
@@ -560,6 +566,13 @@
 
 - (void)presentAddRadioController {
     SRAddRadioViewController *controller = [[SRAddRadioViewController alloc] initEmpty];
+    UINavigationController *navigation = [[UINavigationController alloc] initWithRootViewController:controller];
+    navigation.modalPresentationStyle = UIModalPresentationFormSheet;
+    [self presentViewController:navigation animated:YES completion:NULL];
+}
+
+- (void)presentEditRadioControllerForStation:(SRRadioStation *)station {
+    SRAddRadioViewController *controller = [[SRAddRadioViewController alloc] initWithRadioStation:station];
     UINavigationController *navigation = [[UINavigationController alloc] initWithRootViewController:controller];
     navigation.modalPresentationStyle = UIModalPresentationFormSheet;
     [self presentViewController:navigation animated:YES completion:NULL];

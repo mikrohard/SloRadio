@@ -36,7 +36,7 @@
     self = [self initWithStyle:UITableViewStyleGrouped];
     if (self) {
         self.station = station;
-        self.title = station.name ? station.name : @"Add station";
+        self.title = station.stationId > 0 ? @"Edit station" : @"Add station";
     }
     return self;
 }
@@ -59,25 +59,40 @@
 #pragma mark - Setup
 
 - (void)setupNavigationButtons {
-    UIBarButtonItem *cancelItem = [[UIBarButtonItem alloc] initWithTitle:@"Cancel"
+    BOOL canEdit = [self canEditStationName] || [self canEditStationUrl];
+    UIBarButtonItem *cancelItem = [[UIBarButtonItem alloc] initWithTitle:canEdit ? @"Cancel" : @"Close"
                                                                    style:UIBarButtonItemStyleBordered
                                                                   target:self
                                                                   action:@selector(cancelButtonPressed:)];
     self.navigationItem.leftBarButtonItem = cancelItem;
-    UIBarButtonItem *saveItem = [[UIBarButtonItem alloc] initWithTitle:@"Save"
-                                                                 style:UIBarButtonItemStyleDone
-                                                                target:self
-                                                                action:@selector(saveButtonPressed:)];
-    self.navigationItem.rightBarButtonItem = saveItem;
-    [self updateNavigationButtonsEnabledStatus];
+    if (canEdit) {
+        UIBarButtonItem *saveItem = [[UIBarButtonItem alloc] initWithTitle:@"Save"
+                                                                     style:UIBarButtonItemStyleDone
+                                                                    target:self
+                                                                    action:@selector(saveButtonPressed:)];
+        self.navigationItem.rightBarButtonItem = saveItem;
+        [self updateNavigationButtonsEnabledStatus];
+    }
 }
 
 - (void)updateNavigationButtonsEnabledStatus {
-    self.navigationItem.rightBarButtonItem.enabled = [self canTryToSaveRadioStation];
+    if ([self canEditStationName] || [self canEditStationUrl]) {
+        self.navigationItem.rightBarButtonItem.enabled = [self canTryToSaveRadioStation];
+    }
 }
+
+#pragma mark - Editing & saving
 
 - (BOOL)canTryToSaveRadioStation {
     return self.station.name.length > 0 && self.station.url.absoluteString.length > 0;
+}
+
+- (BOOL)canEditStationName {
+    return self.station.stationId == 0 || [[SRDataManager sharedManager] isCustomRadioStation:self.station];
+}
+
+- (BOOL)canEditStationUrl {
+    return self.station.stationId == 0;
 }
 
 #pragma mark - Rows
@@ -114,8 +129,10 @@
         cell.textInputField.text = self.station.name;
         cell.textInputField.placeholder = @"Insert name";
         cell.textInputField.keyboardType = UIKeyboardTypeDefault;
-        cell.textInputField.returnKeyType = UIReturnKeyNext;
+        cell.textInputField.returnKeyType = [self canEditStationUrl] ? UIReturnKeyNext : UIReturnKeyDone;
         cell.textInputField.autocapitalizationType = UITextAutocapitalizationTypeWords;
+        cell.textInputField.enabled = [self canEditStationName];
+        cell.textInputField.textColor = [self canEditStationName] ? [SRAppearance textColor] : [SRAppearance disabledTextColor];
     }
     else if (indexPath.row == [self indexPathForRadioUrl].row &&
              indexPath.section == [self indexPathForRadioUrl].section) {
@@ -124,6 +141,8 @@
         cell.textInputField.keyboardType = UIKeyboardTypeURL;
         cell.textInputField.returnKeyType = UIReturnKeyDone;
         cell.textInputField.autocapitalizationType = UITextAutocapitalizationTypeNone;
+        cell.textInputField.enabled = [self canEditStationUrl];
+        cell.textInputField.textColor = [self canEditStationUrl] ? [SRAppearance textColor] : [SRAppearance disabledTextColor];
     }
     return cell;
 }
@@ -145,11 +164,17 @@
 }
 
 - (void)saveButtonPressed:(id)sender {
-    SRTextInputCell *urlCell = (SRTextInputCell *)[self.tableView cellForRowAtIndexPath:[self indexPathForRadioUrl]];
-    NSString *urlString = urlCell.textInputField.text;
-    NSURL *url = [NSURL URLWithString:urlString];
-    if (url) {
-        [self playStreamAtUrl:url];
+    if ([self canEditStationUrl]) {
+        SRTextInputCell *urlCell = (SRTextInputCell *)[self.tableView cellForRowAtIndexPath:[self indexPathForRadioUrl]];
+        NSString *urlString = urlCell.textInputField.text;
+        NSURL *url = [NSURL URLWithString:urlString];
+        if (url) {
+            [self playStreamAtUrl:url];
+        }
+    }
+    else {
+        [[SRDataManager sharedManager] updateRadioStation:self.station];
+        [self cancelButtonPressed:nil];
     }
 }
 
@@ -202,7 +227,13 @@
     SRTextInputCell *urlCell = (SRTextInputCell *)[self.tableView cellForRowAtIndexPath:[self indexPathForRadioUrl]];
     if (textField == nameCell.textInputField) {
         // name cell returned... go to next cell
-        [urlCell.textInputField becomeFirstResponder];
+        if ([self canEditStationUrl]) {
+            [urlCell.textInputField becomeFirstResponder];
+        }
+        else if ([self canTryToSaveRadioStation]) {
+            [self saveButtonPressed:nil];
+        }
+        [textField resignFirstResponder];
     }
     else if (textField == urlCell.textInputField) {
         if ([self canTryToSaveRadioStation]) {
@@ -229,7 +260,7 @@
     else if (state == SRRadioPlayerStateError || state == SRRadioPlayerStateStopped) {
         [self stopPlaying];
         [self hideProgressHUD];
-        [self showAlertWithTitle:@"Error"
+        [self showAlertWithTitle:@"Oops!"
                          message:@"Could not add station"
                  dismissCallback:NULL];
     }

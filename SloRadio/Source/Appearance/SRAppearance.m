@@ -43,6 +43,14 @@
     return [UIColor redColor];
 }
 
++ (UIColor *)textColor {
+    return [UIColor blackColor];
+}
+
++ (UIColor *)disabledTextColor {
+    return [UIColor colorWithWhite:0.f alpha:0.4f];
+}
+
 + (UIFont *)applicationFontWithSize:(CGFloat)size {
     return [UIFont fontWithName:@"HelveticaNeue" size:size];
 }

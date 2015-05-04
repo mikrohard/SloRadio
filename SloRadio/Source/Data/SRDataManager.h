@@ -28,6 +28,7 @@ typedef void (^SRDataManagerCompletionHandler)(NSError *error);
 - (void)deleteRadioStation:(SRRadioStation *)station;
 - (void)moveRadioStation:(SRRadioStation *)station atIndex:(NSInteger)index;
 - (void)selectRadioStation:(SRRadioStation *)station;
+- (void)updateRadioStation:(SRRadioStation *)station;
 - (void)loadStationsWithCompletionHandler:(SRDataManagerCompletionHandler)completion;
 - (BOOL)isCustomRadioStation:(SRRadioStation *)station;
 

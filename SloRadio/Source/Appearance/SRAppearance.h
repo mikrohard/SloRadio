@@ -20,6 +20,9 @@
 + (UIColor *)cellActionColor;
 + (UIColor *)cellReportColor;
 
++ (UIColor *)textColor;
++ (UIColor *)disabledTextColor;
+
 + (UIFont *)applicationFontWithSize:(CGFloat)size;
 + (UIFont *)boldApplicationFontWithSize:(CGFloat)size;
 + (UIFont *)mediumApplicationFontWithSize:(CGFloat)size;
