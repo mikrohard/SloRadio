@@ -16,6 +16,7 @@
 + (UIColor *)menuContentColor;
 + (UIColor *)menuSeparatorColor;
 
++ (UIColor *)cellBackgroundColor;
 + (UIColor *)cellActionColor;
 + (UIColor *)cellReportColor;
 

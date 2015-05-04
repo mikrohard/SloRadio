@@ -31,6 +31,10 @@
     return [UIColor colorWithWhite:1.f alpha:0.2f];
 }
 
++ (UIColor *)cellBackgroundColor {
+    return [UIColor colorWithRed:210.0/255.0 green:210.0/255.0 blue:210.0/255.0 alpha:1.0];
+}
+
 + (UIColor *)cellActionColor {
     return [self mainColor];
 }

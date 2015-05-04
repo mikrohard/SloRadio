@@ -366,6 +366,8 @@
     SRRadioStation *station = [[self stations] objectAtIndex:indexPath.row];
     __weak SRRadioViewController *weakSelf = self;
     
+    cell.defaultColor = [SRAppearance cellBackgroundColor];
+    
     BOOL sleepTimerByDefault = [SRDataManager sharedManager].sleepTimerEnabledByDefault;
     UIView *iconView = sleepTimerByDefault ? [self viewWithImageName:@"Play"] : [self viewWithImageName:@"Clock"];
     UIColor *clockColor = [SRAppearance cellActionColor];
