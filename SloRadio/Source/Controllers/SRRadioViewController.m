@@ -80,7 +80,7 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [[SRRadioPlayer sharedPlayer] stop];
+    [self stopAction];
     [self endRemoteControlTracking];
     [self endAudioSession];
 }
