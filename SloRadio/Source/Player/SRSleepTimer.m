@@ -69,7 +69,7 @@ static float const kVolumeTimerResolution = 0.01;
 }
 
 - (void)secondsTimerDidFire:(NSTimer *)timer {
-    NSTimeInterval currentInterval = MAX(0, [self.endTimer.fireDate timeIntervalSince1970] - [[NSDate date] timeIntervalSince1970]);
+    NSTimeInterval currentInterval = MAX(0, round([self.endTimer.fireDate timeIntervalSince1970] - [[NSDate date] timeIntervalSince1970]));
     _timeRemaining = currentInterval;
     [self.delegate sleepTimer:self timeRemaining:currentInterval];
 }
