@@ -55,6 +55,9 @@ static float const kVolumeTimerResolution = 0.01;
     [[NSRunLoop currentRunLoop] addTimer:self.endTimer forMode:NSRunLoopCommonModes];
     [[NSRunLoop currentRunLoop] addTimer:self.volumeTimer forMode:NSRunLoopCommonModes];
     [[NSRunLoop currentRunLoop] addTimer:self.secondsTimer forMode:NSRunLoopCommonModes];
+    
+    // manually fire seconds timer at start
+    [self.secondsTimer fire];
 }
 
 - (void)volumeTimerDidFire:(NSTimer *)timer {
