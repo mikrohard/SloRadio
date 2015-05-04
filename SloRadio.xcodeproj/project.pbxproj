@@ -67,6 +67,8 @@
 		C8C8FA791AEEB8B000E5E46C /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C8FA781AEEB8B000E5E46C /* Security.framework */; };
 		C8C8FA7B1AEEBCB600E5E46C /* libiconv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C8FA7A1AEEBCB600E5E46C /* libiconv.dylib */; };
 		C8FCC27E1AF69F9F00DE77EC /* SRSleepTimerView.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FCC27D1AF69F9F00DE77EC /* SRSleepTimerView.m */; };
+		C8FCC28A1AF7F09500DE77EC /* SRSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FCC2891AF7F09500DE77EC /* SRSettingsViewController.m */; };
+		C8FCC28E1AF7F68C00DE77EC /* SRSettingsPickerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FCC28D1AF7F68C00DE77EC /* SRSettingsPickerCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -195,6 +197,10 @@
 		C8C8FA7A1AEEBCB600E5E46C /* libiconv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiconv.dylib; path = usr/lib/libiconv.dylib; sourceTree = SDKROOT; };
 		C8FCC27C1AF69F9F00DE77EC /* SRSleepTimerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSleepTimerView.h; path = Source/Views/SRSleepTimerView.h; sourceTree = "<group>"; };
 		C8FCC27D1AF69F9F00DE77EC /* SRSleepTimerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSleepTimerView.m; path = Source/Views/SRSleepTimerView.m; sourceTree = "<group>"; };
+		C8FCC2881AF7F09500DE77EC /* SRSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSettingsViewController.h; path = Source/Controllers/SRSettingsViewController.h; sourceTree = "<group>"; };
+		C8FCC2891AF7F09500DE77EC /* SRSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSettingsViewController.m; path = Source/Controllers/SRSettingsViewController.m; sourceTree = "<group>"; };
+		C8FCC28C1AF7F68C00DE77EC /* SRSettingsPickerCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSettingsPickerCell.h; path = Source/Cells/SRSettingsPickerCell.h; sourceTree = "<group>"; };
+		C8FCC28D1AF7F68C00DE77EC /* SRSettingsPickerCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSettingsPickerCell.m; path = Source/Cells/SRSettingsPickerCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -233,6 +239,7 @@
 			children = (
 				C81D33141AEF846A0076BF01 /* Radio */,
 				C81D33131AEF845A0076BF01 /* Menu */,
+				C8FCC2871AF7F05F00DE77EC /* Settings */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -541,6 +548,25 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		C8FCC2871AF7F05F00DE77EC /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				C8FCC28B1AF7F65A00DE77EC /* Cells */,
+				C8FCC2881AF7F09500DE77EC /* SRSettingsViewController.h */,
+				C8FCC2891AF7F09500DE77EC /* SRSettingsViewController.m */,
+			);
+			name = Settings;
+			sourceTree = "<group>";
+		};
+		C8FCC28B1AF7F65A00DE77EC /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				C8FCC28C1AF7F68C00DE77EC /* SRSettingsPickerCell.h */,
+				C8FCC28D1AF7F68C00DE77EC /* SRSettingsPickerCell.m */,
+			);
+			name = Cells;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -672,6 +698,8 @@
 				C8B1D3931AEFF17300A5E0A0 /* MBImageRequest.m in Sources */,
 				C8B1D39A1AEFF17300A5E0A0 /* NSDictionary+MBRequest.m in Sources */,
 				C83745981AF554FD002EBB84 /* SRRadioTableViewCell.m in Sources */,
+				C8FCC28A1AF7F09500DE77EC /* SRSettingsViewController.m in Sources */,
+				C8FCC28E1AF7F68C00DE77EC /* SRSettingsPickerCell.m in Sources */,
 				C81D33121AEF83CE0076BF01 /* SRLeftMenuViewController.m in Sources */,
 				C81D330C1AEF83920076BF01 /* AMSlideMenuMainViewController.m in Sources */,
 				C8C8FA3B1AEEADAD00E5E46C /* SRAppDelegate.m in Sources */,

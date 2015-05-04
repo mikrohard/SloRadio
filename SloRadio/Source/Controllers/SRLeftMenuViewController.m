@@ -8,6 +8,7 @@
 
 #import "SRLeftMenuViewController.h"
 #import "SRRadioViewController.h"
+#import "SRSettingsViewController.h"
 #import "AMSlideMenuMainViewController.h"
 #import "UITableView+Separators.h"
 #import "UIImage+Color.h"
@@ -69,7 +70,7 @@ static NSString * const SRMenuControllersCachedKey = @"SRMenuControllersCachedKe
     NSMutableDictionary *settingsController = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                                @"Settings", SRMenuControllersTitleKey,
                                                [UIImage imageNamed:@"Settings"], SRMenuControllersIconKey,
-                                               [UIViewController class], SRMenuControllersClassKey, nil];
+                                               [SRSettingsViewController class], SRMenuControllersClassKey, nil];
     // about controller
     NSMutableDictionary *aboutController = [NSMutableDictionary dictionaryWithObjectsAndKeys:
                                             @"About", SRMenuControllersTitleKey,

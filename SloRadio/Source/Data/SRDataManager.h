@@ -10,6 +10,7 @@
 
 extern NSString * const SRDataManagerDidLoadStations;
 extern NSString * const SRDataManagerDidChangeStations;
+extern NSString * const SRDataManagerDidChangeSleepTimerSettings;
 
 typedef void (^SRDataManagerCompletionHandler)(NSError *error);
 
@@ -19,17 +20,21 @@ typedef void (^SRDataManagerCompletionHandler)(NSError *error);
 
 @property (nonatomic, readonly) NSArray *stations;
 @property (nonatomic, readonly) SRRadioStation *selectedRadioStation;
-@property (nonatomic, readonly) NSTimeInterval sleepTimerInterval;
-@property (nonatomic, readonly) BOOL sleepTimerEnabledByDefault;
+@property (nonatomic, readonly) NSArray *selectableSleepTimerIntervals;
+@property (nonatomic, readonly) NSUInteger selectedSleepTimerIntervalIndex;
+@property (nonatomic, assign) NSTimeInterval sleepTimerInterval;
+@property (nonatomic, assign) BOOL sleepTimerEnabledByDefault;
 
 + (SRDataManager *)sharedManager;
+
+- (void)loadStationsWithCompletionHandler:(SRDataManagerCompletionHandler)completion;
 
 - (void)addRadioStation:(SRRadioStation *)station;
 - (void)deleteRadioStation:(SRRadioStation *)station;
 - (void)moveRadioStation:(SRRadioStation *)station atIndex:(NSInteger)index;
-- (void)selectRadioStation:(SRRadioStation *)station;
 - (void)updateRadioStation:(SRRadioStation *)station;
-- (void)loadStationsWithCompletionHandler:(SRDataManagerCompletionHandler)completion;
+- (void)selectRadioStation:(SRRadioStation *)station;
+
 - (BOOL)isCustomRadioStation:(SRRadioStation *)station;
 
 @end

@@ -12,8 +12,13 @@
 
 NSString * const SRDataManagerDidLoadStations = @"SRDataManagerDidLoadStations";
 NSString * const SRDataManagerDidChangeStations = @"SRDataManagerDidChangeStations";
+NSString * const SRDataManagerDidChangeSleepTimerSettings = @"SRDataManagerDidChangeSleepTimerSettings";
 
 static NSInteger const SRDataManagerCustomStationIdOffset = 1000000;
+static BOOL const SRDataManagerSleepTimerDefaultEnabled = NO; // disabled by default
+static NSTimeInterval const SRDataManagerSleepTimerDefaultInterval = 60*60.0; // 1 hour
+static NSTimeInterval const SRDataManagerSleepTimerIntervalStep = 5*60.0; // 5 minutes
+static NSTimeInterval const SRDataManagerSleepTimerMaximumInterval = 3*60*60.0; // 3 hours
 
 static NSString * const SRDataManagerStationsApiUrl = @"http://iphone.jernej.org/sloradio/stations.php";
 static NSString * const SRDataManagerStationsKey = @"stations";
@@ -23,11 +28,15 @@ static NSString * const SRDataManagerStationsUrlKey = @"url";
 static NSString * const SRDataManagerStationsHiddenKey = @"hidden";
 static NSString * const SRDataManagerStationsCustomizedKey = @"stations_customized";
 static NSString * const SRDataManagerStationsSelectedIdKey = @"selected_station_id";
+static NSString * const SRDataManagerSleepTimerIntervalKey = @"SRSleepTimerInterval";
+static NSString * const SRDataManagerSleepTimerEnabledKey = @"SRSleepTimerEnabled";
 
 static NSString * const SRLegacyStationPlaylistUrl = @"http://iphone.jernej.org/sloradio/playlist.php";
 static NSString * const SRLegacyStationsDictionaryKey = @"postaje";
 static NSString * const SRLegacyStationUrlKey = @"naslov";
 static NSString * const SRLegacyStationNameKey = @"ime";
+static NSString * const SRLegacySleepTimerMinutesKey = @"SleepTime";
+static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 
 @interface SRDataManager ()
 
@@ -41,6 +50,7 @@ static NSString * const SRLegacyStationNameKey = @"ime";
 @synthesize stations = _stations;
 @synthesize selectedRadioStation = _selectedRadioStation;
 @synthesize sleepTimerInterval = _sleepTimerInterval;
+@synthesize selectableSleepTimerIntervals = _selectableSleepTimerIntervals;
 @synthesize sleepTimerEnabledByDefault = _sleepTimerEnabledByDefault;
 
 #pragma mark - Singleton
@@ -345,8 +355,59 @@ static NSString * const SRLegacyStationNameKey = @"ime";
 #pragma mark - Sleep timer
 
 - (void)loadInitialSleepTimerSettings {
-    _sleepTimerInterval = 60.0;
-    _sleepTimerEnabledByDefault = NO;
+    if (![self migrateSleepTimerSettingsIfNeeded]) {
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        if ([defaults objectForKey:SRDataManagerSleepTimerEnabledKey]) {
+            _sleepTimerEnabledByDefault = [defaults boolForKey:SRDataManagerSleepTimerEnabledKey];
+        }
+        else {
+            _sleepTimerEnabledByDefault = SRDataManagerSleepTimerDefaultEnabled;
+        }
+        if ([defaults objectForKey:SRDataManagerSleepTimerIntervalKey]) {
+            _sleepTimerInterval = [defaults doubleForKey:SRDataManagerSleepTimerIntervalKey];
+        }
+        else {
+            _sleepTimerInterval = SRDataManagerSleepTimerDefaultInterval;
+        }
+    }
+}
+
+- (NSArray *)selectableSleepTimerIntervals {
+    if (!_selectableSleepTimerIntervals) {
+        NSMutableArray *array = [NSMutableArray array];
+        NSTimeInterval intervalStep = SRDataManagerSleepTimerIntervalStep;
+        NSTimeInterval maximumInterval = SRDataManagerSleepTimerMaximumInterval;
+        NSTimeInterval interval = 0;
+        while (interval < maximumInterval) {
+            interval += intervalStep;
+            [array addObject:@(interval)];
+        }
+        _selectableSleepTimerIntervals = [NSArray arrayWithArray:array];
+    }
+    return _selectableSleepTimerIntervals;
+}
+
+- (NSUInteger)selectedSleepTimerIntervalIndex {
+    return [self.selectableSleepTimerIntervals indexOfObject:@(self.sleepTimerInterval)];
+}
+
+- (void)setSleepTimerEnabledByDefault:(BOOL)sleepTimerEnabledByDefault {
+    if (sleepTimerEnabledByDefault != _sleepTimerEnabledByDefault) {
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        _sleepTimerEnabledByDefault = sleepTimerEnabledByDefault;
+        [defaults setBool:_sleepTimerEnabledByDefault forKey:SRDataManagerSleepTimerEnabledKey];
+        [defaults synchronize];
+        [[NSNotificationCenter defaultCenter] postNotificationName:SRDataManagerDidChangeSleepTimerSettings object:nil];
+    }
+}
+
+- (void)setSleepTimerInterval:(NSTimeInterval)sleepTimerInterval {
+    if (sleepTimerInterval != _sleepTimerInterval) {
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        _sleepTimerInterval = sleepTimerInterval;
+        [defaults setDouble:_sleepTimerInterval forKey:SRDataManagerSleepTimerIntervalKey];
+        [defaults synchronize];
+    }
 }
 
 #pragma mark - Data migration from old version
@@ -433,6 +494,23 @@ static NSString * const SRLegacyStationNameKey = @"ime";
     if([[NSFileManager defaultManager] fileExistsAtPath:bundlePath]) {
         [[NSFileManager defaultManager] removeItemAtPath:bundlePath error:nil];
     }
+}
+
+- (BOOL)migrateSleepTimerSettingsIfNeeded {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    if ([defaults objectForKey:SRLegacySleepTimerEnabledKey] ||
+        [defaults objectForKey:SRLegacySleepTimerMinutesKey]) {
+        double minuteStep = SRDataManagerSleepTimerIntervalStep / 60.0;
+        double minutes = minuteStep*round([defaults doubleForKey:SRLegacySleepTimerMinutesKey]/minuteStep);
+        BOOL enabled = [defaults boolForKey:SRLegacySleepTimerEnabledKey];
+        self.sleepTimerEnabledByDefault = enabled;
+        self.sleepTimerInterval = minutes * 60.0;
+        [defaults removeObjectForKey:SRLegacySleepTimerEnabledKey];
+        [defaults removeObjectForKey:SRLegacySleepTimerMinutesKey];
+        [defaults synchronize];
+        return YES;
+    }
+    return NO;
 }
 
 @end

@@ -263,6 +263,7 @@
     NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
     [nc addObserver:self selector:@selector(stationsLoaded:) name:SRDataManagerDidLoadStations object:nil];
     [nc addObserver:self selector:@selector(stationsChanged:) name:SRDataManagerDidChangeStations object:nil];
+    [nc addObserver:self selector:@selector(sleepTimerSettingsChanged:) name:SRDataManagerDidChangeSleepTimerSettings object:nil];
     [nc addObserver:self selector:@selector(audioSessionInterruption:) name:AVAudioSessionInterruptionNotification object:nil];
 }
 
@@ -275,6 +276,10 @@
 }
 
 - (void)stationsChanged:(NSNotification *)notification {
+    [self.tableView reloadData];
+}
+
+- (void)sleepTimerSettingsChanged:(NSNotification *)notification {
     [self.tableView reloadData];
 }
 
