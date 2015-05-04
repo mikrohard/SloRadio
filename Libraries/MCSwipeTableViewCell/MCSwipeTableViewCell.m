@@ -164,6 +164,9 @@ typedef NS_ENUM(NSUInteger, MCSwipeTableViewCellDirection) {
         self.contentView.backgroundColor = isBackgroundClear ? [UIColor whiteColor] :self.backgroundColor;
     }
     
+    self.selected = NO;
+    self.highlighted = NO;
+    
     UIImage *contentViewScreenshotImage = [self imageWithView:self];
     
     if (isContentViewBackgroundClear) {
