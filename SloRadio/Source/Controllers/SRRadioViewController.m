@@ -32,6 +32,7 @@
 @property (nonatomic, strong) SRNowPlayingView *nowPlayingTitleView;
 @property (nonatomic, strong) SRSleepTimer *sleepTimer;
 @property (nonatomic, strong) SRSleepTimerView *sleepTimerView;
+@property (nonatomic, strong) UIToolbar *toolbar;
 @property (nonatomic, strong) UITableView *tableView;
 
 @end
@@ -41,6 +42,7 @@
 @synthesize nowPlayingTitleView = _nowPlayingTitleView;
 @synthesize sleepTimer = _sleepTimer;
 @synthesize sleepTimerView = _sleepTimerView;
+@synthesize toolbar = _toolbar;
 @synthesize tableView = _tableView;
 
 #pragma mark - Lifecycle
@@ -58,6 +60,7 @@
 - (void)loadView {
     [super loadView];
     [self setupTableView];
+    [self setupToolbar];
 }
 
 - (void)viewDidLoad {
@@ -68,8 +71,8 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self setupNavigationBar];
-    [self setupToolbar];
+    [self updateNavigationButtons];
+    [self updateToolbarItems];
     [self setupAudioSession];
     [self startRemoteControlTracking];
     [self setupTableViewInsets];
@@ -109,12 +112,11 @@
 
 
 - (void)setupToolbar {
-    self.navigationController.toolbarHidden = NO;
-    [self updateToolbarItems];
-}
-
-- (void)setupNavigationBar {
-    [self updateNavigationButtons];
+    UIToolbar *toolbar = [[UIToolbar alloc] init];
+    toolbar.barStyle = UIBarStyleDefault;
+    [self.view addSubview:toolbar];
+    self.toolbar = toolbar;
+    [self layoutToolbar];
 }
 
 - (void)setupTableViewInsets {
@@ -129,8 +131,8 @@
         UINavigationBar *bar = self.navigationController.navigationBar;
         topInset = CGRectGetMaxY(bar.frame);
     }
-    if (!self.navigationController.toolbarHidden) {
-        UIToolbar *toolbar = self.navigationController.toolbar;
+    if (self.toolbar) {
+        UIToolbar *toolbar = self.toolbar;
         bottomInset = CGRectGetHeight(toolbar.frame);
     }
     self.tableView.contentInset = UIEdgeInsetsMake(topInset, 0, bottomInset, 0);
@@ -139,6 +141,31 @@
     CGPoint contentOffset = self.tableView.contentOffset;
     contentOffset.y = newTopOffset;
     self.tableView.contentOffset = contentOffset;
+}
+
+#pragma mark - Layout
+
+- (void)layoutToolbar {
+    UINavigationBar *bar = self.navigationController.navigationBar;
+    CGFloat height = CGRectGetHeight(bar.frame);
+    self.toolbar.frame = CGRectMake(0,
+                                    CGRectGetHeight(self.view.frame) - height,
+                                    CGRectGetWidth(self.view.frame),
+                                    height);
+}
+
+
+- (void)layoutSleepTimerView {
+    if (self.sleepTimerView) {
+        UINavigationBar *bar = self.navigationController.navigationBar;
+        CGRect navigationBarFrame = [bar.superview convertRect:bar.frame toView:self.view];
+        CGFloat height = CGRectGetHeight(navigationBarFrame);
+        self.sleepTimerView.frame = CGRectMake(0,
+                                               CGRectGetMaxY(navigationBarFrame),
+                                               CGRectGetWidth(self.view.frame),
+                                               height);
+        self.sleepTimerView.horizontalPadding = self.tableView.separatorInset.left;
+    }
 }
 
 #pragma mark - Audio session
@@ -210,7 +237,7 @@
     }
     UIBarButtonItem *flexibleItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     NSArray *items = @[flexibleItem, middleItem, flexibleItem];
-    [self setToolbarItems:items];
+    [self.toolbar setItems:items];
 }
 
 - (void)updateNavigationButtons {
@@ -704,19 +731,6 @@
     [self hideSleepTimerViewAnimated:YES];
 }
 
-- (void)layoutSleepTimerView {
-    if (self.sleepTimerView) {
-        UINavigationBar *bar = self.navigationController.navigationBar;
-        CGRect navigationBarFrame = [bar.superview convertRect:bar.frame toView:self.view];
-        CGFloat height = CGRectGetHeight(navigationBarFrame);
-        self.sleepTimerView.frame = CGRectMake(0,
-                                               CGRectGetMaxY(navigationBarFrame),
-                                               CGRectGetWidth(self.view.frame),
-                                               height);
-        self.sleepTimerView.horizontalPadding = self.tableView.separatorInset.left;
-    }
-}
-
 - (void)showSleepTimerViewAnimated:(BOOL)animated {
     if (!self.sleepTimerView) {
         self.sleepTimerView = [[SRSleepTimerView alloc] init];
@@ -777,6 +791,7 @@
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     [self layoutSleepTimerView];
+    [self layoutToolbar];
     [self setupTableViewInsets];
 }
 
