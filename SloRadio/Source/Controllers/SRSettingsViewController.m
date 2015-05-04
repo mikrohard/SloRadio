@@ -9,6 +9,8 @@
 #import "SRSettingsViewController.h"
 #import "SRSettingsPickerCell.h"
 #import "SRDataManager.h"
+#import "UIAlertView+Blocks.h"
+#import "MBProgressHUD.h"
 
 @interface SRSettingsViewController () <UIPickerViewDataSource, UIPickerViewDelegate>
 
@@ -188,7 +190,42 @@
 }
 
 - (void)presentResetAction {
+    __weak SRSettingsViewController *weakSelf = self;
+    [UIAlertView showWithTitle:@"Warning"
+                       message:@"This action is going to remove all custom radio stations."
+             cancelButtonTitle:@"Cancel"
+             otherButtonTitles:@[@"Reset"]
+                      tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
+                          if (alertView.cancelButtonIndex != buttonIndex) {
+                              [weakSelf performResetAction];
+                          }
+                      }];
+}
 
+- (void)performResetAction {
+    [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+    __weak SRSettingsViewController *weakSelf = self;
+    [[SRDataManager sharedManager] resetStationsWithCompletionHandler:^(NSError *error) {
+        [MBProgressHUD hideHUDForView:weakSelf.navigationController.view animated:YES];
+        if (error) {
+            [weakSelf handleResetError];
+        }
+    }];
+}
+
+#pragma mark - Error handling
+
+- (void)handleResetError {
+    __weak SRSettingsViewController *weakSelf = self;
+    [UIAlertView showWithTitle:@"Oops!"
+                       message:@"Could not reset radio stations."
+             cancelButtonTitle:@"OK"
+             otherButtonTitles:@[@"Retry"]
+                      tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
+                          if (alertView.cancelButtonIndex != buttonIndex) {
+                              [weakSelf performResetAction];
+                          }
+                      }];
 }
 
 @end

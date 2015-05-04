@@ -28,6 +28,7 @@ typedef void (^SRDataManagerCompletionHandler)(NSError *error);
 + (SRDataManager *)sharedManager;
 
 - (void)loadStationsWithCompletionHandler:(SRDataManagerCompletionHandler)completion;
+- (void)resetStationsWithCompletionHandler:(SRDataManagerCompletionHandler)completion;
 
 - (void)addRadioStation:(SRRadioStation *)station;
 - (void)deleteRadioStation:(SRRadioStation *)station;

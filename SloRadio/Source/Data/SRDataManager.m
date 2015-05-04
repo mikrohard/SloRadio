@@ -97,6 +97,25 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
     }];
 }
 
+- (void)resetStationsWithCompletionHandler:(SRDataManagerCompletionHandler)completion {
+    NSURL *url = [NSURL URLWithString:SRDataManagerStationsApiUrl];
+    NSURLRequest *urlRequest = [NSURLRequest requestWithURL:url];
+    MBJSONRequest *jsonRequest = [[MBJSONRequest alloc] init];
+    [jsonRequest performJSONRequest:urlRequest completionHandler:^(id responseJSON, NSError *error) {
+        if (error != nil) {
+            NSLog(@"Error requesting radio stations: %@", error);
+        } else {
+            NSArray *stations = [responseJSON objectForKey:SRDataManagerStationsKey];
+            NSMutableArray *array = [self stationsForArray:stations];
+            [self setStationsCustomized:NO];
+            [self setupStations:array];
+        }
+        if (completion) {
+            completion(error);
+        }
+    }];
+}
+
 - (void)updateStations:(NSMutableArray *)stations {
     if ([self areStationsCustomized]) {
         // stations are already customized
