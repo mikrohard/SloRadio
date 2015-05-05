@@ -51,7 +51,7 @@
     self = [super init];
     if (self) {
         [self registerForNotifications];
-        self.title = @"Radio stations";
+        self.title = NSLocalizedString(@"RadioStations", @"Radio Stations");
         self.automaticallyAdjustsScrollViewInsets = NO;
     }
     return self;
@@ -249,7 +249,10 @@
 
 - (void)updateNavigationButtons {
     if (self.tableView.editing) {
-        UIBarButtonItem *doneItem = [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(doneButtonPressed:)];
+        UIBarButtonItem *doneItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", @"Done")
+                                                                     style:UIBarButtonItemStyleDone
+                                                                    target:self
+                                                                    action:@selector(doneButtonPressed:)];
         self.navigationItem.rightBarButtonItem = doneItem;
     }
     else {
@@ -714,9 +717,9 @@
 
 - (void)handleStationsLoadError {
     __weak SRRadioViewController *weakSelf = self;
-    [UIAlertView showWithTitle:@"Oops!"
-                       message:@"Could not load radio stations."
-             cancelButtonTitle:@"Retry"
+    [UIAlertView showWithTitle:NSLocalizedString(@"Oops", @"Oops!")
+                       message:NSLocalizedString(@"StationsLoadFailed", @"Error message")
+             cancelButtonTitle:NSLocalizedString(@"Retry", @"Retry")
              otherButtonTitles:nil
                       tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
                           [weakSelf loadRadioStations];
@@ -728,12 +731,18 @@
         // display error
         SRRadioStation *station = [[SRRadioPlayer sharedPlayer] currentRadioStation];
         BOOL canReportProblem = [self isInternetReachable] && [self canReportProblemForRadioStation:station];
-        NSString *message = [NSString stringWithFormat:@"Unable to play \"%@\"", station.name];
+        NSString *message = nil;
+        if ([self isInternetReachable]) {
+            message = [NSString stringWithFormat:NSLocalizedString(@"PlaybackErrorStation", @""), station.name];
+        }
+        else {
+            message = [NSString stringWithFormat:NSLocalizedString(@"PlaybackErrorInternet", @""), station.name];
+        }
         __weak SRRadioViewController *weakSelf = self;
-        [UIAlertView showWithTitle:@"Oops!"
+        [UIAlertView showWithTitle:NSLocalizedString(@"Oops", @"Oops!")
                            message:message
-                 cancelButtonTitle:@"OK"
-                 otherButtonTitles:canReportProblem ? @[@"Report"] : nil
+                 cancelButtonTitle:NSLocalizedString(@"Ok", @"Ok")
+                 otherButtonTitles:canReportProblem ? @[NSLocalizedString(@"Report", @"Report")] : nil
                           tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
                               if (buttonIndex != alertView.cancelButtonIndex) {
                                   [weakSelf reportProblemWithRadioStation:station];

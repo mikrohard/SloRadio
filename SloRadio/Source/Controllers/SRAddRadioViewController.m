@@ -260,7 +260,7 @@
     else if (state == SRRadioPlayerStateError || state == SRRadioPlayerStateStopped) {
         [self stopPlaying];
         [self hideProgressHUD];
-        [self showAlertWithTitle:@"Oops!"
+        [self showAlertWithTitle:NSLocalizedString(@"Oops", @"Oops!")
                          message:@"Could not add station"
                  dismissCallback:NULL];
     }
@@ -271,7 +271,7 @@
 - (void)showAlertWithTitle:(NSString *)title message:(NSString *)message dismissCallback:(dispatch_block_t)callback {
     [UIAlertView showWithTitle:title
                        message:message
-             cancelButtonTitle:@"OK"
+             cancelButtonTitle:NSLocalizedString(@"Ok", @"Ok")
              otherButtonTitles:nil
                       tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
                           if (callback) {

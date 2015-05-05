@@ -63,8 +63,9 @@ static NSString * const SRMenuControllersCachedKey = @"SRMenuControllersCachedKe
 
 - (void)setupMenuData {
     // radio controller
+    NSString *radioStations = NSLocalizedString(@"RadioStations", @"Radio Stations");
     NSMutableDictionary *radioController = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            @"Radio stations", SRMenuControllersTitleKey,
+                                            radioStations, SRMenuControllersTitleKey,
                                             [UIImage imageNamed:@"Radio"], SRMenuControllersIconKey,
                                             [SRRadioViewController class], SRMenuControllersClassKey, nil];
     // settings controller

@@ -124,7 +124,7 @@
         return @"Sleep timer";
     }
     else if (section == [self sectionForReset]) {
-        return @"Radio stations";
+        return NSLocalizedString(@"RadioStations", @"Radio Stations");
     }
     return nil;
 }
@@ -194,7 +194,7 @@
     [UIAlertView showWithTitle:@"Warning"
                        message:@"This action is going to remove all custom radio stations."
              cancelButtonTitle:@"Cancel"
-             otherButtonTitles:@[@"Reset"]
+             otherButtonTitles:@[NSLocalizedString(@"Retry", @"Retry")]
                       tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
                           if (alertView.cancelButtonIndex != buttonIndex) {
                               [weakSelf performResetAction];
@@ -217,10 +217,10 @@
 
 - (void)handleResetError {
     __weak SRSettingsViewController *weakSelf = self;
-    [UIAlertView showWithTitle:@"Oops!"
+    [UIAlertView showWithTitle:NSLocalizedString(@"Oops", @"Oops!")
                        message:@"Could not reset radio stations."
-             cancelButtonTitle:@"OK"
-             otherButtonTitles:@[@"Retry"]
+             cancelButtonTitle:NSLocalizedString(@"Ok", @"Ok")
+             otherButtonTitles:@[NSLocalizedString(@"Retry", @"Retry")]
                       tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
                           if (alertView.cancelButtonIndex != buttonIndex) {
                               [weakSelf performResetAction];

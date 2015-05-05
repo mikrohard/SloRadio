@@ -1,0 +1,22 @@
+/* 
+  Localizable.strings
+  SloRadio
+
+  Created by Jernej Fijačko on 5. 05. 15.
+  Copyright (c) 2015 Jernej Fijačko. All rights reserved.
+*/
+
+// Radio translations
+"RadioStations" = "Radijske postaje";
+
+// Common translations
+"Done" = "Končaj";
+"Retry" = "Ponovi";
+"Ok" = "V redu";
+"Report" = "Poročaj";
+
+// Error handling
+"Oops" = "Ups!";
+"StationsLoadFailed" = "Pri nalaganju radijskih postaj je prišlo do napake. Prosimo, poskusite kasneje.";
+"PlaybackErrorInternet" = "Pri predvajanju postaje „%@“ je prišlo do napake. Preverite vašo internetno povezavo.";
+"PlaybackErrorStation" = "Pri predvajanju postaje „%@“ je prišlo do napake. Prosimo, poskusite kasneje.";

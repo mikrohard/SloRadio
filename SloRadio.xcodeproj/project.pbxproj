@@ -31,6 +31,7 @@
 		C837459F1AF61B0C002EBB84 /* UIImage+Color.m in Sources */ = {isa = PBXBuildFile; fileRef = C837459E1AF61B0C002EBB84 /* UIImage+Color.m */; };
 		C83745A31AF634C4002EBB84 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745A21AF634C4002EBB84 /* Reachability.m */; };
 		C83745A61AF6426D002EBB84 /* SRSleepTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745A51AF6426D002EBB84 /* SRSleepTimer.m */; };
+		C8A46F0E1AF961030031888D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C8A46F0C1AF961030031888D /* Localizable.strings */; };
 		C8B1D3901AEFF17300A5E0A0 /* MBBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */; };
 		C8B1D3911AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3751AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m */; };
 		C8B1D3921AEFF17300A5E0A0 /* MBHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3771AEFF17300A5E0A0 /* MBHTTPRequest.m */; };
@@ -135,6 +136,9 @@
 		C83745A21AF634C4002EBB84 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = Libraries/Reachability/Reachability.m; sourceTree = "<group>"; };
 		C83745A41AF6426D002EBB84 /* SRSleepTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSleepTimer.h; path = Source/Player/SRSleepTimer.h; sourceTree = "<group>"; };
 		C83745A51AF6426D002EBB84 /* SRSleepTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSleepTimer.m; path = Source/Player/SRSleepTimer.m; sourceTree = "<group>"; };
+		C8A46F0D1AF961030031888D /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C8A46F0F1AF961130031888D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C8A46F101AF961150031888D /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8B1D3711AEFF17300A5E0A0 /* MBBaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequest.h; path = Libraries/MBRequest/MBBaseRequest.h; sourceTree = "<group>"; };
 		C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBBaseRequest.m; path = Libraries/MBRequest/MBBaseRequest.m; sourceTree = "<group>"; };
 		C8B1D3731AEFF17300A5E0A0 /* MBBaseRequestSubclass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequestSubclass.h; path = Libraries/MBRequest/MBBaseRequestSubclass.h; sourceTree = "<group>"; };
@@ -269,6 +273,7 @@
 				C8C8FA421AEEADAD00E5E46C /* Images.xcassets */,
 				C8C8FA441AEEADAD00E5E46C /* LaunchScreen.xib */,
 				C8FCC2A01AF938B300DE77EC /* acknowledgements.txt */,
+				C8A46F0C1AF961030031888D /* Localizable.strings */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -651,6 +656,7 @@
 			knownRegions = (
 				en,
 				Base,
+				sl,
 			);
 			mainGroup = C8C8FA291AEEADAD00E5E46C;
 			productRefGroup = C8C8FA331AEEADAD00E5E46C /* Products */;
@@ -669,6 +675,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8C8FA461AEEADAD00E5E46C /* LaunchScreen.xib in Resources */,
+				C8A46F0E1AF961030031888D /* Localizable.strings in Resources */,
 				C8C8FA431AEEADAD00E5E46C /* Images.xcassets in Resources */,
 				C8FCC2A11AF938B300DE77EC /* acknowledgements.txt in Resources */,
 			);
@@ -758,12 +765,24 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		C8A46F0C1AF961030031888D /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C8A46F0D1AF961030031888D /* sl */,
+				C8A46F0F1AF961130031888D /* en */,
+				C8A46F101AF961150031888D /* Base */,
+			);
+			name = Localizable.strings;
+			path = Localization;
+			sourceTree = "<group>";
+		};
 		C8C8FA441AEEADAD00E5E46C /* LaunchScreen.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				C8C8FA451AEEADAD00E5E46C /* Base */,
 			);
 			name = LaunchScreen.xib;
+			path = Localization;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

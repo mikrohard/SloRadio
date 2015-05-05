@@ -1,0 +1,22 @@
+/* 
+  Localizable.strings
+  SloRadio
+
+  Created by Jernej Fijačko on 5. 05. 15.
+  Copyright (c) 2015 Jernej Fijačko. All rights reserved.
+*/
+
+// Radio translations
+"RadioStations" = "Radio stations";
+
+// Common translations
+"Done" = "Done";
+"Retry" = "Retry";
+"Ok" = "OK";
+"Report" = "Report";
+
+// Error handling
+"Oops" = "Oops!";
+"StationsLoadFailed" = "Could not load radio stations. Please try again later.";
+"PlaybackErrorInternet" = "An error occured while trying to play “%@”. Please check your internet connection.";
+"PlaybackErrorStation" = "An error occured while trying to play “%@”. Please try again later.";
