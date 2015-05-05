@@ -75,7 +75,7 @@
     [self updateToolbarItems];
     [self setupAudioSession];
     [self startRemoteControlTracking];
-    [self setupTableViewInsets];
+    [self layoutViews];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -145,6 +145,12 @@
 }
 
 #pragma mark - Layout
+
+- (void)layoutViews {
+    [self layoutSleepTimerView];
+    [self layoutToolbar];
+    [self setupTableViewInsets];
+}
 
 - (void)layoutToolbar {
     UINavigationBar *bar = self.navigationController.navigationBar;
@@ -818,9 +824,7 @@
 #pragma mark - Screen rotation
 
 - (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    [self layoutSleepTimerView];
-    [self layoutToolbar];
-    [self setupTableViewInsets];
+    [self layoutViews];
 }
 
 #pragma mark - Utils
