@@ -69,6 +69,9 @@
 		C8FCC27E1AF69F9F00DE77EC /* SRSleepTimerView.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FCC27D1AF69F9F00DE77EC /* SRSleepTimerView.m */; };
 		C8FCC28A1AF7F09500DE77EC /* SRSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FCC2891AF7F09500DE77EC /* SRSettingsViewController.m */; };
 		C8FCC28E1AF7F68C00DE77EC /* SRSettingsPickerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FCC28D1AF7F68C00DE77EC /* SRSettingsPickerCell.m */; };
+		C8FCC29B1AF91DDB00DE77EC /* SRAboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FCC2991AF91DDB00DE77EC /* SRAboutViewController.m */; };
+		C8FCC29F1AF9347400DE77EC /* SRAcknowledgementsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FCC29E1AF9347400DE77EC /* SRAcknowledgementsViewController.m */; };
+		C8FCC2A11AF938B300DE77EC /* acknowledgements.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8FCC2A01AF938B300DE77EC /* acknowledgements.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -201,6 +204,11 @@
 		C8FCC2891AF7F09500DE77EC /* SRSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSettingsViewController.m; path = Source/Controllers/SRSettingsViewController.m; sourceTree = "<group>"; };
 		C8FCC28C1AF7F68C00DE77EC /* SRSettingsPickerCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSettingsPickerCell.h; path = Source/Cells/SRSettingsPickerCell.h; sourceTree = "<group>"; };
 		C8FCC28D1AF7F68C00DE77EC /* SRSettingsPickerCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSettingsPickerCell.m; path = Source/Cells/SRSettingsPickerCell.m; sourceTree = "<group>"; };
+		C8FCC2981AF91DDB00DE77EC /* SRAboutViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRAboutViewController.h; path = Source/Controllers/SRAboutViewController.h; sourceTree = "<group>"; };
+		C8FCC2991AF91DDB00DE77EC /* SRAboutViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRAboutViewController.m; path = Source/Controllers/SRAboutViewController.m; sourceTree = "<group>"; };
+		C8FCC29D1AF9347400DE77EC /* SRAcknowledgementsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRAcknowledgementsViewController.h; path = Source/Controllers/SRAcknowledgementsViewController.h; sourceTree = "<group>"; };
+		C8FCC29E1AF9347400DE77EC /* SRAcknowledgementsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRAcknowledgementsViewController.m; path = Source/Controllers/SRAcknowledgementsViewController.m; sourceTree = "<group>"; };
+		C8FCC2A01AF938B300DE77EC /* acknowledgements.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = acknowledgements.txt; path = Resources/acknowledgements.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -240,6 +248,7 @@
 				C81D33141AEF846A0076BF01 /* Radio */,
 				C81D33131AEF845A0076BF01 /* Menu */,
 				C8FCC2871AF7F05F00DE77EC /* Settings */,
+				C8FCC2971AF91D9900DE77EC /* About */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -259,6 +268,7 @@
 			children = (
 				C8C8FA421AEEADAD00E5E46C /* Images.xcassets */,
 				C8C8FA441AEEADAD00E5E46C /* LaunchScreen.xib */,
+				C8FCC2A01AF938B300DE77EC /* acknowledgements.txt */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -567,6 +577,17 @@
 			name = Cells;
 			sourceTree = "<group>";
 		};
+		C8FCC2971AF91D9900DE77EC /* About */ = {
+			isa = PBXGroup;
+			children = (
+				C8FCC2981AF91DDB00DE77EC /* SRAboutViewController.h */,
+				C8FCC2991AF91DDB00DE77EC /* SRAboutViewController.m */,
+				C8FCC29D1AF9347400DE77EC /* SRAcknowledgementsViewController.h */,
+				C8FCC29E1AF9347400DE77EC /* SRAcknowledgementsViewController.m */,
+			);
+			name = About;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -649,6 +670,7 @@
 			files = (
 				C8C8FA461AEEADAD00E5E46C /* LaunchScreen.xib in Resources */,
 				C8C8FA431AEEADAD00E5E46C /* Images.xcassets in Resources */,
+				C8FCC2A11AF938B300DE77EC /* acknowledgements.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -694,6 +716,7 @@
 				C8C8FA3E1AEEADAD00E5E46C /* SRMainViewController.m in Sources */,
 				C83745701AF292DF002EBB84 /* UIAlertView+Blocks.m in Sources */,
 				C81D330E1AEF83920076BF01 /* AMSlideMenuRightTableViewController.m in Sources */,
+				C8FCC29F1AF9347400DE77EC /* SRAcknowledgementsViewController.m in Sources */,
 				C837454E1AF11715002EBB84 /* SRAppearance.m in Sources */,
 				C8B1D3931AEFF17300A5E0A0 /* MBImageRequest.m in Sources */,
 				C8B1D39A1AEFF17300A5E0A0 /* NSDictionary+MBRequest.m in Sources */,
@@ -707,6 +730,7 @@
 				C83745511AF11BA9002EBB84 /* VLCDialogDisplayer+Suppress.m in Sources */,
 				C8B1D3A31AEFF3B400A5E0A0 /* SRRadioStation.m in Sources */,
 				C81D330B1AEF83920076BF01 /* AMSlideMenuLeftTableViewController.m in Sources */,
+				C8FCC29B1AF91DDB00DE77EC /* SRAboutViewController.m in Sources */,
 				C8B1D3971AEFF17300A5E0A0 /* MBRequestError.m in Sources */,
 				C8B1D3901AEFF17300A5E0A0 /* MBBaseRequest.m in Sources */,
 				C81D330A1AEF83920076BF01 /* AMSlideMenuLeftMenuSegue.m in Sources */,
