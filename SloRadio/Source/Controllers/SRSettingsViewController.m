@@ -27,7 +27,7 @@
 - (instancetype)init {
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
-        self.title = @"Settings";
+        self.title = NSLocalizedString(@"Settings", @"Settings");
     }
     return self;
 }
@@ -105,13 +105,13 @@
             // reset cell
             cell.selectionStyle = UITableViewCellSelectionStyleDefault;
             cell.textLabel.textColor = [SRAppearance mainColor];
-            cell.textLabel.text = @"Reset";
+            cell.textLabel.text = NSLocalizedString(@"ResetList", @"Reset list");
             cell.accessoryView = nil;
         }
         else {
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
             cell.textLabel.textColor = [SRAppearance textColor];
-            cell.textLabel.text = @"Enabled";
+            cell.textLabel.text = NSLocalizedString(@"AlwaysOn", @"Always on");
             cell.accessoryView = indexPath.row == 0 ? self.sleepTimerSwitch : nil;
             self.sleepTimerSwitch.on = [[SRDataManager sharedManager] sleepTimerEnabledByDefault];
         }
@@ -121,7 +121,7 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     if (section == [self sectionForSleepTimer]) {
-        return @"Sleep timer";
+        return NSLocalizedString(@"SleepTimer", @"Sleep timer");
     }
     else if (section == [self sectionForReset]) {
         return NSLocalizedString(@"RadioStations", @"Radio Stations");
@@ -172,7 +172,7 @@
 - (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
     SRDataManager *dataManager = [SRDataManager sharedManager];
     NSTimeInterval interval = [[dataManager.selectableSleepTimerIntervals objectAtIndex:row] doubleValue];
-    NSString *title = [NSString stringWithFormat:@"%.0f minutes", interval/60.0];
+    NSString *title = [NSString stringWithFormat:NSLocalizedString(@"NumberOfMinutes", nil), (int)(interval/60.0)];
     return title;
 }
 
@@ -191,10 +191,10 @@
 
 - (void)presentResetAction {
     __weak SRSettingsViewController *weakSelf = self;
-    [UIAlertView showWithTitle:@"Warning"
-                       message:@"This action is going to remove all custom radio stations."
-             cancelButtonTitle:@"Cancel"
-             otherButtonTitles:@[NSLocalizedString(@"Retry", @"Retry")]
+    [UIAlertView showWithTitle:NSLocalizedString(@"Reset", @"Reset")
+                       message:NSLocalizedString(@"StationsResetMessage", nil)
+             cancelButtonTitle:NSLocalizedString(@"Cancel", @"Cancel")
+             otherButtonTitles:@[NSLocalizedString(@"Reset", @"Reset")]
                       tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
                           if (alertView.cancelButtonIndex != buttonIndex) {
                               [weakSelf performResetAction];
@@ -218,7 +218,7 @@
 - (void)handleResetError {
     __weak SRSettingsViewController *weakSelf = self;
     [UIAlertView showWithTitle:NSLocalizedString(@"Oops", @"Oops!")
-                       message:@"Could not reset radio stations."
+                       message:NSLocalizedString(@"StationsResetFailed", nil)
              cancelButtonTitle:NSLocalizedString(@"Ok", @"Ok")
              otherButtonTitles:@[NSLocalizedString(@"Retry", @"Retry")]
                       tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {

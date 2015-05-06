@@ -1,4 +1,4 @@
-/* 
+/*
   Localizable.strings
   SloRadio
 
@@ -8,15 +8,45 @@
 
 // Radio translations
 "RadioStations" = "Radio stations";
+"ResetList" = "Reset list";
+"EditStation" = "Edit station";
+"AddStation" = "Add station";
+"InsertName" = "Insert name…";
+"ExampleUrl" = "http://example.com";
+"StationName" = "Station name";
+"StationAddress" = "Station address";
+"StationAddedMessage" = "The radio station “%@” has been successfully added to the list.";
+"StationNotAddedMessage" = "The radio station “%@” could not be added to the list. Please check if the inserted address is correct.";
+"StationsResetMessage" = "This will remove all manually added radio stations and reset the station list to the original state.";
+
+// Sleep timer
+"SleepTimer" = "Sleep timer";
+"AlwaysOn" = "Always on";
 
 // Common translations
 "Done" = "Done";
 "Retry" = "Retry";
 "Ok" = "OK";
 "Report" = "Report";
+"Reset" = "Reset";
+"Cancel" = "Cancel";
+"Close" = "Close";
+"Save" = "Save";
+"Delete" = "Delete";
+"Added" = "Added";
+"Settings" = "Settings";
+"About" = "About";
+"Copyright" = "Copyright";
+"Contact" = "Contact";
+"Acknowledgements" = "Acknowledgements";
+
+// Numbers
+"NumberOfMinutes" = "%d minutes";
+"VersionFormat" = "Version %@ (%@)";
 
 // Error handling
 "Oops" = "Oops!";
 "StationsLoadFailed" = "Could not load radio stations. Please try again later.";
 "PlaybackErrorInternet" = "An error occured while trying to play “%@”. Please check your internet connection.";
 "PlaybackErrorStation" = "An error occured while trying to play “%@”. Please try again later.";
+"StationsResetFailed" = "Could not reset the radio station list. Please try again later.";

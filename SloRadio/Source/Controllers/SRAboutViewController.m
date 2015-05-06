@@ -22,7 +22,7 @@
 - (instancetype)init {
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
-        self.title = @"About";
+        self.title = NSLocalizedString(@"About", @"About");
     }
     return self;
 }
@@ -64,7 +64,7 @@
     NSString *name = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleName"];
     NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
     NSString *build = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
-    NSString *versionString = [NSString stringWithFormat:@"Version %@ (%@)", version, build];
+    NSString *versionString = [NSString stringWithFormat:NSLocalizedString(@"VersionFormat", nil), version, build];
     
     UILabel *nameLabel = [[UILabel alloc] init];
     nameLabel.backgroundColor = [UIColor clearColor];
@@ -120,13 +120,13 @@
         cell.detailTextLabel.textColor = [SRAppearance textColor];
         if (indexPath.row == 0) {
             // copyright
-            cell.textLabel.text = @"Copyright";
+            cell.textLabel.text = NSLocalizedString(@"Copyright", nil);
             cell.detailTextLabel.text = @"© 2015 Jernej Fijačko";
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
         }
         else {
             // contact
-            cell.textLabel.text = @"Contact";
+            cell.textLabel.text = NSLocalizedString(@"Contact", nil);
             cell.detailTextLabel.text = @"sloradio@jernej.org";
             cell.selectionStyle = UITableViewCellSelectionStyleDefault;
         }
@@ -140,7 +140,7 @@
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
         }
         cell.textLabel.textColor = [SRAppearance textColor];
-        cell.textLabel.text = @"Acknowledgements";
+        cell.textLabel.text = NSLocalizedString(@"Acknowledgements", nil);
         cell.textLabel.font = [SRAppearance applicationFontWithSize:14.f];
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         return cell;

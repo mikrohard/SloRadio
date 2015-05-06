@@ -36,7 +36,7 @@
     self = [self initWithStyle:UITableViewStyleGrouped];
     if (self) {
         self.station = station;
-        self.title = station.stationId > 0 ? @"Edit station" : @"Add station";
+        self.title = station.stationId > 0 ? NSLocalizedString(@"EditStation", nil) : NSLocalizedString(@"AddStation", nil);
     }
     return self;
 }
@@ -60,13 +60,14 @@
 
 - (void)setupNavigationButtons {
     BOOL canEdit = [self canEditStationName] || [self canEditStationUrl];
-    UIBarButtonItem *cancelItem = [[UIBarButtonItem alloc] initWithTitle:canEdit ? @"Cancel" : @"Close"
+    NSString *cancel = canEdit ? NSLocalizedString(@"Cancel", nil) : NSLocalizedString(@"Close", nil);
+    UIBarButtonItem *cancelItem = [[UIBarButtonItem alloc] initWithTitle:cancel
                                                                    style:UIBarButtonItemStyleBordered
                                                                   target:self
                                                                   action:@selector(cancelButtonPressed:)];
     self.navigationItem.leftBarButtonItem = cancelItem;
     if (canEdit) {
-        UIBarButtonItem *saveItem = [[UIBarButtonItem alloc] initWithTitle:@"Save"
+        UIBarButtonItem *saveItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Save", nil)
                                                                      style:UIBarButtonItemStyleDone
                                                                     target:self
                                                                     action:@selector(saveButtonPressed:)];
@@ -127,7 +128,7 @@
     if (indexPath.row == [self indexPathForRadioName].row &&
         indexPath.section == [self indexPathForRadioName].section) {
         cell.textInputField.text = self.station.name;
-        cell.textInputField.placeholder = @"Insert name";
+        cell.textInputField.placeholder = NSLocalizedString(@"InsertName", nil);
         cell.textInputField.keyboardType = UIKeyboardTypeDefault;
         cell.textInputField.returnKeyType = [self canEditStationUrl] ? UIReturnKeyNext : UIReturnKeyDone;
         cell.textInputField.autocapitalizationType = UITextAutocapitalizationTypeWords;
@@ -137,7 +138,7 @@
     else if (indexPath.row == [self indexPathForRadioUrl].row &&
              indexPath.section == [self indexPathForRadioUrl].section) {
         cell.textInputField.text = self.station.url.absoluteString;
-        cell.textInputField.placeholder = @"http://example.com";
+        cell.textInputField.placeholder = NSLocalizedString(@"ExampleUrl", nil);
         cell.textInputField.keyboardType = UIKeyboardTypeURL;
         cell.textInputField.returnKeyType = UIReturnKeyDone;
         cell.textInputField.autocapitalizationType = UITextAutocapitalizationTypeNone;
@@ -149,10 +150,10 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     if (section == [self indexPathForRadioName].section) {
-        return @"Station name";
+        return NSLocalizedString(@"StationName", nil);
     }
     else if (section == [self indexPathForRadioUrl].section) {
-        return @"Station address";
+        return NSLocalizedString(@"StationAddress", nil);
     }
     return nil;
 }
@@ -251,8 +252,9 @@
         [[SRDataManager sharedManager] addRadioStation:self.station];
         [self hideProgressHUD];
         __weak SRAddRadioViewController *weakSelf = self;
-        [self showAlertWithTitle:@"Success"
-                         message:@"Station successfully added"
+        NSString *message = [NSString stringWithFormat:NSLocalizedString(@"StationAddedMessage", nil), self.station.name];
+        [self showAlertWithTitle:NSLocalizedString(@"Added", nil)
+                         message:message
                  dismissCallback:^{
                      [weakSelf.presentingViewController dismissViewControllerAnimated:YES completion:NULL];
                  }];
@@ -260,8 +262,9 @@
     else if (state == SRRadioPlayerStateError || state == SRRadioPlayerStateStopped) {
         [self stopPlaying];
         [self hideProgressHUD];
+        NSString *message = [NSString stringWithFormat:NSLocalizedString(@"StationNotAddedMessage", nil), self.station.name];
         [self showAlertWithTitle:NSLocalizedString(@"Oops", @"Oops!")
-                         message:@"Could not add station"
+                         message:message
                  dismissCallback:NULL];
     }
 }

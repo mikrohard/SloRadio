@@ -69,13 +69,15 @@ static NSString * const SRMenuControllersCachedKey = @"SRMenuControllersCachedKe
                                             [UIImage imageNamed:@"Radio"], SRMenuControllersIconKey,
                                             [SRRadioViewController class], SRMenuControllersClassKey, nil];
     // settings controller
+    NSString *settings = NSLocalizedString(@"Settings", @"Settings");
     NSMutableDictionary *settingsController = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                               @"Settings", SRMenuControllersTitleKey,
+                                               settings, SRMenuControllersTitleKey,
                                                [UIImage imageNamed:@"Settings"], SRMenuControllersIconKey,
                                                [SRSettingsViewController class], SRMenuControllersClassKey, nil];
     // about controller
+    NSString *about = NSLocalizedString(@"About", @"About");
     NSMutableDictionary *aboutController = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            @"About", SRMenuControllersTitleKey,
+                                            about, SRMenuControllersTitleKey,
                                             [UIImage imageNamed:@"Info"], SRMenuControllersIconKey,
                                             [SRAboutViewController class], SRMenuControllersClassKey, nil];
     self.controllers = @[radioController, settingsController, aboutController];

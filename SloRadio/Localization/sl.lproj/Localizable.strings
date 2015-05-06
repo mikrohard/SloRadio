@@ -8,15 +8,45 @@
 
 // Radio translations
 "RadioStations" = "Radijske postaje";
+"ResetList" = "Ponastavi seznam";
+"EditStation" = "Uredi postajo";
+"AddStation" = "Dodaj postajo";
+"InsertName" = "Vnesite ime …";
+"ExampleUrl" = "http://primer.si";
+"StationName" = "Ime postaje";
+"StationAddress" = "Naslov postaje";
+"StationAddedMessage" = "Radijska postaja „%@“ je bila uspešno dodana na seznam.";
+"StationNotAddedMessage" = "Radijske postaje „%@“ ni bilo možno dodati na seznam. Prosimo, preverite vnešen naslov.";
+"StationsResetMessage" = "To bo izbrisalo vse ročno dodane radijske postaje in povrnilo seznam postaj v prvotno stanje.";
+
+// Sleep timer
+"SleepTimer" = "Način za spanje";
+"AlwaysOn" = "Vedno vklopljeno";
 
 // Common translations
 "Done" = "Končaj";
 "Retry" = "Ponovi";
 "Ok" = "V redu";
 "Report" = "Poročaj";
+"Reset" = "Ponastavi";
+"Cancel" = "Prekliči";
+"Close" = "Zapri";
+"Save" = "Shrani";
+"Delete" = "Izbriši";
+"Added" = "Dodano";
+"Settings" = "Nastavitve";
+"About" = "O aplikaciji";
+"Copyright" = "Pravice";
+"Contact" = "Kontant";
+"Acknowledgements" = "Zahvale";
+
+// Numbers
+"NumberOfMinutes" = "%d minut";
+"VersionFormat" = "Verzija %@ (%@)";
 
 // Error handling
 "Oops" = "Ups!";
 "StationsLoadFailed" = "Pri nalaganju radijskih postaj je prišlo do napake. Prosimo, poskusite kasneje.";
 "PlaybackErrorInternet" = "Pri predvajanju postaje „%@“ je prišlo do napake. Preverite vašo internetno povezavo.";
 "PlaybackErrorStation" = "Pri predvajanju postaje „%@“ je prišlo do napake. Prosimo, poskusite kasneje.";
+"StationsResetFailed" = "Seznama radijskih postaj ni bilo možno ponastaviti. Prosimo, poskusite kasneje.";

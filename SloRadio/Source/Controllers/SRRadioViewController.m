@@ -483,6 +483,10 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return NSLocalizedString(@"Delete", nil);
+}
+
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView configureSeparatorForCell:cell];
 }

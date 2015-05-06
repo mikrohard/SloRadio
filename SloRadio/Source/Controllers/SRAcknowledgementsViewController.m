@@ -19,7 +19,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.title = @"Acknowledgements";
+        self.title = NSLocalizedString(@"Acknowledgements", nil);
     }
     return self;
 }
