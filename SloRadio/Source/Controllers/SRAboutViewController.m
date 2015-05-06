@@ -116,8 +116,10 @@
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue2 reuseIdentifier:aboutCellIdentifier];
         }
         cell.textLabel.textColor = [SRAppearance mainColor];
+        cell.textLabel.font = [SRAppearance applicationFontWithSize:17.f];
         cell.textLabel.textAlignment = NSTextAlignmentLeft;
         cell.detailTextLabel.textColor = [SRAppearance textColor];
+        cell.detailTextLabel.font = [SRAppearance applicationFontWithSize:17.f];
         if (indexPath.row == 0) {
             // copyright
             cell.textLabel.text = NSLocalizedString(@"Copyright", nil);
@@ -141,7 +143,7 @@
         }
         cell.textLabel.textColor = [SRAppearance textColor];
         cell.textLabel.text = NSLocalizedString(@"Acknowledgements", nil);
-        cell.textLabel.font = [SRAppearance applicationFontWithSize:14.f];
+        cell.textLabel.font = [SRAppearance applicationFontWithSize:17.f];
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         return cell;
     }
