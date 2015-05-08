@@ -42,7 +42,14 @@
 
 // Numbers
 "NumberOfMinutes" = "%d minutes";
+"NumberOfSeconds" = "%.1f seconds";
 "VersionFormat" = "Version %@ (%@)";
+
+// Player
+"Player" = "Player";
+"ManualCaching" = "Manual caching";
+"CacheSize" = "Cache size";
+"CacheWarning" = "Large cache size values can significantly delay the start of playback.";
 
 // Error handling
 "Oops" = "Oops!";

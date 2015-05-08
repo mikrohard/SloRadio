@@ -31,6 +31,7 @@
 		C837459F1AF61B0C002EBB84 /* UIImage+Color.m in Sources */ = {isa = PBXBuildFile; fileRef = C837459E1AF61B0C002EBB84 /* UIImage+Color.m */; };
 		C83745A31AF634C4002EBB84 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745A21AF634C4002EBB84 /* Reachability.m */; };
 		C83745A61AF6426D002EBB84 /* SRSleepTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745A51AF6426D002EBB84 /* SRSleepTimer.m */; };
+		C84DCC721AFD28570062C8F7 /* SRSliderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C84DCC711AFD28570062C8F7 /* SRSliderTableViewCell.m */; };
 		C8A46F0E1AF961030031888D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C8A46F0C1AF961030031888D /* Localizable.strings */; };
 		C8B1D3901AEFF17300A5E0A0 /* MBBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */; };
 		C8B1D3911AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3751AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m */; };
@@ -136,6 +137,8 @@
 		C83745A21AF634C4002EBB84 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Reachability.m; path = Libraries/Reachability/Reachability.m; sourceTree = "<group>"; };
 		C83745A41AF6426D002EBB84 /* SRSleepTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSleepTimer.h; path = Source/Player/SRSleepTimer.h; sourceTree = "<group>"; };
 		C83745A51AF6426D002EBB84 /* SRSleepTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSleepTimer.m; path = Source/Player/SRSleepTimer.m; sourceTree = "<group>"; };
+		C84DCC701AFD28570062C8F7 /* SRSliderTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSliderTableViewCell.h; path = Source/Cells/SRSliderTableViewCell.h; sourceTree = "<group>"; };
+		C84DCC711AFD28570062C8F7 /* SRSliderTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSliderTableViewCell.m; path = Source/Cells/SRSliderTableViewCell.m; sourceTree = "<group>"; };
 		C8A46F0D1AF961030031888D /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8A46F0F1AF961130031888D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8A46F101AF961150031888D /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -578,6 +581,8 @@
 			children = (
 				C8FCC28C1AF7F68C00DE77EC /* SRSettingsPickerCell.h */,
 				C8FCC28D1AF7F68C00DE77EC /* SRSettingsPickerCell.m */,
+				C84DCC701AFD28570062C8F7 /* SRSliderTableViewCell.h */,
+				C84DCC711AFD28570062C8F7 /* SRSliderTableViewCell.m */,
 			);
 			name = Cells;
 			sourceTree = "<group>";
@@ -741,6 +746,7 @@
 				C8B1D3971AEFF17300A5E0A0 /* MBRequestError.m in Sources */,
 				C8B1D3901AEFF17300A5E0A0 /* MBBaseRequest.m in Sources */,
 				C81D330A1AEF83920076BF01 /* AMSlideMenuLeftMenuSegue.m in Sources */,
+				C84DCC721AFD28570062C8F7 /* SRSliderTableViewCell.m in Sources */,
 				C8C8FA5E1AEEAF5A00E5E46C /* SRRadioPlayer.m in Sources */,
 				C8B1D3991AEFF17300A5E0A0 /* MBXMLRequest.m in Sources */,
 			);

@@ -20,6 +20,9 @@ static NSTimeInterval const SRDataManagerSleepTimerDefaultInterval = 60*60.0; //
 static NSTimeInterval const SRDataManagerSleepTimerIntervalStep = 5*60.0; // 5 minutes
 static NSTimeInterval const SRDataManagerSleepTimerMaximumInterval = 3*60*60.0; // 3 hours
 
+static BOOL const SRDataManagerPlayerCachingEnabledDefault = NO; // disabled by default
+static NSTimeInterval const SRDataManagerPlayerCacheSizeDefault = 5.0; // 5 seconds
+
 static NSString * const SRDataManagerStationsApiUrl = @"http://iphone.jernej.org/sloradio/stations.php";
 static NSString * const SRDataManagerStationsKey = @"stations";
 static NSString * const SRDataManagerStationsIdKey = @"id";
@@ -30,6 +33,8 @@ static NSString * const SRDataManagerStationsCustomizedKey = @"stations_customiz
 static NSString * const SRDataManagerStationsSelectedIdKey = @"selected_station_id";
 static NSString * const SRDataManagerSleepTimerIntervalKey = @"SRSleepTimerInterval";
 static NSString * const SRDataManagerSleepTimerEnabledKey = @"SRSleepTimerEnabled";
+static NSString * const SRDataManagerPlayerCachingEnabledKey = @"SRPlayerCacheEnabled";
+static NSString * const SRDataManagerPlayerCacheSizeKey = @"SRPlayerCacheSize";
 
 static NSString * const SRLegacyStationPlaylistUrl = @"http://iphone.jernej.org/sloradio/playlist.php";
 static NSString * const SRLegacyStationsDictionaryKey = @"postaje";
@@ -427,6 +432,36 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
         [defaults setDouble:_sleepTimerInterval forKey:SRDataManagerSleepTimerIntervalKey];
         [defaults synchronize];
     }
+}
+
+#pragma mark - Player caching
+
+- (void)setPlayerCachingEnabled:(BOOL)playerCachingEnabled {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setBool:playerCachingEnabled forKey:SRDataManagerPlayerCachingEnabledKey];
+    [defaults synchronize];
+}
+
+- (BOOL)playerCachingEnabled {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    if ([defaults objectForKey:SRDataManagerPlayerCachingEnabledKey]) {
+        return [defaults boolForKey:SRDataManagerPlayerCachingEnabledKey];
+    }
+    return SRDataManagerPlayerCachingEnabledDefault;
+}
+
+- (void)setPlayerCacheSize:(NSTimeInterval)playerCacheSize {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:@(playerCacheSize) forKey:SRDataManagerPlayerCacheSizeKey];
+    [defaults synchronize];
+}
+
+- (NSTimeInterval)playerCacheSize {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    if ([defaults objectForKey:SRDataManagerPlayerCacheSizeKey]) {
+        return [[defaults objectForKey:SRDataManagerPlayerCacheSizeKey] floatValue];
+    }
+    return SRDataManagerPlayerCacheSizeDefault;
 }
 
 #pragma mark - Data migration from old version

@@ -8,6 +8,7 @@
 
 #import "SRRadioPlayer.h"
 #import "SRRadioStation.h"
+#import "SRDataManager.h"
 #import <MobileVLCKit/MobileVLCKit.h>
 
 NSString * const SRRadioPlayerMetaDataArtistKey = @"SRRadioPlayerMetaDataArtistKey";
@@ -52,7 +53,7 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 
 - (void)playStreamAtUrl:(NSURL *)url {
     [self stopIfPlayingAndClearStation:YES];
-    self.listPlayer = [[VLCMediaListPlayer alloc] init];
+    self.listPlayer = [[VLCMediaListPlayer alloc] initWithOptions:[self playbackOptions]];
     self.player = self.listPlayer.mediaPlayer;
     self.player.delegate = self;
     VLCMedia *media = [VLCMedia mediaWithURL:url];
@@ -90,6 +91,17 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 
 - (void)setVolume:(int)volume {
     self.player.audio.volume = volume;
+}
+
+#pragma mark - Playback options
+
+- (NSArray *)playbackOptions {
+    SRDataManager *dataManager = [SRDataManager sharedManager];
+    if (dataManager.playerCachingEnabled) {
+        NSString *cachingOption = [NSString stringWithFormat:@"--network-caching=%.0f", dataManager.playerCacheSize * 1000];
+        return @[cachingOption];
+    }
+    return nil;
 }
 
 #pragma mark - Meta data

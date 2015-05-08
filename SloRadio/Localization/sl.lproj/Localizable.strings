@@ -42,7 +42,14 @@
 
 // Numbers
 "NumberOfMinutes" = "%d minut";
+"NumberOfSeconds" = "%.1f sekund";
 "VersionFormat" = "Verzija %@ (%@)";
+
+// Player
+"Player" = "Predvajalnik";
+"ManualCaching" = "Ročno predpomnjenje";
+"CacheSize" = "Velikost predpomnilnika";
+"CacheWarning" = "Visoke vrednosti predpomnilnika lahko precej upočasnijo začetek predvajanja.";
 
 // Error handling
 "Oops" = "Ups!";

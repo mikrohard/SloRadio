@@ -24,6 +24,8 @@ typedef void (^SRDataManagerCompletionHandler)(NSError *error);
 @property (nonatomic, readonly) NSUInteger selectedSleepTimerIntervalIndex;
 @property (nonatomic, assign) NSTimeInterval sleepTimerInterval;
 @property (nonatomic, assign) BOOL sleepTimerEnabledByDefault;
+@property (nonatomic, assign) NSTimeInterval playerCacheSize;
+@property (nonatomic, assign) BOOL playerCachingEnabled;
 
 + (SRDataManager *)sharedManager;
 

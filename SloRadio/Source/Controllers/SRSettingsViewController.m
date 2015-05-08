@@ -8,19 +8,16 @@
 
 #import "SRSettingsViewController.h"
 #import "SRSettingsPickerCell.h"
+#import "SRSliderTableViewCell.h"
 #import "SRDataManager.h"
 #import "UIAlertView+Blocks.h"
 #import "MBProgressHUD.h"
 
-@interface SRSettingsViewController () <UIPickerViewDataSource, UIPickerViewDelegate>
-
-@property (nonatomic, strong) UISwitch *sleepTimerSwitch;
+@interface SRSettingsViewController () <UIPickerViewDataSource, UIPickerViewDelegate, SRSliderTableViewCellProtocol>
 
 @end
 
 @implementation SRSettingsViewController
-
-@synthesize sleepTimerSwitch = _sleepTimerSwitch;
 
 #pragma mark - Lifecycle
 
@@ -34,7 +31,6 @@
 
 - (void)loadView {
     [super loadView];
-    [self setupSleepTimerSwitch];
 }
 
 - (void)viewDidLoad {
@@ -46,13 +42,20 @@
     // Dispose of any resources that can be recreated.
 }
 
-#pragma mark - Setup
+#pragma mark - Settings switches
 
-- (void)setupSleepTimerSwitch {
+- (UISwitch *)sleepTimerSwitch {
     UISwitch *settingsSwitch = [[UISwitch alloc] init];
     settingsSwitch.onTintColor = [SRAppearance mainColor];
     [settingsSwitch addTarget:self action:@selector(sleepTimerEnabledChanged:) forControlEvents:UIControlEventValueChanged];
-    self.sleepTimerSwitch = settingsSwitch;
+    return settingsSwitch;
+}
+
+- (UISwitch *)playerCachingSwitch {
+    UISwitch *settingsSwitch = [[UISwitch alloc] init];
+    settingsSwitch.onTintColor = [SRAppearance mainColor];
+    [settingsSwitch addTarget:self action:@selector(playerCachingEnabledChanged:) forControlEvents:UIControlEventValueChanged];
+    return settingsSwitch;
 }
 
 #pragma mark - Section handling
@@ -61,21 +64,28 @@
     return 0;
 }
 
-- (NSInteger)sectionForReset {
+- (NSInteger)sectionForPlayer {
     return 1;
+}
+
+- (NSInteger)sectionForReset {
+    return 2;
 }
 
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     // Return the number of sections.
-    return 2;
+    return 3;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     // Return the number of rows in the section.
     if (section == [self sectionForSleepTimer]) {
         return 2;
+    }
+    else if (section == [self sectionForPlayer]) {
+        return [SRDataManager sharedManager].playerCachingEnabled ? 2 : 1;
     }
     else if (section == [self sectionForReset]) {
         return 1;
@@ -95,6 +105,20 @@
         }
         return cell;
     }
+    else if (indexPath.section == [self sectionForPlayer] && indexPath.row == 1) {
+        // slider cell
+        static NSString *sliderCellIdentifier = @"SliderCell";
+        SRSliderTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:sliderCellIdentifier];
+        if (!cell) {
+            cell = [[SRSliderTableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:sliderCellIdentifier];
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            cell.delegate = self;
+            cell.minimumSliderValue = 0.f;
+            cell.maximumSliderValue = 60.f;
+        }
+        cell.sliderValue = [SRDataManager sharedManager].playerCacheSize;
+        return cell;
+    }
     else {
         static NSString *cellIdentifier = @"SettingsCell";
         UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:cellIdentifier];
@@ -108,12 +132,21 @@
             cell.textLabel.text = NSLocalizedString(@"ResetList", @"Reset list");
             cell.accessoryView = nil;
         }
-        else {
+        else if (indexPath.section == [self sectionForSleepTimer]) {
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
             cell.textLabel.textColor = [SRAppearance textColor];
             cell.textLabel.text = NSLocalizedString(@"AlwaysOn", @"Always on");
-            cell.accessoryView = indexPath.row == 0 ? self.sleepTimerSwitch : nil;
-            self.sleepTimerSwitch.on = [[SRDataManager sharedManager] sleepTimerEnabledByDefault];
+            UISwitch *settingsSwitch = [self sleepTimerSwitch];
+            settingsSwitch.on = [[SRDataManager sharedManager] sleepTimerEnabledByDefault];
+            cell.accessoryView = settingsSwitch;
+        }
+        else if (indexPath.section == [self sectionForPlayer]) {
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            cell.textLabel.textColor = [SRAppearance textColor];
+            cell.textLabel.text = NSLocalizedString(@"ManualCaching", nil);
+            UISwitch *settingsSwitch = [self playerCachingSwitch];
+            settingsSwitch.on = [[SRDataManager sharedManager] playerCachingEnabled];
+            cell.accessoryView = settingsSwitch;
         }
         return cell;
     }
@@ -125,6 +158,16 @@
     }
     else if (section == [self sectionForReset]) {
         return NSLocalizedString(@"RadioStations", @"Radio Stations");
+    }
+    else if (section == [self sectionForPlayer]) {
+        return NSLocalizedString(@"Player", @"Player");
+    }
+    return nil;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
+    if (section == [self sectionForPlayer] && [SRDataManager sharedManager].playerCachingEnabled) {
+        return NSLocalizedString(@"CacheWarning", nil);
     }
     return nil;
 }
@@ -141,6 +184,9 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == [self sectionForSleepTimer] && indexPath.row == 1) {
         return 162.f;
+    }
+    else if (indexPath.section == [self sectionForPlayer] && indexPath.row == 1) {
+        return 84.f;
     }
     return 44.f;
 }
@@ -182,11 +228,29 @@
     dataManager.sleepTimerInterval = interval;
 }
 
+#pragma mark - SRSliderTableViewCellProtocol
+
+- (void)cell:(SRSliderTableViewCell *)cell didChangeSliderValue:(float)sliderValue {
+    SRDataManager *dataManager = [SRDataManager sharedManager];
+    dataManager.playerCacheSize = sliderValue;
+}
+
 #pragma mark - Settings actions
 
 - (void)sleepTimerEnabledChanged:(UISwitch *)settingsSwitch {
     SRDataManager *dataManager = [SRDataManager sharedManager];
     dataManager.sleepTimerEnabledByDefault = settingsSwitch.on;
+}
+
+- (void)playerCachingEnabledChanged:(UISwitch *)settingsSwitch {
+    SRDataManager *dataManager = [SRDataManager sharedManager];
+    if (dataManager.playerCachingEnabled != settingsSwitch.on) {
+        dataManager.playerCachingEnabled = settingsSwitch.on;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:[self sectionForPlayer]]
+                          withRowAnimation:UITableViewRowAnimationFade];
+        });
+    }
 }
 
 - (void)presentResetAction {
