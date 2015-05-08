@@ -7,14 +7,14 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>6478FF79-35EB-4DE6-8E90-3CD1CC2B7C1E</string>
 	<key>IDESourceControlProjectName</key>
-	<string>project</string>
+	<string>SloRadio</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>BCAD4A822D3E5F367FBE7AFDD7471D8FFB93684A</key>
 		<string>https://github.com/mikrohard/SloRadio.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>SloRadio.xcodeproj/project.xcworkspace</string>
+	<string>SloRadio.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>BCAD4A822D3E5F367FBE7AFDD7471D8FFB93684A</key>
