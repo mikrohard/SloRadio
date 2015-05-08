@@ -8,6 +8,8 @@
 
 #import "SRAppDelegate.h"
 #import "SRMainViewController.h"
+#import <Fabric/Fabric.h>
+#import <Crashlytics/Crashlytics.h>
 
 @interface SRAppDelegate ()
 
@@ -22,6 +24,7 @@
     self.window.tintColor = [SRAppearance mainColor];
     self.window.rootViewController = navigation;
     [self.window makeKeyAndVisible];
+    [Fabric with:@[CrashlyticsKit]];
     return YES;
 }
 

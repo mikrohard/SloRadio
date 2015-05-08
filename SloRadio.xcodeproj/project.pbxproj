@@ -32,6 +32,8 @@
 		C83745A31AF634C4002EBB84 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745A21AF634C4002EBB84 /* Reachability.m */; };
 		C83745A61AF6426D002EBB84 /* SRSleepTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745A51AF6426D002EBB84 /* SRSleepTimer.m */; };
 		C84DCC721AFD28570062C8F7 /* SRSliderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C84DCC711AFD28570062C8F7 /* SRSliderTableViewCell.m */; };
+		C84DCC761AFD4BC10062C8F7 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C84DCC741AFD4BC10062C8F7 /* Fabric.framework */; };
+		C84DCC771AFD4BC10062C8F7 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C84DCC751AFD4BC10062C8F7 /* Crashlytics.framework */; };
 		C8A46F0E1AF961030031888D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C8A46F0C1AF961030031888D /* Localizable.strings */; };
 		C8B1D3901AEFF17300A5E0A0 /* MBBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */; };
 		C8B1D3911AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3751AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m */; };
@@ -139,6 +141,8 @@
 		C83745A51AF6426D002EBB84 /* SRSleepTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSleepTimer.m; path = Source/Player/SRSleepTimer.m; sourceTree = "<group>"; };
 		C84DCC701AFD28570062C8F7 /* SRSliderTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSliderTableViewCell.h; path = Source/Cells/SRSliderTableViewCell.h; sourceTree = "<group>"; };
 		C84DCC711AFD28570062C8F7 /* SRSliderTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSliderTableViewCell.m; path = Source/Cells/SRSliderTableViewCell.m; sourceTree = "<group>"; };
+		C84DCC741AFD4BC10062C8F7 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
+		C84DCC751AFD4BC10062C8F7 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		C8A46F0D1AF961030031888D /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8A46F0F1AF961130031888D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8A46F101AF961150031888D /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -224,12 +228,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8C8FA7B1AEEBCB600E5E46C /* libiconv.dylib in Frameworks */,
+				C84DCC771AFD4BC10062C8F7 /* Crashlytics.framework in Frameworks */,
 				C8C8FA6D1AEEB6F200E5E46C /* libsqlite3.dylib in Frameworks */,
 				C8C8FA751AEEB88900E5E46C /* libbz2.dylib in Frameworks */,
 				C8C8FA771AEEB89900E5E46C /* libxml2.dylib in Frameworks */,
 				C8C8FA641AEEB66500E5E46C /* AudioToolbox.framework in Frameworks */,
 				C8C8FA621AEEB65F00E5E46C /* AVFoundation.framework in Frameworks */,
 				C8C8FA601AEEB65A00E5E46C /* CFNetwork.framework in Frameworks */,
+				C84DCC761AFD4BC10062C8F7 /* Fabric.framework in Frameworks */,
 				C8C8FA791AEEB8B000E5E46C /* Security.framework in Frameworks */,
 				C8C8FA731AEEB71F00E5E46C /* SystemConfiguration.framework in Frameworks */,
 				C8C8FA661AEEB66D00E5E46C /* MediaPlayer.framework in Frameworks */,
@@ -548,6 +554,8 @@
 		C8C8FA691AEEB69700E5E46C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C84DCC741AFD4BC10062C8F7 /* Fabric.framework */,
+				C84DCC751AFD4BC10062C8F7 /* Crashlytics.framework */,
 				C8C8FA7A1AEEBCB600E5E46C /* libiconv.dylib */,
 				C8C8FA671AEEB68700E5E46C /* libMobileVLCKit.a */,
 				C8C8FA6C1AEEB6F200E5E46C /* libsqlite3.dylib */,
@@ -608,6 +616,7 @@
 				C8C8FA2E1AEEADAD00E5E46C /* Sources */,
 				C8C8FA2F1AEEADAD00E5E46C /* Frameworks */,
 				C8C8FA301AEEADAD00E5E46C /* Resources */,
+				C84DCC731AFD4B960062C8F7 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -694,6 +703,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C84DCC731AFD4B960062C8F7 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "./Fabric.framework/run e79d8b64e8c46d2eab455beddb7a7d9fd8a343ad a651787ad6f4fe89abf1b2f420225e5b66cbb386509ef6f9ea9d1c24e35676df";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		C8C8FA2E1AEEADAD00E5E46C /* Sources */ = {
@@ -882,6 +907,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_CXX_LIBRARY = "libstdc++";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_NO_COMMON_BLOCKS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -907,6 +936,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_CXX_LIBRARY = "libstdc++";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_NO_COMMON_BLOCKS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
