@@ -143,4 +143,10 @@ static CGFloat const kSingleLineFontSize = 16.f;
     return text;
 }
 
+#pragma mark - Size
+
+- (CGSize)sizeThatFits:(CGSize)size {
+    return size;
+}
+
 @end

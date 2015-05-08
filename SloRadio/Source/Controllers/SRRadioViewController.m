@@ -578,12 +578,15 @@
     
     // update title view
     if ([[SRRadioPlayer sharedPlayer] currentRadioStation]) {
+        CGSize nowPlayingSize = CGSizeMake(240.f, CGRectGetHeight(self.navigationController.navigationBar.frame));
         if (!self.nowPlayingTitleView) {
-            self.nowPlayingTitleView = [[SRNowPlayingView alloc] initWithFrame:CGRectMake(0, 0, 240.f, 44.f)];
+            self.nowPlayingTitleView = [[SRNowPlayingView alloc] initWithFrame:CGRectMake(0, 0, nowPlayingSize.width, nowPlayingSize.height)];
             self.nowPlayingTitleView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         }
         self.nowPlayingTitleView.titleString = selectedStation.name;
         self.nowPlayingTitleView.subtitleString = [nowPlaying capitalizedString];
+        CGSize size = [self.nowPlayingTitleView sizeThatFits:nowPlayingSize];
+        self.nowPlayingTitleView.frame = CGRectMake(0, 0, size.width, size.height);
         self.navigationItem.titleView = self.nowPlayingTitleView;
     }
     else {
