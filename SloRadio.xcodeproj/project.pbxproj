@@ -141,8 +141,8 @@
 		C83745A51AF6426D002EBB84 /* SRSleepTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSleepTimer.m; path = Source/Player/SRSleepTimer.m; sourceTree = "<group>"; };
 		C84DCC701AFD28570062C8F7 /* SRSliderTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSliderTableViewCell.h; path = Source/Cells/SRSliderTableViewCell.h; sourceTree = "<group>"; };
 		C84DCC711AFD28570062C8F7 /* SRSliderTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSliderTableViewCell.m; path = Source/Cells/SRSliderTableViewCell.m; sourceTree = "<group>"; };
-		C84DCC741AFD4BC10062C8F7 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
-		C84DCC751AFD4BC10062C8F7 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
+		C84DCC741AFD4BC10062C8F7 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Fabric.framework; path = Libraries/Fabric.framework; sourceTree = "<group>"; };
+		C84DCC751AFD4BC10062C8F7 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Crashlytics.framework; path = Libraries/Crashlytics.framework; sourceTree = "<group>"; };
 		C8A46F0D1AF961030031888D /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8A46F0F1AF961130031888D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8A46F101AF961150031888D /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -716,7 +716,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "./Fabric.framework/run e79d8b64e8c46d2eab455beddb7a7d9fd8a343ad a651787ad6f4fe89abf1b2f420225e5b66cbb386509ef6f9ea9d1c24e35676df";
+			shellScript = "./Libraries/Fabric.framework/run e79d8b64e8c46d2eab455beddb7a7d9fd8a343ad a651787ad6f4fe89abf1b2f420225e5b66cbb386509ef6f9ea9d1c24e35676df";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -910,6 +910,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					Libraries,
 				);
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_NO_COMMON_BLOCKS = NO;
@@ -939,6 +940,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					Libraries,
 				);
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_NO_COMMON_BLOCKS = NO;
