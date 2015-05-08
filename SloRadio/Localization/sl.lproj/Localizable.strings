@@ -47,7 +47,7 @@
 
 // Player
 "Player" = "Predvajalnik";
-"ManualCaching" = "Ročno predpomnjenje";
+"AdditionalCaching" = "Dodatno predpomnjenje";
 "CacheSize" = "Velikost predpomnilnika";
 "CacheWarning" = "Visoke vrednosti predpomnilnika lahko precej upočasnijo začetek predvajanja.";
 

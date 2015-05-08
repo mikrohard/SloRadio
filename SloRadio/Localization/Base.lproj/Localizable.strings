@@ -46,9 +46,9 @@
 "VersionFormat" = "Version %@ (%@)";
 
 // Player
-"Player" = "Predvajalnik";
-"ManualCaching" = "Manual predpomnjenje";
-"CacheSize" = "Velikost predpomnilnika";
+"Player" = "Player";
+"AdditionalCaching" = "Additional caching";
+"CacheSize" = "Cache size";
 "CacheWarning" = "Large cache size values can significantly delay the start of playback.";
 
 // Error handling

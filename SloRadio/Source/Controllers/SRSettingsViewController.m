@@ -143,7 +143,7 @@
         else if (indexPath.section == [self sectionForPlayer]) {
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
             cell.textLabel.textColor = [SRAppearance textColor];
-            cell.textLabel.text = NSLocalizedString(@"ManualCaching", nil);
+            cell.textLabel.text = NSLocalizedString(@"AdditionalCaching", nil);
             UISwitch *settingsSwitch = [self playerCachingSwitch];
             settingsSwitch.on = [[SRDataManager sharedManager] playerCachingEnabled];
             cell.accessoryView = settingsSwitch;

@@ -47,7 +47,7 @@
 
 // Player
 "Player" = "Player";
-"ManualCaching" = "Manual caching";
+"AdditionalCaching" = "Additional caching";
 "CacheSize" = "Cache size";
 "CacheWarning" = "Large cache size values can significantly delay the start of playback.";
 
