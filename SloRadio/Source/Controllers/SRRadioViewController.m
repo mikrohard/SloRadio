@@ -114,6 +114,7 @@
 
 - (void)setupToolbar {
     UIToolbar *toolbar = [[UIToolbar alloc] init];
+    toolbar.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
     toolbar.barStyle = UIBarStyleDefault;
     [self.view addSubview:toolbar];
     self.toolbar = toolbar;
