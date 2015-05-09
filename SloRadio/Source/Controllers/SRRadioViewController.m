@@ -561,6 +561,7 @@
     if (!nowPlaying.length && title.length && artist.length) {
         nowPlaying = [NSString stringWithFormat:@"%@ - %@", [artist capitalizedString], [title capitalizedString]];
     }
+    nowPlaying = [nowPlaying stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
     if (nowPlaying.length) {
         [nowPlayingInfo setObject:[nowPlaying capitalizedString] forKey:MPMediaItemPropertyTitle];
     }
@@ -584,7 +585,7 @@
             self.nowPlayingTitleView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         }
         self.nowPlayingTitleView.titleString = selectedStation.name;
-        self.nowPlayingTitleView.subtitleString = [nowPlaying capitalizedString];
+        self.nowPlayingTitleView.subtitleString = nowPlaying.length ? [nowPlaying capitalizedString] : nil;
         CGSize size = [self.nowPlayingTitleView sizeThatFits:nowPlayingSize];
         self.nowPlayingTitleView.frame = CGRectMake(0, 0, size.width, size.height);
         self.navigationItem.titleView = self.nowPlayingTitleView;
