@@ -108,20 +108,6 @@ static NSMutableArray *allInstances;
         dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
             [self configureSlideLayer:self.currentActiveNVC.view.layer];
         });
-        
-        
-        //fix orientation for iPhone
-        if (UI_USER_INTERFACE_IDIOM() != UIUserInterfaceIdiomPad)
-        {
-            UIInterfaceOrientation toInterfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
-            CGRect frame = self.currentActiveNVC.navigationBar.frame;
-            if (toInterfaceOrientation == UIInterfaceOrientationPortrait || toInterfaceOrientation == UIInterfaceOrientationPortraitUpsideDown) {
-                frame.size.height = 44;
-            } else {
-                frame.size.height = 32;
-            }
-            self.currentActiveNVC.navigationBar.frame = frame;
-        }
     }
 }
 
