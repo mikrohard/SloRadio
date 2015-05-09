@@ -141,7 +141,7 @@
     self.tableView.scrollIndicatorInsets = self.tableView.contentInset;
     CGFloat newTopOffset = previousTopOffset + previousTopInset - topInset;
     CGPoint contentOffset = self.tableView.contentOffset;
-    contentOffset.y = newTopOffset;
+    contentOffset.y = MAX(-topInset, MIN(newTopOffset, self.tableView.contentSize.height - CGRectGetHeight(self.tableView.frame) + bottomInset));
     self.tableView.contentOffset = contentOffset;
 }
 
