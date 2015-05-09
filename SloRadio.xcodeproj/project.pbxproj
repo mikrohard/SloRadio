@@ -34,6 +34,7 @@
 		C84DCC721AFD28570062C8F7 /* SRSliderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C84DCC711AFD28570062C8F7 /* SRSliderTableViewCell.m */; };
 		C84DCC761AFD4BC10062C8F7 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C84DCC741AFD4BC10062C8F7 /* Fabric.framework */; };
 		C84DCC771AFD4BC10062C8F7 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C84DCC751AFD4BC10062C8F7 /* Crashlytics.framework */; };
+		C84DCC7B1AFE06380062C8F7 /* MobileVLCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C84DCC7A1AFE06380062C8F7 /* MobileVLCKit.framework */; };
 		C8A46F0E1AF961030031888D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C8A46F0C1AF961030031888D /* Localizable.strings */; };
 		C8B1D3901AEFF17300A5E0A0 /* MBBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */; };
 		C8B1D3911AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3751AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m */; };
@@ -61,7 +62,6 @@
 		C8C8FA621AEEB65F00E5E46C /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C8FA611AEEB65F00E5E46C /* AVFoundation.framework */; };
 		C8C8FA641AEEB66500E5E46C /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C8FA631AEEB66500E5E46C /* AudioToolbox.framework */; };
 		C8C8FA661AEEB66D00E5E46C /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C8FA651AEEB66D00E5E46C /* MediaPlayer.framework */; };
-		C8C8FA681AEEB68700E5E46C /* libMobileVLCKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C8FA671AEEB68700E5E46C /* libMobileVLCKit.a */; };
 		C8C8FA6D1AEEB6F200E5E46C /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C8FA6C1AEEB6F200E5E46C /* libsqlite3.dylib */; };
 		C8C8FA6F1AEEB70300E5E46C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C8FA6E1AEEB70300E5E46C /* Foundation.framework */; };
 		C8C8FA711AEEB70A00E5E46C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C8FA701AEEB70A00E5E46C /* UIKit.framework */; };
@@ -143,6 +143,7 @@
 		C84DCC711AFD28570062C8F7 /* SRSliderTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSliderTableViewCell.m; path = Source/Cells/SRSliderTableViewCell.m; sourceTree = "<group>"; };
 		C84DCC741AFD4BC10062C8F7 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Fabric.framework; path = Libraries/Fabric.framework; sourceTree = "<group>"; };
 		C84DCC751AFD4BC10062C8F7 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Crashlytics.framework; path = Libraries/Crashlytics.framework; sourceTree = "<group>"; };
+		C84DCC7A1AFE06380062C8F7 /* MobileVLCKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileVLCKit.framework; path = Libraries/MobileVLCKit.framework; sourceTree = "<group>"; };
 		C8A46F0D1AF961030031888D /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8A46F0F1AF961130031888D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8A46F101AF961150031888D /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -199,7 +200,6 @@
 		C8C8FA611AEEB65F00E5E46C /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		C8C8FA631AEEB66500E5E46C /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		C8C8FA651AEEB66D00E5E46C /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
-		C8C8FA671AEEB68700E5E46C /* libMobileVLCKit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libMobileVLCKit.a; path = Libraries/MobileVLCKit/libMobileVLCKit.a; sourceTree = "<group>"; };
 		C8C8FA6A1AEEB6E500E5E46C /* libstdc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.dylib"; path = "usr/lib/libstdc++.dylib"; sourceTree = SDKROOT; };
 		C8C8FA6C1AEEB6F200E5E46C /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		C8C8FA6E1AEEB70300E5E46C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -227,6 +227,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C84DCC7B1AFE06380062C8F7 /* MobileVLCKit.framework in Frameworks */,
 				C8C8FA7B1AEEBCB600E5E46C /* libiconv.dylib in Frameworks */,
 				C84DCC771AFD4BC10062C8F7 /* Crashlytics.framework in Frameworks */,
 				C8C8FA6D1AEEB6F200E5E46C /* libsqlite3.dylib in Frameworks */,
@@ -241,7 +242,6 @@
 				C8C8FA661AEEB66D00E5E46C /* MediaPlayer.framework in Frameworks */,
 				C8C8FA711AEEB70A00E5E46C /* UIKit.framework in Frameworks */,
 				C8C8FA6F1AEEB70300E5E46C /* Foundation.framework in Frameworks */,
-				C8C8FA681AEEB68700E5E46C /* libMobileVLCKit.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -554,10 +554,10 @@
 		C8C8FA691AEEB69700E5E46C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C84DCC7A1AFE06380062C8F7 /* MobileVLCKit.framework */,
 				C84DCC741AFD4BC10062C8F7 /* Fabric.framework */,
 				C84DCC751AFD4BC10062C8F7 /* Crashlytics.framework */,
 				C8C8FA7A1AEEBCB600E5E46C /* libiconv.dylib */,
-				C8C8FA671AEEB68700E5E46C /* libMobileVLCKit.a */,
 				C8C8FA6C1AEEB6F200E5E46C /* libsqlite3.dylib */,
 				C8C8FA6A1AEEB6E500E5E46C /* libstdc++.dylib */,
 				C8C8FA761AEEB89900E5E46C /* libxml2.dylib */,
@@ -911,6 +911,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					Libraries,
+					"$(PROJECT_DIR)/Libraries",
 				);
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_NO_COMMON_BLOCKS = NO;
@@ -920,13 +921,12 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					Libraries/MobileVLCKit/include,
 				);
 				INFOPLIST_FILE = SloRadio/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/Libraries/MobileVLCKit";
-				OTHER_LDFLAGS = "-Wl,-no_pie";
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_LDFLAGS = "-Wl,-no_pie,-no_compact_unwind";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -941,6 +941,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					Libraries,
+					"$(PROJECT_DIR)/Libraries",
 				);
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_NO_COMMON_BLOCKS = NO;
@@ -950,13 +951,12 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					Libraries/MobileVLCKit/include,
 				);
 				INFOPLIST_FILE = SloRadio/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/Libraries/MobileVLCKit";
-				OTHER_LDFLAGS = "-Wl,-no_pie";
+				LIBRARY_SEARCH_PATHS = "";
+				OTHER_LDFLAGS = "-Wl,-no_pie,-no_compact_unwind";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
