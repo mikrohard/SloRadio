@@ -1,4 +1,4 @@
-# SloRadio
+# SloRadio [![Download on the App Store](http://iphone.jernej.org/app_store.png)](https://itunes.apple.com/si/app/sloradio/id316264385?mt=8)
 
 Simple radio player app using MobileVLCKit library. It uses a simple API to fetch & update Slovenian radio stations. It also allows the user to freely add/remove/move radio stations.
 
