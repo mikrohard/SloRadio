@@ -23,7 +23,7 @@ static NSTimeInterval const SRDataManagerSleepTimerMaximumInterval = 3*60*60.0; 
 static BOOL const SRDataManagerPlayerCachingEnabledDefault = NO; // disabled by default
 static NSTimeInterval const SRDataManagerPlayerCacheSizeDefault = 5.0; // 5 seconds
 
-static NSString * const SRDataManagerStationsApiUrl = @"http://iphone.jernej.org/sloradio/stations.php";
+static NSString * const SRDataManagerStationsApiUrl = @"https://iphone.jernej.org/sloradio/stations.php";
 static NSString * const SRDataManagerStationsKey = @"stations";
 static NSString * const SRDataManagerStationsIdKey = @"id";
 static NSString * const SRDataManagerStationsNameKey = @"name";
@@ -36,7 +36,7 @@ static NSString * const SRDataManagerSleepTimerEnabledKey = @"SRSleepTimerEnable
 static NSString * const SRDataManagerPlayerCachingEnabledKey = @"SRPlayerCacheEnabled";
 static NSString * const SRDataManagerPlayerCacheSizeKey = @"SRPlayerCacheSize";
 
-static NSString * const SRLegacyStationPlaylistUrl = @"http://iphone.jernej.org/sloradio/playlist.php";
+static NSString * const SRLegacyStationPlaylistUrl = @"https://iphone.jernej.org/sloradio/playlist.php";
 static NSString * const SRLegacyStationsDictionaryKey = @"postaje";
 static NSString * const SRLegacyStationUrlKey = @"naslov";
 static NSString * const SRLegacyStationNameKey = @"ime";
