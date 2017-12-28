@@ -13,7 +13,7 @@ SloRadio depends on the MobileVLCKit framework. You can either compile it from s
 * Source: https://code.videolan.org/videolan/VLCKit
 * Binary: http://nightlies.videolan.org/build/iOS
 
-Note: In order for the sleep timer fade-out volume to work you will need to compile MobileVLCKit using a modified version of VLC (https://github.com/mikrohard/vlc/tree/audiounit_volume);
+Note: In order for the sleep timer fade-out volume to work you will need to compile MobileVLCKit using a modified version of VLC (https://github.com/mikrohard/vlc/tree/audiounit_volume)
 
 ## License
 
