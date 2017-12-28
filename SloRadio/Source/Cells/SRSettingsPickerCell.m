@@ -30,4 +30,12 @@
     self.pickerView.frame = CGRectMake(0, 0, CGRectGetWidth(bounds), 162.f);
 }
 
+- (UIEdgeInsets)layoutMargins {
+	return UIEdgeInsetsZero;
+}
+
+- (NSDirectionalEdgeInsets)directionalLayoutMargins {
+	return NSDirectionalEdgeInsetsZero;
+}
+
 @end

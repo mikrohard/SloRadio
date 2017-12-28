@@ -20,4 +20,12 @@
     return self;
 }
 
+- (UIEdgeInsets)layoutMargins {
+	return UIEdgeInsetsZero;
+}
+
+- (NSDirectionalEdgeInsets)directionalLayoutMargins {
+	return NSDirectionalEdgeInsetsZero;
+}
+
 @end

@@ -8,6 +8,7 @@
 
 #import "SRAboutViewController.h"
 #import "SRAcknowledgementsViewController.h"
+#import "SRTableViewCell.h"
 
 @import MessageUI;
 
@@ -35,6 +36,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+	self.tableView.separatorInset = UIEdgeInsetsMake(0.f, 15.f, 0.f, 0.f);
 }
 
 - (void)didReceiveMemoryWarning {
@@ -113,7 +115,7 @@
         static NSString *aboutCellIdentifier = @"AboutCellIdentifier";
         UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:aboutCellIdentifier];
         if (!cell) {
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue2 reuseIdentifier:aboutCellIdentifier];
+            cell = [[SRTableViewCell alloc] initWithStyle:UITableViewCellStyleValue2 reuseIdentifier:aboutCellIdentifier];
         }
         cell.textLabel.textColor = [SRAppearance mainColor];
         cell.textLabel.font = [SRAppearance applicationFontWithSize:17.f];
@@ -139,7 +141,7 @@
         static NSString *cellIdentifier = @"AcknowledgementsCellIdentifier";
         UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:cellIdentifier];
         if (!cell) {
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+            cell = [[SRTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
         }
         cell.textLabel.textColor = [SRAppearance textColor];
         cell.textLabel.text = NSLocalizedString(@"Acknowledgements", nil);

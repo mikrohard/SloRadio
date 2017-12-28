@@ -31,4 +31,12 @@
     _textInputField.frame = CGRectMake(horizontalPadding, 0, CGRectGetWidth(bounds) - horizontalPadding, CGRectGetHeight(bounds));
 }
 
+- (UIEdgeInsets)layoutMargins {
+	return UIEdgeInsetsZero;
+}
+
+- (NSDirectionalEdgeInsets)directionalLayoutMargins {
+	return NSDirectionalEdgeInsetsZero;
+}
+
 @end

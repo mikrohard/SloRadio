@@ -12,6 +12,7 @@
 #import "SRDataManager.h"
 #import "UIAlertView+Blocks.h"
 #import "MBProgressHUD.h"
+#import "SRTableViewCell.h"
 
 @interface SRSettingsViewController () <UIPickerViewDataSource, UIPickerViewDelegate, SRSliderTableViewCellProtocol>
 
@@ -35,6 +36,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+	self.tableView.separatorInset = UIEdgeInsetsMake(0.f, 15.f, 0.f, 0.f);
 }
 
 - (void)didReceiveMemoryWarning {
@@ -123,7 +125,7 @@
         static NSString *cellIdentifier = @"SettingsCell";
         UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:cellIdentifier];
         if (!cell) {
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+            cell = [[SRTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
         }
         if (indexPath.section == [self sectionForReset]) {
             // reset cell

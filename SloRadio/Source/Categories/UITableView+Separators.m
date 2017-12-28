@@ -30,4 +30,12 @@ static NSInteger SRSeparatorViewTag = 100010001;
     [cell addSubview:separatorView];
 }
 
+- (UIEdgeInsets)layoutMargins {
+	return UIEdgeInsetsZero;
+}
+
+- (NSDirectionalEdgeInsets)directionalLayoutMargins {
+	return NSDirectionalEdgeInsetsZero;
+}
+
 @end

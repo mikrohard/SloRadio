@@ -111,4 +111,14 @@
     [self setNeedsLayout];
 }
 
+#pragma mark - Layout margins
+
+- (UIEdgeInsets)layoutMargins {
+	return UIEdgeInsetsZero;
+}
+
+- (NSDirectionalEdgeInsets)directionalLayoutMargins {
+	return NSDirectionalEdgeInsetsZero;
+}
+
 @end

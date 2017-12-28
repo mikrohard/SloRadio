@@ -13,6 +13,7 @@
 #import "AMSlideMenuMainViewController.h"
 #import "UITableView+Separators.h"
 #import "UIImage+Color.h"
+#import "SRTableViewCell.h"
 
 static NSString * const SRMenuControllersTitleKey = @"SRMenuControllersTitleKey";
 static NSString * const SRMenuControllersIconKey = @"SRMenuControllersIconKey";
@@ -39,10 +40,16 @@ static NSString * const SRMenuControllersCachedKey = @"SRMenuControllersCachedKe
     self.tableView.backgroundColor = [SRAppearance menuBackgroundColor];
     self.tableView.separatorColor = [SRAppearance menuSeparatorColor];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-	self.tableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, statusBarHeight)];
+	self.tableView.separatorInset = UIEdgeInsetsMake(0.f, 15.f, 0.f, 0.f);
+	self.tableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, statusBarHeight + 15.f)];
 	self.tableView.tableHeaderView.backgroundColor = [UIColor clearColor];
 	self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, 44.f)];
     self.tableView.tableFooterView.backgroundColor = [UIColor clearColor];
+	
+	self.automaticallyAdjustsScrollViewInsets = NO;
+	if (@available(iOS 11, *)) {
+		self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+	}
 }
 
 - (void)viewDidLoad {
@@ -119,11 +126,12 @@ static NSString * const SRMenuControllersCachedKey = @"SRMenuControllersCachedKe
     static NSString *cellIdentifier = @"LeftMenuCellIdentifier";
     UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+        cell = [[SRTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
         cell.backgroundColor = [UIColor clearColor];
         cell.selectedBackgroundView = [[UIView alloc] initWithFrame:cell.bounds];
         cell.selectedBackgroundView.backgroundColor = [UIColor clearColor];
     }
+	cell.separatorInset = UIEdgeInsetsMake(0.f, 15.f, 0.f, 0.f);
     cell.textLabel.textColor = [SRAppearance menuContentColor];
     cell.textLabel.highlightedTextColor = [SRAppearance mainColor];
     UIImage *icon = [[self.controllers objectAtIndex:indexPath.row] objectForKey:SRMenuControllersIconKey];

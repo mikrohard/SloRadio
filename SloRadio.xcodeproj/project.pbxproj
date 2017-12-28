@@ -51,6 +51,7 @@
 		C8B1D39C1AEFF17300A5E0A0 /* NSURL+MBRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D38F1AEFF17300A5E0A0 /* NSURL+MBRequest.m */; };
 		C8B1D3A01AEFF20E00A5E0A0 /* SRDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D39F1AEFF20E00A5E0A0 /* SRDataManager.m */; };
 		C8B1D3A31AEFF3B400A5E0A0 /* SRRadioStation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3A21AEFF3B400A5E0A0 /* SRRadioStation.m */; };
+		C8BA48791FF5A5E100EA457A /* SRTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BA48781FF5A5E100EA457A /* SRTableViewCell.m */; };
 		C8C8FA381AEEADAD00E5E46C /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = C8C8FA371AEEADAD00E5E46C /* main.mm */; };
 		C8C8FA3B1AEEADAD00E5E46C /* SRAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C8FA3A1AEEADAD00E5E46C /* SRAppDelegate.m */; };
 		C8C8FA3E1AEEADAD00E5E46C /* SRMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C8FA3D1AEEADAD00E5E46C /* SRMainViewController.m */; };
@@ -181,6 +182,8 @@
 		C8B1D39F1AEFF20E00A5E0A0 /* SRDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRDataManager.m; path = Source/Data/SRDataManager.m; sourceTree = "<group>"; };
 		C8B1D3A11AEFF3B400A5E0A0 /* SRRadioStation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRRadioStation.h; path = Source/Data/SRRadioStation.h; sourceTree = "<group>"; };
 		C8B1D3A21AEFF3B400A5E0A0 /* SRRadioStation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRRadioStation.m; path = Source/Data/SRRadioStation.m; sourceTree = "<group>"; };
+		C8BA48771FF5A5E100EA457A /* SRTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SRTableViewCell.h; path = Source/Views/SRTableViewCell.h; sourceTree = "<group>"; };
+		C8BA48781FF5A5E100EA457A /* SRTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SRTableViewCell.m; path = Source/Views/SRTableViewCell.m; sourceTree = "<group>"; };
 		C8C8FA321AEEADAD00E5E46C /* SloRadio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SloRadio.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8C8FA361AEEADAD00E5E46C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C8C8FA371AEEADAD00E5E46C /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = main.mm; path = Source/Base/main.mm; sourceTree = "<group>"; };
@@ -396,6 +399,8 @@
 				C837457D1AF51C93002EBB84 /* SRNowPlayingView.m */,
 				C8FCC27C1AF69F9F00DE77EC /* SRSleepTimerView.h */,
 				C8FCC27D1AF69F9F00DE77EC /* SRSleepTimerView.m */,
+				C8BA48771FF5A5E100EA457A /* SRTableViewCell.h */,
+				C8BA48781FF5A5E100EA457A /* SRTableViewCell.m */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -727,6 +732,7 @@
 			files = (
 				C8B1D3981AEFF17300A5E0A0 /* MBURLConnectionOperation.m in Sources */,
 				C83745821AF51D9B002EBB84 /* CBAutoScrollLabel.m in Sources */,
+				C8BA48791FF5A5E100EA457A /* SRTableViewCell.m in Sources */,
 				C8B1D3911AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m in Sources */,
 				C8B1D3951AEFF17300A5E0A0 /* MBMultipartFormData.m in Sources */,
 				C8B1D39C1AEFF17300A5E0A0 /* NSURL+MBRequest.m in Sources */,
