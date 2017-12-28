@@ -107,11 +107,18 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 #pragma mark - Meta data
 
 - (void)updateMetaData {
+	[self updateMetaDataPreserveNowPlaying:NO];
+}
+
+- (void)updateMetaDataPreserveNowPlaying:(BOOL)preserve {
     NSDictionary *mediaMetaData = self.media.metaDictionary;
     NSString *genre = [mediaMetaData objectForKey:VLCMetaInformationGenre];
     NSString *title = [mediaMetaData objectForKey:VLCMetaInformationTitle];
     NSString *artist = [mediaMetaData objectForKey:VLCMetaInformationArtist];
     NSString *nowPlaying = [mediaMetaData objectForKey:VLCMetaInformationNowPlaying];
+	if (preserve && !nowPlaying) {
+		nowPlaying = [_metaData objectForKey:SRRadioPlayerMetaDataNowPlayingKey];
+	}
     NSMutableDictionary *metaData = [NSMutableDictionary dictionary];
     if (genre) {
         [metaData setObject:genre forKey:SRRadioPlayerMetaDataGenreKey];
@@ -124,7 +131,7 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
     }
     if (nowPlaying) {
         [metaData setObject:nowPlaying forKey:SRRadioPlayerMetaDataNowPlayingKey];
-    }
+	}
     _metaData = [NSDictionary dictionaryWithDictionary:metaData];
     if ([self.delegate respondsToSelector:@selector(radioPlayer:didChangeMetaData:)]) {
         [self.delegate radioPlayer:self didChangeMetaData:self.metaData];
@@ -169,7 +176,7 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 #pragma mark - VLCMediaPlayerDelegate
 
 - (void)mediaPlayerTimeChanged:(NSNotification *)aNotification {
-    _timePlaying = self.player.time.numberValue.doubleValue / 1000.0;
+    _timePlaying = self.player.time.value.doubleValue / 1000.0;
     if (self.state != SRRadioPlayerStatePlaying && self.timePlaying > 0) {
         [self updatePlayerState];
     }
@@ -183,11 +190,11 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 #pragma mark - VLCMediaDelegate
 
 - (void)mediaMetaDataDidChange:(VLCMedia *)aMedia {
-    [self updateMetaData];
+    [self updateMetaDataPreserveNowPlaying:YES];
 }
 
 - (void)mediaDidFinishParsing:(VLCMedia *)aMedia {
-    [self updateMetaData];
+    [self updateMetaDataPreserveNowPlaying:YES];
 }
 
 #pragma mark - Player state handling
@@ -232,7 +239,7 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
     if (state != _state) {
         _state = state;
         if (_state == SRRadioPlayerStatePlaying) {
-            [self.media parse];
+            [self.media parseWithOptions:VLCMediaParseNetwork];
         }
         if ([self.delegate respondsToSelector:@selector(radioPlayer:didChangeState:)]) {
             [self.delegate radioPlayer:self didChangeState:_state];
