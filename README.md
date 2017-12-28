@@ -10,10 +10,10 @@ Simple radio player app using MobileVLCKit library. It uses a simple API to fetc
 
 SloRadio depends on the MobileVLCKit framework. You can either compile it from source or download a precompiled version. Just drop a working version of "MobileVLCKit.framework" into the "Libraries" directory and you're ready to build SloRadio.
 
-* Source: http://git.videolan.org/?p=vlc-bindings/VLCKit.git
-* Binary: http://nightlies.videolan.org/build/ios/
+* Source: https://code.videolan.org/videolan/VLCKit
+* Binary: http://nightlies.videolan.org/build/iOS
 
-Note: In order for the sleep timer fade-out volume to work the current MobileVLCKit needs to be compiled with the "--enable-audioqueue" option.
+Note: In order for the sleep timer fade-out volume to work you will need to compile MobileVLCKit using a modified version of VLC (https://github.com/mikrohard/vlc/tree/audiounit_volume);
 
 ## License
 
