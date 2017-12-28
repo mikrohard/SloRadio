@@ -85,6 +85,12 @@
     [self endAudioSession];
 }
 
+- (void)viewSafeAreaInsetsDidChange {
+	[super viewSafeAreaInsetsDidChange];
+	[self layoutToolbar];
+	[self setupTableViewInsets];
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -107,6 +113,9 @@
     tableView.alwaysBounceVertical = YES;
     tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, 44.f)];
+	if (@available(iOS 11, *)) {
+		tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+	}
     [self.view addSubview:tableView];
     self.tableView = tableView;
 }
@@ -135,7 +144,7 @@
     }
     if (self.toolbar) {
         UIToolbar *toolbar = self.toolbar;
-        bottomInset = CGRectGetHeight(toolbar.frame);
+        bottomInset = CGRectGetMaxY(self.view.frame) - CGRectGetMinY(toolbar.frame);
     }
     self.tableView.contentInset = UIEdgeInsetsMake(topInset, 0, bottomInset, 0);
     self.tableView.scrollIndicatorInsets = self.tableView.contentInset;
@@ -156,8 +165,12 @@
 - (void)layoutToolbar {
     UINavigationBar *bar = self.navigationController.navigationBar;
     CGFloat height = CGRectGetHeight(bar.frame);
+	CGFloat safeAreaBottom = 0.f;
+	if (@available(iOS 11, *)) {
+		safeAreaBottom = self.view.safeAreaInsets.bottom;
+	}
     self.toolbar.frame = CGRectMake(0,
-                                    CGRectGetHeight(self.view.frame) - height,
+                                    CGRectGetHeight(self.view.frame) - height - safeAreaBottom,
                                     CGRectGetWidth(self.view.frame),
                                     height);
 }

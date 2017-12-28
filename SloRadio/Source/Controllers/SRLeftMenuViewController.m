@@ -35,10 +35,13 @@ static NSString * const SRMenuControllersCachedKey = @"SRMenuControllersCachedKe
 
 - (void)loadView {
     [super loadView];
+	CGFloat statusBarHeight = [[UIApplication sharedApplication] statusBarFrame].size.height;
     self.tableView.backgroundColor = [SRAppearance menuBackgroundColor];
     self.tableView.separatorColor = [SRAppearance menuSeparatorColor];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, 44.f)];
+	self.tableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, statusBarHeight)];
+	self.tableView.tableHeaderView.backgroundColor = [UIColor clearColor];
+	self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, 44.f)];
     self.tableView.tableFooterView.backgroundColor = [UIColor clearColor];
 }
 
