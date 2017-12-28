@@ -8,14 +8,11 @@
 
 #import "SRSleepTimer.h"
 
-static float const kVolumeTimerResolution = 0.01;
-
 @interface SRSleepTimer () {
     NSTimeInterval _interval;
 }
 
 @property (nonatomic, weak) id<SRSleepTimerDelegate> delegate;
-@property (nonatomic, strong) NSTimer *volumeTimer;
 @property (nonatomic, strong) NSTimer *secondsTimer;
 @property (nonatomic, strong) NSTimer *endTimer;
 
@@ -49,29 +46,19 @@ static float const kVolumeTimerResolution = 0.01;
 - (void)startTimer {
     NSTimeInterval interval = _interval;
     self.endTimer = [NSTimer timerWithTimeInterval:interval target:self selector:@selector(endTimerDidFire:) userInfo:nil repeats:NO];
-    NSTimeInterval volumeTimerInterval = interval * kVolumeTimerResolution;
-    self.volumeTimer = [NSTimer timerWithTimeInterval:volumeTimerInterval target:self selector:@selector(volumeTimerDidFire:) userInfo:nil repeats:YES];
     self.secondsTimer = [NSTimer timerWithTimeInterval:1.0 target:self selector:@selector(secondsTimerDidFire:) userInfo:nil repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:self.endTimer forMode:NSRunLoopCommonModes];
-    [[NSRunLoop currentRunLoop] addTimer:self.volumeTimer forMode:NSRunLoopCommonModes];
     [[NSRunLoop currentRunLoop] addTimer:self.secondsTimer forMode:NSRunLoopCommonModes];
     
     // manually fire seconds timer at start
     [self.secondsTimer fire];
 }
 
-- (void)volumeTimerDidFire:(NSTimer *)timer {
-    // calculate volume
-    NSTimeInterval interval = _interval;
-    NSTimeInterval currentInterval = MAX(0, [self.endTimer.fireDate timeIntervalSince1970] - [[NSDate date] timeIntervalSince1970]);
-    float currentVolume = currentInterval / interval;
-    [self.delegate sleepTimer:self changeVolumeLevel:currentVolume];
-}
-
 - (void)secondsTimerDidFire:(NSTimer *)timer {
     NSTimeInterval currentInterval = MAX(0, round([self.endTimer.fireDate timeIntervalSince1970] - [[NSDate date] timeIntervalSince1970]));
     _timeRemaining = currentInterval;
     [self.delegate sleepTimer:self timeRemaining:currentInterval];
+	[self calculateCurrentVolume];
 }
 
 - (void)endTimerDidFire:(NSTimer *)timer {
@@ -81,16 +68,27 @@ static float const kVolumeTimerResolution = 0.01;
 }
 
 - (void)invalidate {
-    [self.volumeTimer invalidate];
     [self.secondsTimer invalidate];
     [self.endTimer invalidate];
-    self.volumeTimer = nil;
     self.secondsTimer = nil;
     self.endTimer = nil;
 }
 
 - (BOOL)isRunning {
     return self.endTimer.isValid;
+}
+
+#pragma mark - Volume
+
+- (void)calculateCurrentVolume {
+	// calculate volume
+	NSTimeInterval fadeOutInterval = 5*60; // last 5 mintues
+	NSTimeInterval timeToEnd = MAX(0, [self.endTimer.fireDate timeIntervalSince1970] - [[NSDate date] timeIntervalSince1970]);
+	float currentVolume = 1.f;
+	if (timeToEnd < fadeOutInterval) {
+		currentVolume = timeToEnd / fadeOutInterval;
+	}
+	[self.delegate sleepTimer:self changeVolumeLevel:currentVolume];
 }
 
 @end
