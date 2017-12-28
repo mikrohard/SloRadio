@@ -18,7 +18,6 @@
 		C81D33171AEF84900076BF01 /* SRRadioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D33161AEF84900076BF01 /* SRRadioViewController.m */; };
 		C824E3811FF5226D00EF1B03 /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C824E3801FF5226D00EF1B03 /* VideoToolbox.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		C837454E1AF11715002EBB84 /* SRAppearance.m in Sources */ = {isa = PBXBuildFile; fileRef = C837454D1AF11715002EBB84 /* SRAppearance.m */; };
-		C83745511AF11BA9002EBB84 /* VLCDialogDisplayer+Suppress.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745501AF11BA9002EBB84 /* VLCDialogDisplayer+Suppress.m */; };
 		C83745641AF24FAF002EBB84 /* SRAddRadioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745631AF24FAF002EBB84 /* SRAddRadioViewController.m */; };
 		C83745681AF26E58002EBB84 /* SRTextInputCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745671AF26E58002EBB84 /* SRTextInputCell.m */; };
 		C837456C1AF28016002EBB84 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = C837456B1AF28016002EBB84 /* MBProgressHUD.m */; };
@@ -113,8 +112,6 @@
 		C824E3801FF5226D00EF1B03 /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
 		C837454C1AF11715002EBB84 /* SRAppearance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRAppearance.h; path = Source/Appearance/SRAppearance.h; sourceTree = "<group>"; };
 		C837454D1AF11715002EBB84 /* SRAppearance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRAppearance.m; path = Source/Appearance/SRAppearance.m; sourceTree = "<group>"; };
-		C837454F1AF11BA9002EBB84 /* VLCDialogDisplayer+Suppress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "VLCDialogDisplayer+Suppress.h"; path = "Source/Player/VLCDialogDisplayer+Suppress.h"; sourceTree = "<group>"; };
-		C83745501AF11BA9002EBB84 /* VLCDialogDisplayer+Suppress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "VLCDialogDisplayer+Suppress.m"; path = "Source/Player/VLCDialogDisplayer+Suppress.m"; sourceTree = "<group>"; };
 		C83745621AF24FAF002EBB84 /* SRAddRadioViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRAddRadioViewController.h; path = Source/Controllers/SRAddRadioViewController.h; sourceTree = "<group>"; };
 		C83745631AF24FAF002EBB84 /* SRAddRadioViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRAddRadioViewController.m; path = Source/Controllers/SRAddRadioViewController.m; sourceTree = "<group>"; };
 		C83745661AF26E58002EBB84 /* SRTextInputCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRTextInputCell.h; path = Source/Cells/SRTextInputCell.h; sourceTree = "<group>"; };
@@ -544,8 +541,6 @@
 		C8C8FA5B1AEEAF0100E5E46C /* Player */ = {
 			isa = PBXGroup;
 			children = (
-				C837454F1AF11BA9002EBB84 /* VLCDialogDisplayer+Suppress.h */,
-				C83745501AF11BA9002EBB84 /* VLCDialogDisplayer+Suppress.m */,
 				C8C8FA5C1AEEAF5A00E5E46C /* SRRadioPlayer.h */,
 				C8C8FA5D1AEEAF5A00E5E46C /* SRRadioPlayer.m */,
 				C83745A41AF6426D002EBB84 /* SRSleepTimer.h */,
@@ -769,7 +764,6 @@
 				C81D330C1AEF83920076BF01 /* AMSlideMenuMainViewController.m in Sources */,
 				C8C8FA3B1AEEADAD00E5E46C /* SRAppDelegate.m in Sources */,
 				C8C8FA381AEEADAD00E5E46C /* main.mm in Sources */,
-				C83745511AF11BA9002EBB84 /* VLCDialogDisplayer+Suppress.m in Sources */,
 				C8B1D3A31AEFF3B400A5E0A0 /* SRRadioStation.m in Sources */,
 				C81D330B1AEF83920076BF01 /* AMSlideMenuLeftTableViewController.m in Sources */,
 				C8FCC29B1AF91DDB00DE77EC /* SRAboutViewController.m in Sources */,
