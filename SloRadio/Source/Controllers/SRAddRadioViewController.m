@@ -62,7 +62,7 @@
     BOOL canEdit = [self canEditStationName] || [self canEditStationUrl];
     NSString *cancel = canEdit ? NSLocalizedString(@"Cancel", nil) : NSLocalizedString(@"Close", nil);
     UIBarButtonItem *cancelItem = [[UIBarButtonItem alloc] initWithTitle:cancel
-                                                                   style:UIBarButtonItemStyleBordered
+                                                                   style:UIBarButtonItemStylePlain
                                                                   target:self
                                                                   action:@selector(cancelButtonPressed:)];
     self.navigationItem.leftBarButtonItem = cancelItem;
