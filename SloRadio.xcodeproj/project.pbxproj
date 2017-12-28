@@ -16,6 +16,7 @@
 		C81D330F1AEF83920076BF01 /* UIViewController+AMSlideMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D33081AEF83920076BF01 /* UIViewController+AMSlideMenu.m */; };
 		C81D33121AEF83CE0076BF01 /* SRLeftMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D33111AEF83CE0076BF01 /* SRLeftMenuViewController.m */; };
 		C81D33171AEF84900076BF01 /* SRRadioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D33161AEF84900076BF01 /* SRRadioViewController.m */; };
+		C824E3811FF5226D00EF1B03 /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C824E3801FF5226D00EF1B03 /* VideoToolbox.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		C837454E1AF11715002EBB84 /* SRAppearance.m in Sources */ = {isa = PBXBuildFile; fileRef = C837454D1AF11715002EBB84 /* SRAppearance.m */; };
 		C83745511AF11BA9002EBB84 /* VLCDialogDisplayer+Suppress.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745501AF11BA9002EBB84 /* VLCDialogDisplayer+Suppress.m */; };
 		C83745641AF24FAF002EBB84 /* SRAddRadioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745631AF24FAF002EBB84 /* SRAddRadioViewController.m */; };
@@ -109,6 +110,7 @@
 		C81D33151AEF84900076BF01 /* SRRadioViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRRadioViewController.h; path = Source/Controllers/SRRadioViewController.h; sourceTree = "<group>"; };
 		C81D33161AEF84900076BF01 /* SRRadioViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRRadioViewController.m; path = Source/Controllers/SRRadioViewController.m; sourceTree = "<group>"; };
 		C81D33181AEF86D20076BF01 /* SRPrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SRPrefixHeader.pch; path = Source/Base/SRPrefixHeader.pch; sourceTree = "<group>"; };
+		C824E3801FF5226D00EF1B03 /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
 		C837454C1AF11715002EBB84 /* SRAppearance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRAppearance.h; path = Source/Appearance/SRAppearance.h; sourceTree = "<group>"; };
 		C837454D1AF11715002EBB84 /* SRAppearance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRAppearance.m; path = Source/Appearance/SRAppearance.m; sourceTree = "<group>"; };
 		C837454F1AF11BA9002EBB84 /* VLCDialogDisplayer+Suppress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "VLCDialogDisplayer+Suppress.h"; path = "Source/Player/VLCDialogDisplayer+Suppress.h"; sourceTree = "<group>"; };
@@ -227,6 +229,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C824E3811FF5226D00EF1B03 /* VideoToolbox.framework in Frameworks */,
 				C84DCC7B1AFE06380062C8F7 /* MobileVLCKit.framework in Frameworks */,
 				C8C8FA7B1AEEBCB600E5E46C /* libiconv.dylib in Frameworks */,
 				C84DCC771AFD4BC10062C8F7 /* Crashlytics.framework in Frameworks */,
@@ -554,6 +557,7 @@
 		C8C8FA691AEEB69700E5E46C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C824E3801FF5226D00EF1B03 /* VideoToolbox.framework */,
 				C84DCC7A1AFE06380062C8F7 /* MobileVLCKit.framework */,
 				C84DCC741AFD4BC10062C8F7 /* Fabric.framework */,
 				C84DCC751AFD4BC10062C8F7 /* Crashlytics.framework */,
@@ -651,11 +655,12 @@
 		C8C8FA2A1AEEADAD00E5E46C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0630;
+				LastUpgradeCheck = 0920;
 				ORGANIZATIONNAME = "Jernej Fijačko";
 				TargetAttributes = {
 					C8C8FA311AEEADAD00E5E46C = {
 						CreatedOnToolsVersion = 6.3.1;
+						DevelopmentTeam = 4PZ2UBJ583;
 					};
 					C8C8FA4A1AEEADAD00E5E46C = {
 						CreatedOnToolsVersion = 6.3.1;
@@ -823,23 +828,33 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -867,17 +882,26 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -906,7 +930,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CLANG_CXX_LIBRARY = "libstdc++";
+				CLANG_CXX_LIBRARY = "libc++";
+				DEVELOPMENT_TEAM = 4PZ2UBJ583;
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -923,10 +949,11 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
 				INFOPLIST_FILE = SloRadio/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_LDFLAGS = "-Wl,-no_pie,-no_compact_unwind";
+				PRODUCT_BUNDLE_IDENTIFIER = org.jernej.RadioWakeUp.sloradio;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -936,7 +963,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CLANG_CXX_LIBRARY = "libstdc++";
+				CLANG_CXX_LIBRARY = "libc++";
+				DEVELOPMENT_TEAM = 4PZ2UBJ583;
+				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -953,10 +982,11 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
 				INFOPLIST_FILE = SloRadio/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_LDFLAGS = "-Wl,-no_pie,-no_compact_unwind";
+				PRODUCT_BUNDLE_IDENTIFIER = org.jernej.RadioWakeUp.sloradio;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -975,6 +1005,7 @@
 				);
 				INFOPLIST_FILE = SloRadioTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.jernej.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SloRadio.app/SloRadio";
 			};
@@ -990,6 +1021,7 @@
 				);
 				INFOPLIST_FILE = SloRadioTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.jernej.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SloRadio.app/SloRadio";
 			};
