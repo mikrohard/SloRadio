@@ -517,14 +517,12 @@ static NSMutableArray *allInstances;
     
     if (self.leftMenu && [self deepnessForLeftMenu])
     {
-        self.leftMenu.view.layer.transform = kMenuTransformScale;
         self.leftMenu.view.layer.opacity = kMenuLayerInitialOpacity;
         self.leftMenu.view.autoresizingMask = kAutoresizingMaskAll;
         self.leftMenu.view.hidden = YES;
     }
     if (self.rightMenu && [self deepnessForRightMenu])
     {
-        self.rightMenu.view.layer.transform = kMenuTransformScale;
         self.rightMenu.view.layer.opacity = kMenuLayerInitialOpacity;
         self.rightMenu.view.autoresizingMask = kAutoresizingMaskAll;
         self.rightMenu.view.hidden = YES;
@@ -552,13 +550,17 @@ static NSMutableArray *allInstances;
     
     if (!self.darknessView)
         [self configureDarknessView];
-    
+	
+	if ([self deepnessForLeftMenu] && self.leftMenu.view.hidden) {
+		self.leftMenu.view.layer.transform = kMenuTransformScale;
+	}
+	
     self.rightMenu.view.hidden = YES;
     self.leftMenu.view.hidden = NO;
     
     CGRect frame = self.currentActiveNVC.view.frame;
     frame.origin.x = [self leftMenuWidth];
-    
+	
     [UIView animateWithDuration: animated ? self.openAnimationDuration : 0 delay:0.0 options:self.openAnimationCurve animations:^{
         self.currentActiveNVC.view.frame = frame;
         
@@ -595,7 +597,11 @@ static NSMutableArray *allInstances;
         [self.slideMenuDelegate rightMenuWillOpen];
     if (!self.darknessView)
         [self configureDarknessView];
-    
+	
+	if ([self deepnessForRightMenu] && self.rightMenu.view.hidden) {
+		self.rightMenu.view.layer.transform = kMenuTransformScale;
+	}
+	
     self.rightMenu.view.hidden = NO;
     self.leftMenu.view.hidden = YES;
     
@@ -660,13 +666,16 @@ static NSMutableArray *allInstances;
         [self desableGestures];
         self.menuState = AMSlideMenuClosed;
         [self.currentActiveNVC.view addGestureRecognizer:self.panGesture];
-        
+		
         if (self.slideMenuDelegate && [self.slideMenuDelegate respondsToSelector:@selector(leftMenuDidClose)])
             [self.slideMenuDelegate leftMenuDidClose];
     }];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.closeAnimationDuration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         self.leftMenu.view.hidden = YES;
+		if ([self deepnessForLeftMenu]) {
+			self.leftMenu.view.layer.transform = CATransform3DMakeScale(1.0, 1.0, 1.0);
+		}
     });
 }
 
@@ -699,18 +708,19 @@ static NSMutableArray *allInstances;
         
         self.darknessView.alpha = 0;
     } completion:^(BOOL finished) {
-        
-        
         [self.overlayView removeFromSuperview];        
         [self desableGestures];
         self.menuState = AMSlideMenuClosed;
         [self.currentActiveNVC.view addGestureRecognizer:self.panGesture];
-        
+		
         if (self.slideMenuDelegate && [self.slideMenuDelegate respondsToSelector:@selector(rightMenuDidClose)])
             [self.slideMenuDelegate rightMenuDidClose];
     }];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(self.closeAnimationDuration * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        self.leftMenu.view.hidden = YES;
+        self.rightMenu.view.hidden = YES;
+		if ([self deepnessForRightMenu]) {
+			self.rightMenu.view.layer.transform = CATransform3DMakeScale(1.0, 1.0, 1.0);
+		}
     });
 }
 
@@ -1058,6 +1068,9 @@ static NSMutableArray *allInstances;
                 [self rightMenuWillReveal];
                 if (self.menuState == AMSlideMenuClosed)
                 {
+					if ([self deepnessForRightMenu]) {
+						self.rightMenu.view.layer.transform = kMenuTransformScale;
+					}
                     self.leftMenu.view.hidden = YES;
                     self.rightMenu.view.hidden = NO;
                 }
@@ -1069,6 +1082,9 @@ static NSMutableArray *allInstances;
                 [self leftMenuWillReveal];
                 if (self.menuState == AMSlideMenuClosed)
                 {
+					if ([self deepnessForLeftMenu]) {
+						self.leftMenu.view.layer.transform = kMenuTransformScale;
+					}
                     self.leftMenu.view.hidden = NO;
                     self.rightMenu.view.hidden = YES;
                 }
