@@ -667,42 +667,51 @@
 #pragma mark - Remote control events
 
 - (void)startRemoteControlTracking {
-    [self becomeFirstResponder];
-    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+	MPRemoteCommandCenter *commandCenter = [MPRemoteCommandCenter sharedCommandCenter];
+	
+	MPRemoteCommand *nextTrackCommand = [commandCenter nextTrackCommand];
+	[nextTrackCommand setEnabled:YES];
+	[nextTrackCommand addTarget:self action:@selector(remotePlayNext)];
+	
+	MPRemoteCommand *previousTrackCommand = [commandCenter previousTrackCommand];
+	[previousTrackCommand setEnabled:YES];
+	[previousTrackCommand addTarget:self action:@selector(remotePlayPrevious)];
+	
+	MPRemoteCommand *pauseCommand = [commandCenter pauseCommand];
+	[pauseCommand setEnabled:YES];
+	[pauseCommand addTarget:self action:@selector(remoteStop)];
+	
+	MPRemoteCommand *playCommand = [commandCenter playCommand];
+	[playCommand setEnabled:YES];
+	[playCommand addTarget:self action:@selector(remotePlay)];
+	
+	MPRemoteCommand *togglePlayPauseCommand = [commandCenter togglePlayPauseCommand];
+	[togglePlayPauseCommand setEnabled:YES];
+	[togglePlayPauseCommand addTarget:self action:@selector(remoteTogglePlayPause)];
 }
 
 - (void)endRemoteControlTracking {
-    [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
-    [self resignFirstResponder];
-}
-
-- (BOOL)canBecomeFirstResponder {
-    return YES;
-}
-
-- (void)remoteControlReceivedWithEvent:(UIEvent *)event {
-    if (event.type == UIEventTypeRemoteControl) {
-        switch (event.subtype) {
-            case UIEventSubtypeRemoteControlPlay:
-                [self remotePlay];
-                break;
-            case UIEventSubtypeRemoteControlPause:
-            case UIEventSubtypeRemoteControlStop:
-                [self remoteStop];
-                break;
-            case UIEventSubtypeRemoteControlTogglePlayPause:
-                [self remoteTogglePlayPause];
-                break;
-            case UIEventSubtypeRemoteControlNextTrack:
-                [self remotePlayNext];
-                break;
-            case UIEventSubtypeRemoteControlPreviousTrack:
-                [self remotePlayPrevious];
-                break;
-            default:
-                break;
-        }
-    }
+	MPRemoteCommandCenter *commandCenter = [MPRemoteCommandCenter sharedCommandCenter];
+	
+	MPRemoteCommand *nextTrackCommand = [commandCenter nextTrackCommand];
+	[nextTrackCommand setEnabled:NO];
+	[nextTrackCommand removeTarget:self];
+	
+	MPRemoteCommand *previousTrackCommand = [commandCenter previousTrackCommand];
+	[previousTrackCommand setEnabled:NO];
+	[previousTrackCommand removeTarget:self];
+	
+	MPRemoteCommand *pauseCommand = [commandCenter pauseCommand];
+	[pauseCommand setEnabled:NO];
+	[pauseCommand removeTarget:self];
+	
+	MPRemoteCommand *playCommand = [commandCenter playCommand];
+	[playCommand setEnabled:NO];
+	[playCommand removeTarget:self];
+	
+	MPRemoteCommand *togglePlayPauseCommand = [commandCenter togglePlayPauseCommand];
+	[togglePlayPauseCommand setEnabled:NO];
+	[togglePlayPauseCommand removeTarget:self];
 }
 
 - (void)remotePlay {
