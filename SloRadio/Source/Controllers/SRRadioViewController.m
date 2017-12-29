@@ -25,8 +25,11 @@
 @import MediaPlayer;
 @import MessageUI;
 
+static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
+
 @interface SRRadioViewController () <SRRadioPlayerDelegate, SRSleepTimerDelegate, SRSleepTimerViewDelegate, MFMailComposeViewControllerDelegate, UITableViewDataSource, UITableViewDelegate> {
     BOOL _playbackInterrupted;
+	NSTimeInterval _stationsLoadedTimestamp;
 }
 
 @property (nonatomic, strong) SRNowPlayingView *nowPlayingTitleView;
@@ -288,6 +291,7 @@
     [nc addObserver:self selector:@selector(stationsChanged:) name:SRDataManagerDidChangeStations object:nil];
     [nc addObserver:self selector:@selector(sleepTimerSettingsChanged:) name:SRDataManagerDidChangeSleepTimerSettings object:nil];
     [nc addObserver:self selector:@selector(audioSessionInterruption:) name:AVAudioSessionInterruptionNotification object:nil];
+	[nc addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
 - (void)unregisterFromNotifications {
@@ -323,9 +327,14 @@
     }
 }
 
+- (void)applicationDidBecomeActive:(NSNotification *)notification {
+	[self updateRadioStations];
+}
+
 #pragma mark - Network
 
 - (void)loadRadioStations {
+	_stationsLoadedTimestamp = [[NSDate date] timeIntervalSince1970];
     if ([self stations].count == 0) {
         [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     }
@@ -337,6 +346,13 @@
             [self handleStationsLoadError];
         }
     }];
+}
+
+- (void)updateRadioStations {
+	// update radio stations if last load is more than one hour ago
+	if ([[NSDate date] timeIntervalSince1970] - _stationsLoadedTimestamp > SRRadioStationsUpdateInterval) {
+		[self loadRadioStations];
+	}
 }
 
 #pragma mark - Stations
