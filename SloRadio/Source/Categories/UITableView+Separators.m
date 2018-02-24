@@ -14,20 +14,20 @@ static NSInteger SRSeparatorViewTag = 100010001;
 @implementation UITableView (Separators)
 
 - (void)configureSeparatorForCell:(UITableViewCell *)cell {
-    SRSeparatorView *separatorView = (SRSeparatorView *)[cell viewWithTag:SRSeparatorViewTag];
-    if (!separatorView) {
-        separatorView = [[SRSeparatorView alloc] init];
-        separatorView.separatorColor = self.separatorColor;
-        separatorView.tag = SRSeparatorViewTag;
-    }
-    CGRect separatorFrame = separatorView.frame;
-    separatorFrame.origin.x = cell.separatorInset.left;
-    separatorFrame.size.width = CGRectGetWidth(cell.bounds) - separatorFrame.origin.x;
-    separatorFrame.size.height = 1.f / [[UIScreen mainScreen] scale];
-    separatorFrame.origin.y = CGRectGetHeight(cell.bounds) - separatorFrame.size.height;
-    separatorView.frame = separatorFrame;
-    separatorView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    [cell addSubview:separatorView];
+	SRSeparatorView *separatorView = (SRSeparatorView *)[cell viewWithTag:SRSeparatorViewTag];
+	if (!separatorView) {
+		separatorView = [[SRSeparatorView alloc] init];
+		separatorView.separatorColor = self.separatorColor;
+		separatorView.tag = SRSeparatorViewTag;
+	}
+	CGRect separatorFrame = separatorView.frame;
+	separatorFrame.origin.x = cell.separatorInset.left;
+	separatorFrame.size.width = CGRectGetWidth(cell.bounds) - separatorFrame.origin.x;
+	separatorFrame.size.height = 1.f / [[UIScreen mainScreen] scale];
+	separatorFrame.origin.y = CGRectGetHeight(cell.bounds) - separatorFrame.size.height;
+	separatorView.frame = separatorFrame;
+	separatorView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+	[cell addSubview:separatorView];
 }
 
 - (UIEdgeInsets)layoutMargins {

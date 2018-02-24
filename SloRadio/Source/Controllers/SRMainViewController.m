@@ -18,39 +18,39 @@
 #pragma mark - Lifecycle
 
 - (void)viewDidLoad {
-    [self setupMenus];
-    [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+	[self setupMenus];
+	[super viewDidLoad];
+	// Do any additional setup after loading the view, typically from a nib.
 }
 
 - (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+	[super didReceiveMemoryWarning];
+	// Dispose of any resources that can be recreated.
 }
 
 #pragma mark - Setup
 
 - (void)setupMenus {
-    self.leftMenu = [[SRLeftMenuViewController alloc] initWithStyle:UITableViewStylePlain];
+	self.leftMenu = [[SRLeftMenuViewController alloc] initWithStyle:UITableViewStylePlain];
 }
 
 - (void)configureLeftMenuButton:(UIButton *)button {
-    UIImage *menuIcon = [[UIImage imageNamed:@"MenuIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    CGRect frame = button.frame;
-    frame.origin = CGPointMake(0, 0);
-    frame.size = menuIcon.size;
-    button.frame = frame;
-    [button setImage:menuIcon forState:UIControlStateNormal];
+	UIImage *menuIcon = [[UIImage imageNamed:@"MenuIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+	CGRect frame = button.frame;
+	frame.origin = CGPointMake(0, 0);
+	frame.size = menuIcon.size;
+	button.frame = frame;
+	[button setImage:menuIcon forState:UIControlStateNormal];
 }
 
 - (BOOL)deepnessForLeftMenu {
-    return YES;
+	return YES;
 }
 
 #pragma mark - Status bar
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
-    return UIStatusBarStyleLightContent;
+	return UIStatusBarStyleLightContent;
 }
 
 @end

@@ -15,12 +15,12 @@
 #pragma mark - Separator color
 
 - (void)setSeparatorColor:(UIColor *)separatorColor {
-    _separatorColor = separatorColor;
-    [self setBackgroundColor:separatorColor];
+	_separatorColor = separatorColor;
+	[self setBackgroundColor:separatorColor];
 }
 
 - (void)setBackgroundColor:(UIColor *)backgroundColor {
-    [super setBackgroundColor:self.separatorColor];
+	[super setBackgroundColor:self.separatorColor];
 }
 
 @end

@@ -28,259 +28,259 @@
 #pragma mark - Lifecycle
 
 - (instancetype)initEmpty {
-    SRRadioStation *station = [[SRRadioStation alloc] init];
-    return [self initWithRadioStation:station];
+	SRRadioStation *station = [[SRRadioStation alloc] init];
+	return [self initWithRadioStation:station];
 }
 
 - (instancetype)initWithRadioStation:(SRRadioStation *)station {
-    self = [self initWithStyle:UITableViewStyleGrouped];
-    if (self) {
-        self.station = station;
-        self.title = station.stationId > 0 ? NSLocalizedString(@"EditStation", nil) : NSLocalizedString(@"AddStation", nil);
-    }
-    return self;
+	self = [self initWithStyle:UITableViewStyleGrouped];
+	if (self) {
+		self.station = station;
+		self.title = station.stationId > 0 ? NSLocalizedString(@"EditStation", nil) : NSLocalizedString(@"AddStation", nil);
+	}
+	return self;
 }
 
 - (void)viewDidLoad {
-    [super viewDidLoad];
-    [self setupNavigationButtons];
+	[super viewDidLoad];
+	[self setupNavigationButtons];
 }
 
 - (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+	[super didReceiveMemoryWarning];
+	// Dispose of any resources that can be recreated.
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    [self stopPlaying];
+	[super viewWillDisappear:animated];
+	[self stopPlaying];
 }
 
 #pragma mark - Setup
 
 - (void)setupNavigationButtons {
-    BOOL canEdit = [self canEditStationName] || [self canEditStationUrl];
-    NSString *cancel = canEdit ? NSLocalizedString(@"Cancel", nil) : NSLocalizedString(@"Close", nil);
-    UIBarButtonItem *cancelItem = [[UIBarButtonItem alloc] initWithTitle:cancel
-                                                                   style:UIBarButtonItemStylePlain
-                                                                  target:self
-                                                                  action:@selector(cancelButtonPressed:)];
-    self.navigationItem.leftBarButtonItem = cancelItem;
-    if (canEdit) {
-        UIBarButtonItem *saveItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Save", nil)
-                                                                     style:UIBarButtonItemStyleDone
-                                                                    target:self
-                                                                    action:@selector(saveButtonPressed:)];
-        self.navigationItem.rightBarButtonItem = saveItem;
-        [self updateNavigationButtonsEnabledStatus];
-    }
+	BOOL canEdit = [self canEditStationName] || [self canEditStationUrl];
+	NSString *cancel = canEdit ? NSLocalizedString(@"Cancel", nil) : NSLocalizedString(@"Close", nil);
+	UIBarButtonItem *cancelItem = [[UIBarButtonItem alloc] initWithTitle:cancel
+																   style:UIBarButtonItemStylePlain
+																  target:self
+																  action:@selector(cancelButtonPressed:)];
+	self.navigationItem.leftBarButtonItem = cancelItem;
+	if (canEdit) {
+		UIBarButtonItem *saveItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Save", nil)
+																	 style:UIBarButtonItemStyleDone
+																	target:self
+																	action:@selector(saveButtonPressed:)];
+		self.navigationItem.rightBarButtonItem = saveItem;
+		[self updateNavigationButtonsEnabledStatus];
+	}
 }
 
 - (void)updateNavigationButtonsEnabledStatus {
-    if ([self canEditStationName] || [self canEditStationUrl]) {
-        self.navigationItem.rightBarButtonItem.enabled = [self canTryToSaveRadioStation];
-    }
+	if ([self canEditStationName] || [self canEditStationUrl]) {
+		self.navigationItem.rightBarButtonItem.enabled = [self canTryToSaveRadioStation];
+	}
 }
 
 #pragma mark - Editing & saving
 
 - (BOOL)canTryToSaveRadioStation {
-    return self.station.name.length > 0 && self.station.url.absoluteString.length > 0;
+	return self.station.name.length > 0 && self.station.url.absoluteString.length > 0;
 }
 
 - (BOOL)canEditStationName {
-    return self.station.stationId == 0 || [[SRDataManager sharedManager] isCustomRadioStation:self.station];
+	return self.station.stationId == 0 || [[SRDataManager sharedManager] isCustomRadioStation:self.station];
 }
 
 - (BOOL)canEditStationUrl {
-    return self.station.stationId == 0;
+	return self.station.stationId == 0;
 }
 
 #pragma mark - Rows
 
 - (NSIndexPath *)indexPathForRadioName {
-    return [NSIndexPath indexPathForRow:0 inSection:0];
+	return [NSIndexPath indexPathForRow:0 inSection:0];
 }
 
 - (NSIndexPath *)indexPathForRadioUrl {
-    return [NSIndexPath indexPathForRow:0 inSection:1];
+	return [NSIndexPath indexPathForRow:0 inSection:1];
 }
 
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    // Return the number of sections.
-    return 2;
+	// Return the number of sections.
+	return 2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    // Return the number of rows in the section.
-    return 1;
+	// Return the number of rows in the section.
+	return 1;
 }
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    static NSString *cellIdentifier = @"TextInputCell";
-    SRTextInputCell *cell = [self.tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    if (!cell) {
-        cell = [[SRTextInputCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        cell.textInputField.delegate = self;
-    }
-    if (indexPath.row == [self indexPathForRadioName].row &&
-        indexPath.section == [self indexPathForRadioName].section) {
-        cell.textInputField.text = self.station.name;
-        cell.textInputField.placeholder = NSLocalizedString(@"InsertName", nil);
-        cell.textInputField.keyboardType = UIKeyboardTypeDefault;
-        cell.textInputField.returnKeyType = [self canEditStationUrl] ? UIReturnKeyNext : UIReturnKeyDone;
-        cell.textInputField.autocapitalizationType = UITextAutocapitalizationTypeWords;
-        cell.textInputField.enabled = [self canEditStationName];
-        cell.textInputField.textColor = [self canEditStationName] ? [SRAppearance textColor] : [SRAppearance disabledTextColor];
-    }
-    else if (indexPath.row == [self indexPathForRadioUrl].row &&
-             indexPath.section == [self indexPathForRadioUrl].section) {
-        cell.textInputField.text = self.station.url.absoluteString;
-        cell.textInputField.placeholder = NSLocalizedString(@"ExampleUrl", nil);
-        cell.textInputField.keyboardType = UIKeyboardTypeURL;
-        cell.textInputField.returnKeyType = UIReturnKeyDone;
-        cell.textInputField.autocapitalizationType = UITextAutocapitalizationTypeNone;
-        cell.textInputField.enabled = [self canEditStationUrl];
-        cell.textInputField.textColor = [self canEditStationUrl] ? [SRAppearance textColor] : [SRAppearance disabledTextColor];
-    }
-    return cell;
+	static NSString *cellIdentifier = @"TextInputCell";
+	SRTextInputCell *cell = [self.tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+	if (!cell) {
+		cell = [[SRTextInputCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+		cell.selectionStyle = UITableViewCellSelectionStyleNone;
+		cell.textInputField.delegate = self;
+	}
+	if (indexPath.row == [self indexPathForRadioName].row &&
+		indexPath.section == [self indexPathForRadioName].section) {
+		cell.textInputField.text = self.station.name;
+		cell.textInputField.placeholder = NSLocalizedString(@"InsertName", nil);
+		cell.textInputField.keyboardType = UIKeyboardTypeDefault;
+		cell.textInputField.returnKeyType = [self canEditStationUrl] ? UIReturnKeyNext : UIReturnKeyDone;
+		cell.textInputField.autocapitalizationType = UITextAutocapitalizationTypeWords;
+		cell.textInputField.enabled = [self canEditStationName];
+		cell.textInputField.textColor = [self canEditStationName] ? [SRAppearance textColor] : [SRAppearance disabledTextColor];
+	}
+	else if (indexPath.row == [self indexPathForRadioUrl].row &&
+			 indexPath.section == [self indexPathForRadioUrl].section) {
+		cell.textInputField.text = self.station.url.absoluteString;
+		cell.textInputField.placeholder = NSLocalizedString(@"ExampleUrl", nil);
+		cell.textInputField.keyboardType = UIKeyboardTypeURL;
+		cell.textInputField.returnKeyType = UIReturnKeyDone;
+		cell.textInputField.autocapitalizationType = UITextAutocapitalizationTypeNone;
+		cell.textInputField.enabled = [self canEditStationUrl];
+		cell.textInputField.textColor = [self canEditStationUrl] ? [SRAppearance textColor] : [SRAppearance disabledTextColor];
+	}
+	return cell;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if (section == [self indexPathForRadioName].section) {
-        return NSLocalizedString(@"StationName", nil);
-    }
-    else if (section == [self indexPathForRadioUrl].section) {
-        return NSLocalizedString(@"StationAddress", nil);
-    }
-    return nil;
+	if (section == [self indexPathForRadioName].section) {
+		return NSLocalizedString(@"StationName", nil);
+	}
+	else if (section == [self indexPathForRadioUrl].section) {
+		return NSLocalizedString(@"StationAddress", nil);
+	}
+	return nil;
 }
 
 #pragma mark - Button actions
 
 - (void)cancelButtonPressed:(id)sender {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:NULL];
+	[self.presentingViewController dismissViewControllerAnimated:YES completion:NULL];
 }
 
 - (void)saveButtonPressed:(id)sender {
-    if ([self canEditStationUrl]) {
-        SRTextInputCell *urlCell = (SRTextInputCell *)[self.tableView cellForRowAtIndexPath:[self indexPathForRadioUrl]];
-        NSString *urlString = urlCell.textInputField.text;
-        NSURL *url = [NSURL URLWithString:urlString];
-        if (url) {
-            [self playStreamAtUrl:url];
-        }
-    }
-    else {
-        [[SRDataManager sharedManager] updateRadioStation:self.station];
-        [self cancelButtonPressed:nil];
-    }
+	if ([self canEditStationUrl]) {
+		SRTextInputCell *urlCell = (SRTextInputCell *)[self.tableView cellForRowAtIndexPath:[self indexPathForRadioUrl]];
+		NSString *urlString = urlCell.textInputField.text;
+		NSURL *url = [NSURL URLWithString:urlString];
+		if (url) {
+			[self playStreamAtUrl:url];
+		}
+	}
+	else {
+		[[SRDataManager sharedManager] updateRadioStation:self.station];
+		[self cancelButtonPressed:nil];
+	}
 }
 
 #pragma mark - Player
 
 - (void)playStreamAtUrl:(NSURL *)url {
-    if (!self.player) {
-        self.player = [[SRRadioPlayer alloc] init];
-    }
-    self.player.delegate = self;
-    [self.player playStreamAtUrl:url];
-    [self showProgressHUD];
+	if (!self.player) {
+		self.player = [[SRRadioPlayer alloc] init];
+	}
+	self.player.delegate = self;
+	[self.player playStreamAtUrl:url];
+	[self showProgressHUD];
 }
 
 - (void)stopPlaying {
-    self.player.delegate = nil;
-    [self.player stop];
-    self.player = nil;
+	self.player.delegate = nil;
+	[self.player stop];
+	self.player = nil;
 }
 
 #pragma mark - Progress HUD
 
 - (void)showProgressHUD {
-    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-    hud.dimBackground = YES;
+	MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
+	hud.dimBackground = YES;
 }
 
 - (void)hideProgressHUD {
-    [MBProgressHUD hideHUDForView:self.navigationController.view animated:YES];
+	[MBProgressHUD hideHUDForView:self.navigationController.view animated:YES];
 }
 
 #pragma mark - UITextFieldDelegate
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
-    SRTextInputCell *nameCell = (SRTextInputCell *)[self.tableView cellForRowAtIndexPath:[self indexPathForRadioName]];
-    SRTextInputCell *urlCell = (SRTextInputCell *)[self.tableView cellForRowAtIndexPath:[self indexPathForRadioUrl]];
-    NSString *changedString = [textField.text stringByReplacingCharactersInRange:range withString:string];
-    if (textField == nameCell.textInputField) {
-        self.station.name = changedString;
-    }
-    else if (textField == urlCell.textInputField) {
-        self.station.url = [NSURL URLWithString:changedString];
-    }
-    [self updateNavigationButtonsEnabledStatus];
-    return YES;
+	SRTextInputCell *nameCell = (SRTextInputCell *)[self.tableView cellForRowAtIndexPath:[self indexPathForRadioName]];
+	SRTextInputCell *urlCell = (SRTextInputCell *)[self.tableView cellForRowAtIndexPath:[self indexPathForRadioUrl]];
+	NSString *changedString = [textField.text stringByReplacingCharactersInRange:range withString:string];
+	if (textField == nameCell.textInputField) {
+		self.station.name = changedString;
+	}
+	else if (textField == urlCell.textInputField) {
+		self.station.url = [NSURL URLWithString:changedString];
+	}
+	[self updateNavigationButtonsEnabledStatus];
+	return YES;
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
-    SRTextInputCell *nameCell = (SRTextInputCell *)[self.tableView cellForRowAtIndexPath:[self indexPathForRadioName]];
-    SRTextInputCell *urlCell = (SRTextInputCell *)[self.tableView cellForRowAtIndexPath:[self indexPathForRadioUrl]];
-    if (textField == nameCell.textInputField) {
-        // name cell returned... go to next cell
-        if ([self canEditStationUrl]) {
-            [urlCell.textInputField becomeFirstResponder];
-        }
-        else if ([self canTryToSaveRadioStation]) {
-            [self saveButtonPressed:nil];
-        }
-        [textField resignFirstResponder];
-    }
-    else if (textField == urlCell.textInputField) {
-        if ([self canTryToSaveRadioStation]) {
-            [self saveButtonPressed:nil];
-        }
-        [textField resignFirstResponder];
-    }
-    return YES;
+	SRTextInputCell *nameCell = (SRTextInputCell *)[self.tableView cellForRowAtIndexPath:[self indexPathForRadioName]];
+	SRTextInputCell *urlCell = (SRTextInputCell *)[self.tableView cellForRowAtIndexPath:[self indexPathForRadioUrl]];
+	if (textField == nameCell.textInputField) {
+		// name cell returned... go to next cell
+		if ([self canEditStationUrl]) {
+			[urlCell.textInputField becomeFirstResponder];
+		}
+		else if ([self canTryToSaveRadioStation]) {
+			[self saveButtonPressed:nil];
+		}
+		[textField resignFirstResponder];
+	}
+	else if (textField == urlCell.textInputField) {
+		if ([self canTryToSaveRadioStation]) {
+			[self saveButtonPressed:nil];
+		}
+		[textField resignFirstResponder];
+	}
+	return YES;
 }
 
 #pragma mark - SRRadioPlayerDelegate
 
 - (void)radioPlayer:(SRRadioPlayer *)player didChangeState:(SRRadioPlayerState)state {
-    if (state == SRRadioPlayerStatePlaying) {
-        [[SRDataManager sharedManager] addRadioStation:self.station];
-        [self hideProgressHUD];
-        __weak SRAddRadioViewController *weakSelf = self;
-        NSString *message = [NSString stringWithFormat:NSLocalizedString(@"StationAddedMessage", nil), self.station.name];
-        [self showAlertWithTitle:NSLocalizedString(@"Added", nil)
-                         message:message
-                 dismissCallback:^{
-                     [weakSelf.presentingViewController dismissViewControllerAnimated:YES completion:NULL];
-                 }];
-    }
-    else if (state == SRRadioPlayerStateError || state == SRRadioPlayerStateStopped) {
-        [self stopPlaying];
-        [self hideProgressHUD];
-        NSString *message = [NSString stringWithFormat:NSLocalizedString(@"StationNotAddedMessage", nil), self.station.name];
-        [self showAlertWithTitle:NSLocalizedString(@"Oops", @"Oops!")
-                         message:message
-                 dismissCallback:NULL];
-    }
+	if (state == SRRadioPlayerStatePlaying) {
+		[[SRDataManager sharedManager] addRadioStation:self.station];
+		[self hideProgressHUD];
+		__weak SRAddRadioViewController *weakSelf = self;
+		NSString *message = [NSString stringWithFormat:NSLocalizedString(@"StationAddedMessage", nil), self.station.name];
+		[self showAlertWithTitle:NSLocalizedString(@"Added", nil)
+						 message:message
+				 dismissCallback:^{
+					 [weakSelf.presentingViewController dismissViewControllerAnimated:YES completion:NULL];
+				 }];
+	}
+	else if (state == SRRadioPlayerStateError || state == SRRadioPlayerStateStopped) {
+		[self stopPlaying];
+		[self hideProgressHUD];
+		NSString *message = [NSString stringWithFormat:NSLocalizedString(@"StationNotAddedMessage", nil), self.station.name];
+		[self showAlertWithTitle:NSLocalizedString(@"Oops", @"Oops!")
+						 message:message
+				 dismissCallback:NULL];
+	}
 }
 
 #pragma mark - Alert
 
 - (void)showAlertWithTitle:(NSString *)title message:(NSString *)message dismissCallback:(dispatch_block_t)callback {
-    [UIAlertView showWithTitle:title
-                       message:message
-             cancelButtonTitle:NSLocalizedString(@"Ok", @"Ok")
-             otherButtonTitles:nil
-                      tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
-                          if (callback) {
-                              callback();
-                          }
-                      }];
+	[UIAlertView showWithTitle:title
+					   message:message
+			 cancelButtonTitle:NSLocalizedString(@"Ok", @"Ok")
+			 otherButtonTitles:nil
+					  tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
+						  if (callback) {
+							  callback();
+						  }
+					  }];
 }
 
 @end

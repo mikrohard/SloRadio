@@ -15,20 +15,20 @@
 #pragma mark - Lifecycle
 
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
-    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
-    if (self) {
-        UITextField *textField = [[UITextField alloc] init];
-        [self.contentView addSubview:textField];
-        _textInputField = textField;
-    }
-    return self;
+	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+	if (self) {
+		UITextField *textField = [[UITextField alloc] init];
+		[self.contentView addSubview:textField];
+		_textInputField = textField;
+	}
+	return self;
 }
 
 - (void)layoutSubviews {
-    [super layoutSubviews];
-    CGRect bounds = self.contentView.bounds;
-    CGFloat horizontalPadding = self.separatorInset.left;
-    _textInputField.frame = CGRectMake(horizontalPadding, 0, CGRectGetWidth(bounds) - horizontalPadding, CGRectGetHeight(bounds));
+	[super layoutSubviews];
+	CGRect bounds = self.contentView.bounds;
+	CGFloat horizontalPadding = self.separatorInset.left;
+	_textInputField.frame = CGRectMake(horizontalPadding, 0, CGRectGetWidth(bounds) - horizontalPadding, CGRectGetHeight(bounds));
 }
 
 - (UIEdgeInsets)layoutMargins {

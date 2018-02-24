@@ -35,16 +35,16 @@ static NSString * const SRMenuControllersCachedKey = @"SRMenuControllersCachedKe
 #pragma mark - Lifecycle
 
 - (void)loadView {
-    [super loadView];
+	[super loadView];
 	CGFloat statusBarHeight = [[UIApplication sharedApplication] statusBarFrame].size.height;
-    self.tableView.backgroundColor = [SRAppearance menuBackgroundColor];
-    self.tableView.separatorColor = [SRAppearance menuSeparatorColor];
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+	self.tableView.backgroundColor = [SRAppearance menuBackgroundColor];
+	self.tableView.separatorColor = [SRAppearance menuSeparatorColor];
+	self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 	self.tableView.separatorInset = UIEdgeInsetsMake(0.f, 15.f, 0.f, 0.f);
 	self.tableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, statusBarHeight + 15.f)];
 	self.tableView.tableHeaderView.backgroundColor = [UIColor clearColor];
 	self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, 44.f)];
-    self.tableView.tableFooterView.backgroundColor = [UIColor clearColor];
+	self.tableView.tableFooterView.backgroundColor = [UIColor clearColor];
 	
 	self.automaticallyAdjustsScrollViewInsets = NO;
 	if (@available(iOS 11, *)) {
@@ -53,115 +53,115 @@ static NSString * const SRMenuControllersCachedKey = @"SRMenuControllersCachedKe
 }
 
 - (void)viewDidLoad {
-    [super viewDidLoad];
-    [self setupMenuData];
+	[super viewDidLoad];
+	[self setupMenuData];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self highlightSelectedController];
-    });
+	[super viewWillAppear:animated];
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[self highlightSelectedController];
+	});
 }
 
 - (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+	[super didReceiveMemoryWarning];
+	// Dispose of any resources that can be recreated.
 }
 
 #pragma mark - Menu data
 
 - (void)setupMenuData {
-    // radio controller
-    NSString *radioStations = NSLocalizedString(@"RadioStations", @"Radio Stations");
-    NSMutableDictionary *radioController = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            radioStations, SRMenuControllersTitleKey,
-                                            [UIImage imageNamed:@"Radio"], SRMenuControllersIconKey,
-                                            [SRRadioViewController class], SRMenuControllersClassKey, nil];
-    // settings controller
-    NSString *settings = NSLocalizedString(@"Settings", @"Settings");
-    NSMutableDictionary *settingsController = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                               settings, SRMenuControllersTitleKey,
-                                               [UIImage imageNamed:@"Settings"], SRMenuControllersIconKey,
-                                               [SRSettingsViewController class], SRMenuControllersClassKey, nil];
-    // about controller
-    NSString *about = NSLocalizedString(@"About", @"About");
-    NSMutableDictionary *aboutController = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            about, SRMenuControllersTitleKey,
-                                            [UIImage imageNamed:@"Info"], SRMenuControllersIconKey,
-                                            [SRAboutViewController class], SRMenuControllersClassKey, nil];
-    self.controllers = @[radioController, settingsController, aboutController];
+	// radio controller
+	NSString *radioStations = NSLocalizedString(@"RadioStations", @"Radio Stations");
+	NSMutableDictionary *radioController = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+											radioStations, SRMenuControllersTitleKey,
+											[UIImage imageNamed:@"Radio"], SRMenuControllersIconKey,
+											[SRRadioViewController class], SRMenuControllersClassKey, nil];
+	// settings controller
+	NSString *settings = NSLocalizedString(@"Settings", @"Settings");
+	NSMutableDictionary *settingsController = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+											   settings, SRMenuControllersTitleKey,
+											   [UIImage imageNamed:@"Settings"], SRMenuControllersIconKey,
+											   [SRSettingsViewController class], SRMenuControllersClassKey, nil];
+	// about controller
+	NSString *about = NSLocalizedString(@"About", @"About");
+	NSMutableDictionary *aboutController = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+											about, SRMenuControllersTitleKey,
+											[UIImage imageNamed:@"Info"], SRMenuControllersIconKey,
+											[SRAboutViewController class], SRMenuControllersClassKey, nil];
+	self.controllers = @[radioController, settingsController, aboutController];
 }
 
 - (UIViewController *)controllerForIndexPath:(NSIndexPath *)indexPath {
-    NSMutableDictionary *controllerDict = [self.controllers objectAtIndex:indexPath.row];
-    UIViewController *controller = [controllerDict objectForKey:SRMenuControllersCachedKey];
-    if (!controller) {
-        Class controllerClass = [controllerDict objectForKey:SRMenuControllersClassKey];
-        controller = [[controllerClass alloc] init];
-        [controllerDict setObject:controller forKey:SRMenuControllersCachedKey];
-    }
-    return controller;
+	NSMutableDictionary *controllerDict = [self.controllers objectAtIndex:indexPath.row];
+	UIViewController *controller = [controllerDict objectForKey:SRMenuControllersCachedKey];
+	if (!controller) {
+		Class controllerClass = [controllerDict objectForKey:SRMenuControllersClassKey];
+		controller = [[controllerClass alloc] init];
+		[controllerDict setObject:controller forKey:SRMenuControllersCachedKey];
+	}
+	return controller;
 }
 
 - (void)highlightSelectedController {
-    [self.tableView selectRowAtIndexPath:self.selectedControllerIndexPath
-                                animated:NO
-                          scrollPosition:UITableViewScrollPositionNone];
+	[self.tableView selectRowAtIndexPath:self.selectedControllerIndexPath
+								animated:NO
+						  scrollPosition:UITableViewScrollPositionNone];
 }
 
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    // Return the number of sections.
-    return 1;
+	// Return the number of sections.
+	return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    // Return the number of rows in the section.
-    return self.controllers.count;
+	// Return the number of rows in the section.
+	return self.controllers.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    static NSString *cellIdentifier = @"LeftMenuCellIdentifier";
-    UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    if (!cell) {
-        cell = [[SRTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
-        cell.backgroundColor = [UIColor clearColor];
-        cell.selectedBackgroundView = [[UIView alloc] initWithFrame:cell.bounds];
-        cell.selectedBackgroundView.backgroundColor = [UIColor clearColor];
-    }
+	static NSString *cellIdentifier = @"LeftMenuCellIdentifier";
+	UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+	if (!cell) {
+		cell = [[SRTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+		cell.backgroundColor = [UIColor clearColor];
+		cell.selectedBackgroundView = [[UIView alloc] initWithFrame:cell.bounds];
+		cell.selectedBackgroundView.backgroundColor = [UIColor clearColor];
+	}
 	cell.separatorInset = UIEdgeInsetsMake(0.f, 15.f, 0.f, 0.f);
-    cell.textLabel.textColor = [SRAppearance menuContentColor];
-    cell.textLabel.highlightedTextColor = [SRAppearance mainColor];
-    UIImage *icon = [[self.controllers objectAtIndex:indexPath.row] objectForKey:SRMenuControllersIconKey];
-    cell.imageView.image = [icon imageWithColor:[SRAppearance menuContentColor]];
-    cell.imageView.highlightedImage = [icon imageWithColor:[SRAppearance mainColor]];
-    cell.textLabel.text = [[self.controllers objectAtIndex:indexPath.row] objectForKey:SRMenuControllersTitleKey];
-    return cell;
+	cell.textLabel.textColor = [SRAppearance menuContentColor];
+	cell.textLabel.highlightedTextColor = [SRAppearance mainColor];
+	UIImage *icon = [[self.controllers objectAtIndex:indexPath.row] objectForKey:SRMenuControllersIconKey];
+	cell.imageView.image = [icon imageWithColor:[SRAppearance menuContentColor]];
+	cell.imageView.highlightedImage = [icon imageWithColor:[SRAppearance mainColor]];
+	cell.textLabel.text = [[self.controllers objectAtIndex:indexPath.row] objectForKey:SRMenuControllersTitleKey];
+	return cell;
 }
 
 #pragma mark - TableView Delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSIndexPath *selectedPath = [self selectedControllerIndexPath];
-    if (selectedPath && selectedPath.row == indexPath.row) {
-        [self.mainVC closeLeftMenu];
-    }
-    else {
-        UIViewController *controller = [self controllerForIndexPath:indexPath];
-        UINavigationController *navigation = [[UINavigationController alloc] initWithRootViewController:controller];
-        [navigation.navigationBar setBarTintColor:[SRAppearance mainColor]];
-        [navigation.navigationBar setTintColor:[SRAppearance navigationBarContentColor]];
-        [navigation.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName: [SRAppearance navigationBarContentColor]}];
-        [self openContentNavigationController:navigation];
-        self.selectedControllerIndexPath = indexPath;
-    }
+	NSIndexPath *selectedPath = [self selectedControllerIndexPath];
+	if (selectedPath && selectedPath.row == indexPath.row) {
+		[self.mainVC closeLeftMenu];
+	}
+	else {
+		UIViewController *controller = [self controllerForIndexPath:indexPath];
+		UINavigationController *navigation = [[UINavigationController alloc] initWithRootViewController:controller];
+		[navigation.navigationBar setBarTintColor:[SRAppearance mainColor]];
+		[navigation.navigationBar setTintColor:[SRAppearance navigationBarContentColor]];
+		[navigation.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName: [SRAppearance navigationBarContentColor]}];
+		[self openContentNavigationController:navigation];
+		self.selectedControllerIndexPath = indexPath;
+	}
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView configureSeparatorForCell:cell];
+	[tableView configureSeparatorForCell:cell];
 }
 
 @end

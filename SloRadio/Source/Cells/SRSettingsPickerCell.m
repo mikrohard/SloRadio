@@ -15,19 +15,19 @@
 #pragma mark - Lifecycle
 
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
-    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
-    if (self) {
-        UIPickerView *pickerView = [[UIPickerView alloc] init];
-        [self.contentView addSubview:pickerView];
-        _pickerView = pickerView;
-    }
-    return self;
+	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+	if (self) {
+		UIPickerView *pickerView = [[UIPickerView alloc] init];
+		[self.contentView addSubview:pickerView];
+		_pickerView = pickerView;
+	}
+	return self;
 }
 
 - (void)layoutSubviews {
-    [super layoutSubviews];
-    CGRect bounds = self.contentView.bounds;
-    self.pickerView.frame = CGRectMake(0, 0, CGRectGetWidth(bounds), 162.f);
+	[super layoutSubviews];
+	CGRect bounds = self.contentView.bounds;
+	self.pickerView.frame = CGRectMake(0, 0, CGRectGetWidth(bounds), 162.f);
 }
 
 - (UIEdgeInsets)layoutMargins {
