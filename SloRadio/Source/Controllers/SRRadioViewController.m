@@ -46,6 +46,9 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 @property (nonatomic, strong) CTCallCenter *callCenter;
 @property (nonatomic, assign) BOOL callInProgress;
 
+// background task
+@property (nonatomic, assign) UIBackgroundTaskIdentifier bgTask;
+
 @end
 
 @implementation SRRadioViewController
@@ -56,6 +59,7 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 @synthesize toolbar = _toolbar;
 @synthesize tableView = _tableView;
 @synthesize callInProgress = _callInProgress;
+@synthesize bgTask = _bgTask;
 
 #pragma mark - Lifecycle
 
@@ -309,6 +313,7 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 		if (strongSelf) {
 			if (call.callState == CTCallStateIncoming || call.callState == CTCallStateDialing) {
 				[strongSelf audioSessionInterruptedByCall:YES];
+				[strongSelf startBackgroundTask];
 			} else if (call.callState == CTCallStateDisconnected && strongSelf.callInProgress) {
 				[strongSelf audioSessionResumeByCall:YES];
 			}
@@ -361,7 +366,7 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 	}
 	if ([[SRRadioPlayer sharedPlayer] state] != SRRadioPlayerStateStopped) {
 		_playbackInterrupted = YES;
-		[self performSelectorOnMainThread:@selector(stopAction) withObject:nil waitUntilDone:NO];
+		[self performSelectorOnMainThread:@selector(stopAction) withObject:nil waitUntilDone:YES];
 	}
 }
 
@@ -373,7 +378,7 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 	}
 	if ([[SRRadioPlayer sharedPlayer] state] == SRRadioPlayerStateStopped && _playbackInterrupted && !_callInProgress && !_audioSessionInterrupted) {
 		// resume playback
-		[self performSelectorOnMainThread:@selector(playAction) withObject:nil waitUntilDone:NO];
+		[self performSelectorOnMainThread:@selector(playAction) withObject:nil waitUntilDone:YES];
 	}
 }
 
@@ -598,6 +603,29 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
     [self presentAddRadioController];
 }
 
+#pragma mark - Background task
+
+- (void)startBackgroundTask {
+	UIApplication *application = [UIApplication sharedApplication];
+	if (_bgTask != UIBackgroundTaskInvalid) {
+		[application endBackgroundTask:_bgTask];
+		_bgTask = UIBackgroundTaskInvalid;
+	}
+	__weak SRRadioViewController *weakSelf = self;
+	_bgTask = [application beginBackgroundTaskWithExpirationHandler:^{
+		[application endBackgroundTask:weakSelf.bgTask];
+		weakSelf.bgTask = UIBackgroundTaskInvalid;
+	}];
+}
+
+- (void)endBackgroundTask {
+	if (_bgTask != UIBackgroundTaskInvalid) {
+		[[UIApplication sharedApplication] endBackgroundTask:_bgTask];
+		_bgTask = UIBackgroundTaskInvalid;
+	}
+}
+
+
 #pragma mark - Common actions
 
 - (void)playAction {
@@ -606,6 +634,7 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 }
 
 - (void)playActionWithSleepTimer:(BOOL)sleepTimer {
+	[self startBackgroundTask];
     if (sleepTimer) {
         [self setupSleepTimer];
     }
@@ -700,6 +729,11 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
         self.sleepTimer && !self.sleepTimer.isRunning) {
         [self startSleepTimer];
     }
+	if (state == SRRadioPlayerStateError ||
+		state == SRRadioPlayerStatePlaying ||
+		state == SRRadioPlayerStateStopped) {
+		[self endBackgroundTask];
+	}
 }
 
 - (void)radioPlayer:(SRRadioPlayer *)player didChangeMetaData:(NSDictionary *)metadata {
