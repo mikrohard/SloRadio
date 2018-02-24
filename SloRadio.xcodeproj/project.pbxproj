@@ -35,6 +35,7 @@
 		C84DCC761AFD4BC10062C8F7 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C84DCC741AFD4BC10062C8F7 /* Fabric.framework */; };
 		C84DCC771AFD4BC10062C8F7 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C84DCC751AFD4BC10062C8F7 /* Crashlytics.framework */; };
 		C84DCC7B1AFE06380062C8F7 /* MobileVLCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C84DCC7A1AFE06380062C8F7 /* MobileVLCKit.framework */; };
+		C88849FA20416B1C008B0276 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C88849F920416B1C008B0276 /* CoreTelephony.framework */; };
 		C8A46F0E1AF961030031888D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C8A46F0C1AF961030031888D /* Localizable.strings */; };
 		C8B1D3901AEFF17300A5E0A0 /* MBBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */; };
 		C8B1D3911AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3751AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m */; };
@@ -144,6 +145,7 @@
 		C84DCC741AFD4BC10062C8F7 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Fabric.framework; path = Libraries/Fabric.framework; sourceTree = "<group>"; };
 		C84DCC751AFD4BC10062C8F7 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Crashlytics.framework; path = Libraries/Crashlytics.framework; sourceTree = "<group>"; };
 		C84DCC7A1AFE06380062C8F7 /* MobileVLCKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileVLCKit.framework; path = Libraries/MobileVLCKit.framework; sourceTree = "<group>"; };
+		C88849F920416B1C008B0276 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
 		C8A46F0D1AF961030031888D /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8A46F0F1AF961130031888D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8A46F101AF961150031888D /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -229,6 +231,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C88849FA20416B1C008B0276 /* CoreTelephony.framework in Frameworks */,
 				C824E3811FF5226D00EF1B03 /* VideoToolbox.framework in Frameworks */,
 				C84DCC7B1AFE06380062C8F7 /* MobileVLCKit.framework in Frameworks */,
 				C8C8FA7B1AEEBCB600E5E46C /* libiconv.dylib in Frameworks */,
@@ -557,6 +560,7 @@
 		C8C8FA691AEEB69700E5E46C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C88849F920416B1C008B0276 /* CoreTelephony.framework */,
 				C824E3801FF5226D00EF1B03 /* VideoToolbox.framework */,
 				C84DCC7A1AFE06380062C8F7 /* MobileVLCKit.framework */,
 				C84DCC741AFD4BC10062C8F7 /* Fabric.framework */,

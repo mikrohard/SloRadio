@@ -6,6 +6,9 @@
 //  Copyright (c) 2015 Jernej Fijačko. All rights reserved.
 //
 
+#import <CoreTelephony/CTCallCenter.h>
+#import <CoreTelephony/CTCall.h>
+
 #import "SRRadioViewController.h"
 #import "SRDataManager.h"
 #import "SRRadioPlayer.h"
@@ -29,6 +32,7 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 
 @interface SRRadioViewController () <SRRadioPlayerDelegate, SRSleepTimerDelegate, SRSleepTimerViewDelegate, MFMailComposeViewControllerDelegate, UITableViewDataSource, UITableViewDelegate> {
     BOOL _playbackInterrupted;
+	BOOL _audioSessionInterrupted;
 	NSTimeInterval _stationsLoadedTimestamp;
 }
 
@@ -37,6 +41,10 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 @property (nonatomic, strong) SRSleepTimerView *sleepTimerView;
 @property (nonatomic, strong) UIToolbar *toolbar;
 @property (nonatomic, strong) UITableView *tableView;
+
+// call interruption handling
+@property (nonatomic, strong) CTCallCenter *callCenter;
+@property (nonatomic, assign) BOOL callInProgress;
 
 @end
 
@@ -47,6 +55,7 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 @synthesize sleepTimerView = _sleepTimerView;
 @synthesize toolbar = _toolbar;
 @synthesize tableView = _tableView;
+@synthesize callInProgress = _callInProgress;
 
 #pragma mark - Lifecycle
 
@@ -292,10 +301,25 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
     [nc addObserver:self selector:@selector(sleepTimerSettingsChanged:) name:SRDataManagerDidChangeSleepTimerSettings object:nil];
     [nc addObserver:self selector:@selector(audioSessionInterruption:) name:AVAudioSessionInterruptionNotification object:nil];
 	[nc addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+	
+	__weak SRRadioViewController *weakSelf = self;
+	self.callCenter = [[CTCallCenter alloc] init];
+	self.callCenter.callEventHandler = ^(CTCall *call) {
+		__strong SRRadioViewController *strongSelf = weakSelf;
+		if (strongSelf) {
+			if (call.callState == CTCallStateIncoming || call.callState == CTCallStateDialing) {
+				[strongSelf audioSessionInterruptedByCall:YES];
+			} else if (call.callState == CTCallStateDisconnected && strongSelf.callInProgress) {
+				[strongSelf audioSessionResumeByCall:YES];
+			}
+		}
+	};
 }
 
 - (void)unregisterFromNotifications {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+	self.callCenter.callEventHandler = nil;
+	self.callCenter = nil;
 }
 
 - (void)stationsLoaded:(NSNotification *)notification {
@@ -313,22 +337,44 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 - (void)audioSessionInterruption:(NSNotification *)notification {
     AVAudioSessionInterruptionType interruptionType = [[notification.userInfo objectForKey:AVAudioSessionInterruptionTypeKey] integerValue];
     if (interruptionType == AVAudioSessionInterruptionTypeBegan) {
-        if ([[SRRadioPlayer sharedPlayer] state] != SRRadioPlayerStateStopped) {
-            _playbackInterrupted = YES;
-            [self performSelectorOnMainThread:@selector(stopAction) withObject:nil waitUntilDone:NO];
-        }
+		[self audioSessionInterruptedByCall:NO];
     }
     else if (interruptionType == AVAudioSessionInterruptionTypeEnded) {
         AVAudioSessionInterruptionOptions interruptionOption = [[notification.userInfo objectForKey:AVAudioSessionInterruptionOptionKey] integerValue];
-        if (_playbackInterrupted && interruptionOption == AVAudioSessionInterruptionOptionShouldResume) {
-            // resume playback
-            [self performSelectorOnMainThread:@selector(playAction) withObject:nil waitUntilDone:NO];
+        if (_audioSessionInterrupted && interruptionOption == AVAudioSessionInterruptionOptionShouldResume) {
+			[self audioSessionResumeByCall:NO];
         }
     }
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
 	[self updateRadioStations];
+}
+
+#pragma mark - Playback interruption
+
+- (void)audioSessionInterruptedByCall:(BOOL)call {
+	if (call) {
+		_callInProgress = YES;
+	} else {
+		_audioSessionInterrupted = YES;
+	}
+	if ([[SRRadioPlayer sharedPlayer] state] != SRRadioPlayerStateStopped) {
+		_playbackInterrupted = YES;
+		[self performSelectorOnMainThread:@selector(stopAction) withObject:nil waitUntilDone:NO];
+	}
+}
+
+- (void)audioSessionResumeByCall:(BOOL)call {
+	if (call) {
+		_callInProgress = NO;
+	} else {
+		_audioSessionInterrupted = NO;
+	}
+	if ([[SRRadioPlayer sharedPlayer] state] == SRRadioPlayerStateStopped && _playbackInterrupted && !_callInProgress && !_audioSessionInterrupted) {
+		// resume playback
+		[self performSelectorOnMainThread:@selector(playAction) withObject:nil waitUntilDone:NO];
+	}
 }
 
 #pragma mark - Network
@@ -567,6 +613,8 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
         [self clearSleepTimer];
     }
     _playbackInterrupted = NO;
+	_audioSessionInterrupted = NO;
+	_callInProgress = NO;
     SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
     [[SRRadioPlayer sharedPlayer] playRadioStation:selectedStation];
 }
