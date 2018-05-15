@@ -8,7 +8,24 @@
 
 #import "SRTableViewCell.h"
 
-@implementation SRTableViewCell
+@implementation SRTableViewCell {
+	UITableViewCellStyle _cellStyle;
+}
+
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(nullable NSString *)reuseIdentifier {
+	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+	if (self) {
+		_cellStyle = style;
+	}
+	return self;
+}
+
+- (void)layoutSubviews {
+	[super layoutSubviews];
+	if (_cellStyle == UITableViewCellStyleValue2) {
+		self.textLabel.textAlignment = NSTextAlignmentLeft;
+	}
+}
 
 - (UIEdgeInsets)layoutMargins {
 	return UIEdgeInsetsZero;
