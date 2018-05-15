@@ -606,9 +606,9 @@ typedef NS_ENUM(NSUInteger, MCSwipeTableViewCellDirection) {
     }
     
     [UIView animateWithDuration:duration delay:0 options:(UIViewAnimationOptionCurveEaseOut | UIViewAnimationOptionAllowUserInteraction) animations:^{
-        _contentScreenshotView.frame = frame;
-        _slidingView.alpha = 0;
-        [self slideViewWithPercentage:percentage view:_activeView isDragging:self.shouldAnimateIcons];
+        self->_contentScreenshotView.frame = frame;
+        self->_slidingView.alpha = 0;
+        [self slideViewWithPercentage:percentage view:self->_activeView isDragging:self.shouldAnimateIcons];
     } completion:^(BOOL finished) {
         [self executeCompletionBlock];
     }];
@@ -621,19 +621,19 @@ typedef NS_ENUM(NSUInteger, MCSwipeTableViewCellDirection) {
         
         [UIView animateWithDuration:_animationDuration delay:0.0 usingSpringWithDamping:_damping initialSpringVelocity:_velocity options:UIViewAnimationOptionCurveEaseInOut animations:^{
             
-            CGRect frame = _contentScreenshotView.frame;
+            CGRect frame = self->_contentScreenshotView.frame;
             frame.origin.x = 0;
-            _contentScreenshotView.frame = frame;
+            self->_contentScreenshotView.frame = frame;
             
             // Clearing the indicator view
-            _colorIndicatorView.backgroundColor = self.defaultColor;
+            self->_colorIndicatorView.backgroundColor = self.defaultColor;
             
-            _slidingView.alpha = 0;
-            [self slideViewWithPercentage:0 view:_activeView isDragging:NO];
+            self->_slidingView.alpha = 0;
+            [self slideViewWithPercentage:0 view:self->_activeView isDragging:NO];
             
         } completion:^(BOOL finished) {
             
-            _isExited = NO;
+            self->_isExited = NO;
             [self uninstallSwipingView];
             
             if (completion) {
@@ -645,30 +645,30 @@ typedef NS_ENUM(NSUInteger, MCSwipeTableViewCellDirection) {
     else {
         [UIView animateWithDuration:kMCBounceDuration1 delay:0 options:(UIViewAnimationOptionCurveEaseOut) animations:^{
             
-            CGRect frame = _contentScreenshotView.frame;
+            CGRect frame = self->_contentScreenshotView.frame;
             frame.origin.x = -bounceDistance;
-            _contentScreenshotView.frame = frame;
+            self->_contentScreenshotView.frame = frame;
             
-            _slidingView.alpha = 0;
-            [self slideViewWithPercentage:0 view:_activeView isDragging:NO];
+            self->_slidingView.alpha = 0;
+            [self slideViewWithPercentage:0 view:self->_activeView isDragging:NO];
             
             // Setting back the color to the default.
-            _colorIndicatorView.backgroundColor = self.defaultColor;
+            self->_colorIndicatorView.backgroundColor = self.defaultColor;
             
         } completion:^(BOOL finished1) {
             
             [UIView animateWithDuration:kMCBounceDuration2 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
                 
-                CGRect frame = _contentScreenshotView.frame;
+                CGRect frame = self->_contentScreenshotView.frame;
                 frame.origin.x = 0;
-                _contentScreenshotView.frame = frame;
+                self->_contentScreenshotView.frame = frame;
                 
                 // Clearing the indicator view
-                _colorIndicatorView.backgroundColor = [UIColor clearColor];
+                self->_colorIndicatorView.backgroundColor = [UIColor clearColor];
                 
             } completion:^(BOOL finished2) {
                 
-                _isExited = NO;
+                self->_isExited = NO;
                 [self uninstallSwipingView];
                 
                 if (completion) {

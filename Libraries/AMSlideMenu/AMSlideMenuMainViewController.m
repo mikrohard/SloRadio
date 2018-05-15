@@ -111,12 +111,12 @@ static NSMutableArray *allInstances;
     }
 }
 
-- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator
 {
-    if ([self.currentActiveNVC shouldAutorotate])
-    {
-        self.currentActiveNVC.view.layer.shadowOpacity = 0;
-    }
+	if ([self.currentActiveNVC shouldAutorotate])
+	{
+		self.currentActiveNVC.view.layer.shadowOpacity = 0;
+	}
 }
 
 - (void)dealloc

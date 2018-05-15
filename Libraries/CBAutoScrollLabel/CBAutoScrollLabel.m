@@ -277,7 +277,7 @@ static void each_object(NSArray *objects, void (^block)(id object)) {
          // adjust offset
          self.scrollView.contentOffset = (doScrollLeft ? CGPointMake(labelWidth + self.labelSpacing, 0) : CGPointZero);
      } completion: ^(BOOL finished) {
-         _scrolling = NO;
+         self->_scrolling = NO;
 
          // remove the left shadow
          [self applyGradientMaskForFadeLength:self.fadeLength enableFade:NO];

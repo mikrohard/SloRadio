@@ -961,8 +961,10 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 
 #pragma mark - Screen rotation
 
-- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-	[self layoutViews];
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+	[coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+		[self layoutViews];
+	} completion:nil];
 }
 
 #pragma mark - Utils
