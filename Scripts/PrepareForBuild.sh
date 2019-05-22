@@ -4,7 +4,7 @@
 FRAMEWORK_NAME="MobileVLCKit.framework"
 LIBRARIES_PATH="${SOURCE_ROOT}/Libraries/"
 VLCKIT_FRAMEWORK="${LIBRARIES_PATH}${FRAMEWORK_NAME}"
-VLCKIT_FILE="MobileVLCKit-3.1.5-5b3b1db-c6718efd1a.tar.xz"
+VLCKIT_FILE="MobileVLCKit-3.3.2-e16829a-774a96ae6.tar.xz"
 VLCKIT_URL="http://download.videolan.org/pub/cocoapods/prod/${VLCKIT_FILE}"
 TEMP_PATH="${SOURCE_ROOT}/Temp"
 
