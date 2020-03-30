@@ -11,6 +11,7 @@
 @interface SRAcknowledgementsViewController ()
 
 @property (nonatomic, strong) UITextView *textView;
+@property (nonatomic, assign) BOOL initialScroll;
 
 @end
 
@@ -35,6 +36,14 @@
 	textView.text = text;
 	[self.view addSubview:textView];
 	self.textView = textView;
+}
+
+- (void)viewWillLayoutSubviews {
+	[super viewWillLayoutSubviews];
+	if (!self.initialScroll) {
+		self.initialScroll = YES;
+		[self.textView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:NO];
+	}
 }
 
 - (void)viewDidLoad {
