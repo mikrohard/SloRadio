@@ -36,19 +36,6 @@
 		C84DCC7B1AFE06380062C8F7 /* MobileVLCKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C84DCC7A1AFE06380062C8F7 /* MobileVLCKit.framework */; };
 		C88849FA20416B1C008B0276 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C88849F920416B1C008B0276 /* CoreTelephony.framework */; };
 		C8A46F0E1AF961030031888D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C8A46F0C1AF961030031888D /* Localizable.strings */; };
-		C8B1D3901AEFF17300A5E0A0 /* MBBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */; };
-		C8B1D3911AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3751AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m */; };
-		C8B1D3921AEFF17300A5E0A0 /* MBHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3771AEFF17300A5E0A0 /* MBHTTPRequest.m */; };
-		C8B1D3931AEFF17300A5E0A0 /* MBImageRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3791AEFF17300A5E0A0 /* MBImageRequest.m */; };
-		C8B1D3941AEFF17300A5E0A0 /* MBJSONRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D37B1AEFF17300A5E0A0 /* MBJSONRequest.m */; };
-		C8B1D3951AEFF17300A5E0A0 /* MBMultipartFormData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D37D1AEFF17300A5E0A0 /* MBMultipartFormData.m */; };
-		C8B1D3961AEFF17300A5E0A0 /* MBNetworkActivityIndicatorManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D37F1AEFF17300A5E0A0 /* MBNetworkActivityIndicatorManager.m */; };
-		C8B1D3971AEFF17300A5E0A0 /* MBRequestError.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3821AEFF17300A5E0A0 /* MBRequestError.m */; };
-		C8B1D3981AEFF17300A5E0A0 /* MBURLConnectionOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3861AEFF17300A5E0A0 /* MBURLConnectionOperation.m */; };
-		C8B1D3991AEFF17300A5E0A0 /* MBXMLRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3891AEFF17300A5E0A0 /* MBXMLRequest.m */; };
-		C8B1D39A1AEFF17300A5E0A0 /* NSDictionary+MBRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D38B1AEFF17300A5E0A0 /* NSDictionary+MBRequest.m */; };
-		C8B1D39B1AEFF17300A5E0A0 /* NSString+MBRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D38D1AEFF17300A5E0A0 /* NSString+MBRequest.m */; };
-		C8B1D39C1AEFF17300A5E0A0 /* NSURL+MBRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D38F1AEFF17300A5E0A0 /* NSURL+MBRequest.m */; };
 		C8B1D3A01AEFF20E00A5E0A0 /* SRDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D39F1AEFF20E00A5E0A0 /* SRDataManager.m */; };
 		C8B1D3A31AEFF3B400A5E0A0 /* SRRadioStation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3A21AEFF3B400A5E0A0 /* SRRadioStation.m */; };
 		C8BA48791FF5A5E100EA457A /* SRTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BA48781FF5A5E100EA457A /* SRTableViewCell.m */; };
@@ -146,37 +133,6 @@
 		C8A46F0D1AF961030031888D /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8A46F0F1AF961130031888D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8A46F101AF961150031888D /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
-		C8B1D3711AEFF17300A5E0A0 /* MBBaseRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequest.h; path = Libraries/MBRequest/MBBaseRequest.h; sourceTree = "<group>"; };
-		C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBBaseRequest.m; path = Libraries/MBRequest/MBBaseRequest.m; sourceTree = "<group>"; };
-		C8B1D3731AEFF17300A5E0A0 /* MBBaseRequestSubclass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBBaseRequestSubclass.h; path = Libraries/MBRequest/MBBaseRequestSubclass.h; sourceTree = "<group>"; };
-		C8B1D3741AEFF17300A5E0A0 /* MBHTTPConnectionOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBHTTPConnectionOperation.h; path = Libraries/MBRequest/MBHTTPConnectionOperation.h; sourceTree = "<group>"; };
-		C8B1D3751AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBHTTPConnectionOperation.m; path = Libraries/MBRequest/MBHTTPConnectionOperation.m; sourceTree = "<group>"; };
-		C8B1D3761AEFF17300A5E0A0 /* MBHTTPRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBHTTPRequest.h; path = Libraries/MBRequest/MBHTTPRequest.h; sourceTree = "<group>"; };
-		C8B1D3771AEFF17300A5E0A0 /* MBHTTPRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBHTTPRequest.m; path = Libraries/MBRequest/MBHTTPRequest.m; sourceTree = "<group>"; };
-		C8B1D3781AEFF17300A5E0A0 /* MBImageRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBImageRequest.h; path = Libraries/MBRequest/MBImageRequest.h; sourceTree = "<group>"; };
-		C8B1D3791AEFF17300A5E0A0 /* MBImageRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBImageRequest.m; path = Libraries/MBRequest/MBImageRequest.m; sourceTree = "<group>"; };
-		C8B1D37A1AEFF17300A5E0A0 /* MBJSONRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBJSONRequest.h; path = Libraries/MBRequest/MBJSONRequest.h; sourceTree = "<group>"; };
-		C8B1D37B1AEFF17300A5E0A0 /* MBJSONRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBJSONRequest.m; path = Libraries/MBRequest/MBJSONRequest.m; sourceTree = "<group>"; };
-		C8B1D37C1AEFF17300A5E0A0 /* MBMultipartFormData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBMultipartFormData.h; path = Libraries/MBRequest/MBMultipartFormData.h; sourceTree = "<group>"; };
-		C8B1D37D1AEFF17300A5E0A0 /* MBMultipartFormData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBMultipartFormData.m; path = Libraries/MBRequest/MBMultipartFormData.m; sourceTree = "<group>"; };
-		C8B1D37E1AEFF17300A5E0A0 /* MBNetworkActivityIndicatorManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBNetworkActivityIndicatorManager.h; path = Libraries/MBRequest/MBNetworkActivityIndicatorManager.h; sourceTree = "<group>"; };
-		C8B1D37F1AEFF17300A5E0A0 /* MBNetworkActivityIndicatorManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBNetworkActivityIndicatorManager.m; path = Libraries/MBRequest/MBNetworkActivityIndicatorManager.m; sourceTree = "<group>"; };
-		C8B1D3801AEFF17300A5E0A0 /* MBRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBRequest.h; path = Libraries/MBRequest/MBRequest.h; sourceTree = "<group>"; };
-		C8B1D3811AEFF17300A5E0A0 /* MBRequestError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBRequestError.h; path = Libraries/MBRequest/MBRequestError.h; sourceTree = "<group>"; };
-		C8B1D3821AEFF17300A5E0A0 /* MBRequestError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBRequestError.m; path = Libraries/MBRequest/MBRequestError.m; sourceTree = "<group>"; };
-		C8B1D3831AEFF17300A5E0A0 /* MBRequestLocalization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBRequestLocalization.h; path = Libraries/MBRequest/MBRequestLocalization.h; sourceTree = "<group>"; };
-		C8B1D3841AEFF17300A5E0A0 /* MBRequestLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBRequestLog.h; path = Libraries/MBRequest/MBRequestLog.h; sourceTree = "<group>"; };
-		C8B1D3851AEFF17300A5E0A0 /* MBURLConnectionOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBURLConnectionOperation.h; path = Libraries/MBRequest/MBURLConnectionOperation.h; sourceTree = "<group>"; };
-		C8B1D3861AEFF17300A5E0A0 /* MBURLConnectionOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBURLConnectionOperation.m; path = Libraries/MBRequest/MBURLConnectionOperation.m; sourceTree = "<group>"; };
-		C8B1D3871AEFF17300A5E0A0 /* MBURLConnectionOperationSubclass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBURLConnectionOperationSubclass.h; path = Libraries/MBRequest/MBURLConnectionOperationSubclass.h; sourceTree = "<group>"; };
-		C8B1D3881AEFF17300A5E0A0 /* MBXMLRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBXMLRequest.h; path = Libraries/MBRequest/MBXMLRequest.h; sourceTree = "<group>"; };
-		C8B1D3891AEFF17300A5E0A0 /* MBXMLRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBXMLRequest.m; path = Libraries/MBRequest/MBXMLRequest.m; sourceTree = "<group>"; };
-		C8B1D38A1AEFF17300A5E0A0 /* NSDictionary+MBRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSDictionary+MBRequest.h"; path = "Libraries/MBRequest/NSDictionary+MBRequest.h"; sourceTree = "<group>"; };
-		C8B1D38B1AEFF17300A5E0A0 /* NSDictionary+MBRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSDictionary+MBRequest.m"; path = "Libraries/MBRequest/NSDictionary+MBRequest.m"; sourceTree = "<group>"; };
-		C8B1D38C1AEFF17300A5E0A0 /* NSString+MBRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+MBRequest.h"; path = "Libraries/MBRequest/NSString+MBRequest.h"; sourceTree = "<group>"; };
-		C8B1D38D1AEFF17300A5E0A0 /* NSString+MBRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+MBRequest.m"; path = "Libraries/MBRequest/NSString+MBRequest.m"; sourceTree = "<group>"; };
-		C8B1D38E1AEFF17300A5E0A0 /* NSURL+MBRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSURL+MBRequest.h"; path = "Libraries/MBRequest/NSURL+MBRequest.h"; sourceTree = "<group>"; };
-		C8B1D38F1AEFF17300A5E0A0 /* NSURL+MBRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSURL+MBRequest.m"; path = "Libraries/MBRequest/NSURL+MBRequest.m"; sourceTree = "<group>"; };
 		C8B1D39E1AEFF20E00A5E0A0 /* SRDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRDataManager.h; path = Source/Data/SRDataManager.h; sourceTree = "<group>"; };
 		C8B1D39F1AEFF20E00A5E0A0 /* SRDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRDataManager.m; path = Source/Data/SRDataManager.m; sourceTree = "<group>"; };
 		C8B1D3A11AEFF3B400A5E0A0 /* SRRadioStation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRRadioStation.h; path = Source/Data/SRRadioStation.h; sourceTree = "<group>"; };
@@ -296,7 +252,6 @@
 				C81D32F91AEF83810076BF01 /* AMSlideMenu */,
 				C837457F1AF51D89002EBB84 /* CBAutoScrollLabel */,
 				C83745691AF27FFA002EBB84 /* MBProgressHud */,
-				C8B1D3701AEFF16700A5E0A0 /* MBRequest */,
 				C83745991AF56606002EBB84 /* MCSwipeTableViewCell */,
 				C83745A01AF634B1002EBB84 /* Reachability */,
 			);
@@ -428,44 +383,6 @@
 				C83745A21AF634C4002EBB84 /* Reachability.m */,
 			);
 			name = Reachability;
-			sourceTree = "<group>";
-		};
-		C8B1D3701AEFF16700A5E0A0 /* MBRequest */ = {
-			isa = PBXGroup;
-			children = (
-				C8B1D3711AEFF17300A5E0A0 /* MBBaseRequest.h */,
-				C8B1D3721AEFF17300A5E0A0 /* MBBaseRequest.m */,
-				C8B1D3731AEFF17300A5E0A0 /* MBBaseRequestSubclass.h */,
-				C8B1D3741AEFF17300A5E0A0 /* MBHTTPConnectionOperation.h */,
-				C8B1D3751AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m */,
-				C8B1D3761AEFF17300A5E0A0 /* MBHTTPRequest.h */,
-				C8B1D3771AEFF17300A5E0A0 /* MBHTTPRequest.m */,
-				C8B1D3781AEFF17300A5E0A0 /* MBImageRequest.h */,
-				C8B1D3791AEFF17300A5E0A0 /* MBImageRequest.m */,
-				C8B1D37A1AEFF17300A5E0A0 /* MBJSONRequest.h */,
-				C8B1D37B1AEFF17300A5E0A0 /* MBJSONRequest.m */,
-				C8B1D37C1AEFF17300A5E0A0 /* MBMultipartFormData.h */,
-				C8B1D37D1AEFF17300A5E0A0 /* MBMultipartFormData.m */,
-				C8B1D37E1AEFF17300A5E0A0 /* MBNetworkActivityIndicatorManager.h */,
-				C8B1D37F1AEFF17300A5E0A0 /* MBNetworkActivityIndicatorManager.m */,
-				C8B1D3801AEFF17300A5E0A0 /* MBRequest.h */,
-				C8B1D3811AEFF17300A5E0A0 /* MBRequestError.h */,
-				C8B1D3821AEFF17300A5E0A0 /* MBRequestError.m */,
-				C8B1D3831AEFF17300A5E0A0 /* MBRequestLocalization.h */,
-				C8B1D3841AEFF17300A5E0A0 /* MBRequestLog.h */,
-				C8B1D3851AEFF17300A5E0A0 /* MBURLConnectionOperation.h */,
-				C8B1D3861AEFF17300A5E0A0 /* MBURLConnectionOperation.m */,
-				C8B1D3871AEFF17300A5E0A0 /* MBURLConnectionOperationSubclass.h */,
-				C8B1D3881AEFF17300A5E0A0 /* MBXMLRequest.h */,
-				C8B1D3891AEFF17300A5E0A0 /* MBXMLRequest.m */,
-				C8B1D38A1AEFF17300A5E0A0 /* NSDictionary+MBRequest.h */,
-				C8B1D38B1AEFF17300A5E0A0 /* NSDictionary+MBRequest.m */,
-				C8B1D38C1AEFF17300A5E0A0 /* NSString+MBRequest.h */,
-				C8B1D38D1AEFF17300A5E0A0 /* NSString+MBRequest.m */,
-				C8B1D38E1AEFF17300A5E0A0 /* NSURL+MBRequest.h */,
-				C8B1D38F1AEFF17300A5E0A0 /* NSURL+MBRequest.m */,
-			);
-			name = MBRequest;
 			sourceTree = "<group>";
 		};
 		C8B1D39D1AEFF1F300A5E0A0 /* Data */ = {
@@ -729,24 +646,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C8B1D3981AEFF17300A5E0A0 /* MBURLConnectionOperation.m in Sources */,
 				C83745821AF51D9B002EBB84 /* CBAutoScrollLabel.m in Sources */,
 				C8BA48791FF5A5E100EA457A /* SRTableViewCell.m in Sources */,
-				C8B1D3911AEFF17300A5E0A0 /* MBHTTPConnectionOperation.m in Sources */,
-				C8B1D3951AEFF17300A5E0A0 /* MBMultipartFormData.m in Sources */,
-				C8B1D39C1AEFF17300A5E0A0 /* NSURL+MBRequest.m in Sources */,
 				C837456C1AF28016002EBB84 /* MBProgressHUD.m in Sources */,
 				C83745A61AF6426D002EBB84 /* SRSleepTimer.m in Sources */,
 				C81D330F1AEF83920076BF01 /* UIViewController+AMSlideMenu.m in Sources */,
-				C8B1D3921AEFF17300A5E0A0 /* MBHTTPRequest.m in Sources */,
 				C83745681AF26E58002EBB84 /* SRTextInputCell.m in Sources */,
 				C81D33171AEF84900076BF01 /* SRRadioViewController.m in Sources */,
 				C8FCC27E1AF69F9F00DE77EC /* SRSleepTimerView.m in Sources */,
 				C83745A31AF634C4002EBB84 /* Reachability.m in Sources */,
 				C837457B1AF50C83002EBB84 /* SRSeparatorView.m in Sources */,
 				C83745771AF50BC5002EBB84 /* UITableView+Separators.m in Sources */,
-				C8B1D39B1AEFF17300A5E0A0 /* NSString+MBRequest.m in Sources */,
-				C8B1D3941AEFF17300A5E0A0 /* MBJSONRequest.m in Sources */,
 				C83745641AF24FAF002EBB84 /* SRAddRadioViewController.m in Sources */,
 				C8B1D3A01AEFF20E00A5E0A0 /* SRDataManager.m in Sources */,
 				C837459F1AF61B0C002EBB84 /* UIImage+Color.m in Sources */,
@@ -754,13 +664,10 @@
 				C837459C1AF56613002EBB84 /* MCSwipeTableViewCell.m in Sources */,
 				C81D33091AEF83920076BF01 /* AMSlideMenuContentSegue.m in Sources */,
 				C837457E1AF51C93002EBB84 /* SRNowPlayingView.m in Sources */,
-				C8B1D3961AEFF17300A5E0A0 /* MBNetworkActivityIndicatorManager.m in Sources */,
 				C8C8FA3E1AEEADAD00E5E46C /* SRMainViewController.m in Sources */,
 				C81D330E1AEF83920076BF01 /* AMSlideMenuRightTableViewController.m in Sources */,
 				C8FCC29F1AF9347400DE77EC /* SRAcknowledgementsViewController.m in Sources */,
 				C837454E1AF11715002EBB84 /* SRAppearance.m in Sources */,
-				C8B1D3931AEFF17300A5E0A0 /* MBImageRequest.m in Sources */,
-				C8B1D39A1AEFF17300A5E0A0 /* NSDictionary+MBRequest.m in Sources */,
 				C83745981AF554FD002EBB84 /* SRRadioTableViewCell.m in Sources */,
 				C8FCC28A1AF7F09500DE77EC /* SRSettingsViewController.m in Sources */,
 				C8FCC28E1AF7F68C00DE77EC /* SRSettingsPickerCell.m in Sources */,
@@ -771,12 +678,9 @@
 				C8B1D3A31AEFF3B400A5E0A0 /* SRRadioStation.m in Sources */,
 				C81D330B1AEF83920076BF01 /* AMSlideMenuLeftTableViewController.m in Sources */,
 				C8FCC29B1AF91DDB00DE77EC /* SRAboutViewController.m in Sources */,
-				C8B1D3971AEFF17300A5E0A0 /* MBRequestError.m in Sources */,
-				C8B1D3901AEFF17300A5E0A0 /* MBBaseRequest.m in Sources */,
 				C81D330A1AEF83920076BF01 /* AMSlideMenuLeftMenuSegue.m in Sources */,
 				C84DCC721AFD28570062C8F7 /* SRSliderTableViewCell.m in Sources */,
 				C8C8FA5E1AEEAF5A00E5E46C /* SRRadioPlayer.m in Sources */,
-				C8B1D3991AEFF17300A5E0A0 /* MBXMLRequest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

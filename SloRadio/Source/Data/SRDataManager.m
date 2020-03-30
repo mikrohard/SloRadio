@@ -7,7 +7,6 @@
 //
 
 #import "SRDataManager.h"
-#import "MBRequest.h"
 #import "SRRadioStation.h"
 
 NSString * const SRDataManagerDidLoadStations = @"SRDataManagerDidLoadStations";
@@ -82,43 +81,65 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 - (void)loadStationsWithCompletionHandler:(SRDataManagerCompletionHandler)completion {
 	NSURL *url = [NSURL URLWithString:SRDataManagerStationsApiUrl];
 	NSURLRequest *urlRequest = [NSURLRequest requestWithURL:url];
-	MBJSONRequest *jsonRequest = [[MBJSONRequest alloc] init];
-	[jsonRequest performJSONRequest:urlRequest completionHandler:^(id responseJSON, NSError *error) {
-		if (error != nil) {
-			NSLog(@"Error requesting radio stations: %@", error);
-		} else {
-			NSArray *stations = [responseJSON objectForKey:SRDataManagerStationsKey];
-			NSMutableArray *array = [self stationsForArray:stations];
-			if (self.allStations.count > 0) {
-				[self updateStations:array];
+	[[[NSURLSession sharedSession] dataTaskWithRequest:urlRequest
+									 completionHandler:^(NSData * _Nullable data,
+														 NSURLResponse * _Nullable response,
+														 NSError * _Nullable connectionError) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			NSDictionary *responseJSON = nil;
+			NSError *error = nil;
+			if (connectionError) {
+				error = connectionError;
+			} else {
+				responseJSON = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
 			}
-			else {
-				[self setupStations:array];
+			if (error != nil) {
+				NSLog(@"Error requesting radio stations: %@", error);
+			} else {
+				NSArray *stations = [responseJSON objectForKey:SRDataManagerStationsKey];
+				NSMutableArray *array = [self stationsForArray:stations];
+				if (self.allStations.count > 0) {
+					[self updateStations:array];
+				}
+				else {
+					[self setupStations:array];
+				}
 			}
-		}
-		if (completion) {
-			completion(error);
-		}
-	}];
+			if (completion) {
+				completion(error);
+			}
+		});
+	}] resume];
 }
 
 - (void)resetStationsWithCompletionHandler:(SRDataManagerCompletionHandler)completion {
 	NSURL *url = [NSURL URLWithString:SRDataManagerStationsApiUrl];
 	NSURLRequest *urlRequest = [NSURLRequest requestWithURL:url];
-	MBJSONRequest *jsonRequest = [[MBJSONRequest alloc] init];
-	[jsonRequest performJSONRequest:urlRequest completionHandler:^(id responseJSON, NSError *error) {
-		if (error != nil) {
-			NSLog(@"Error requesting radio stations: %@", error);
-		} else {
-			NSArray *stations = [responseJSON objectForKey:SRDataManagerStationsKey];
-			NSMutableArray *array = [self stationsForArray:stations];
-			[self setStationsCustomized:NO];
-			[self setupStations:array];
-		}
-		if (completion) {
-			completion(error);
-		}
-	}];
+	[[[NSURLSession sharedSession] dataTaskWithRequest:urlRequest
+									 completionHandler:^(NSData * _Nullable data,
+														 NSURLResponse * _Nullable response,
+														 NSError * _Nullable connectionError) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			NSDictionary *responseJSON = nil;
+			NSError *error = nil;
+			if (connectionError) {
+				error = connectionError;
+			} else {
+				responseJSON = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+			}
+			if (error != nil) {
+				NSLog(@"Error requesting radio stations: %@", error);
+			} else {
+				NSArray *stations = [responseJSON objectForKey:SRDataManagerStationsKey];
+				NSMutableArray *array = [self stationsForArray:stations];
+				[self setStationsCustomized:NO];
+				[self setupStations:array];
+			}
+			if (completion) {
+				completion(error);
+			}
+		});
+	}] resume];
 }
 
 - (void)updateStations:(NSMutableArray *)stations {
