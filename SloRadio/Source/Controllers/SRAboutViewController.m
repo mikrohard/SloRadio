@@ -125,7 +125,7 @@
 		if (indexPath.row == 0) {
 			// copyright
 			cell.textLabel.text = NSLocalizedString(@"Copyright", nil);
-			cell.detailTextLabel.text = @"© 2018 Jernej Fijačko";
+			cell.detailTextLabel.text = @"© 2020 Jernej Fijačko";
 			cell.selectionStyle = UITableViewCellSelectionStyleNone;
 		}
 		else {
