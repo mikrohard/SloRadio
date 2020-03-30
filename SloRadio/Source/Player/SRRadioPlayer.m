@@ -215,6 +215,9 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 			case VLCMediaPlayerStateError:
 				state = SRRadioPlayerStateError;
 				break;
+			case VLCMediaPlayerStateESAdded:
+				state = _state;
+				break;
 			case VLCMediaPlayerStateStopped:
 			case VLCMediaPlayerStateEnded:
 			default:
