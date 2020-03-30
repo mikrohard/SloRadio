@@ -41,6 +41,15 @@
 }
 
 + (UIColor *)cellBackgroundColor {
+	if (@available(iOS 13, *)) {
+		return [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+			if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+				return [UIColor colorWithRed:55.0/255.0 green:55.0/255.0 blue:55.0/255.0 alpha:1.0];
+			} else {
+				return [UIColor colorWithRed:210.0/255.0 green:210.0/255.0 blue:210.0/255.0 alpha:1.0];
+			}
+		}];
+	}
 	return [UIColor colorWithRed:210.0/255.0 green:210.0/255.0 blue:210.0/255.0 alpha:1.0];
 }
 
