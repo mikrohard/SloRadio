@@ -21,7 +21,6 @@
 		C83745641AF24FAF002EBB84 /* SRAddRadioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745631AF24FAF002EBB84 /* SRAddRadioViewController.m */; };
 		C83745681AF26E58002EBB84 /* SRTextInputCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745671AF26E58002EBB84 /* SRTextInputCell.m */; };
 		C837456C1AF28016002EBB84 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = C837456B1AF28016002EBB84 /* MBProgressHUD.m */; };
-		C83745701AF292DF002EBB84 /* UIAlertView+Blocks.m in Sources */ = {isa = PBXBuildFile; fileRef = C837456F1AF292DF002EBB84 /* UIAlertView+Blocks.m */; };
 		C83745771AF50BC5002EBB84 /* UITableView+Separators.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745761AF50BC5002EBB84 /* UITableView+Separators.m */; };
 		C837457B1AF50C83002EBB84 /* SRSeparatorView.m in Sources */ = {isa = PBXBuildFile; fileRef = C837457A1AF50C83002EBB84 /* SRSeparatorView.m */; };
 		C837457E1AF51C93002EBB84 /* SRNowPlayingView.m in Sources */ = {isa = PBXBuildFile; fileRef = C837457D1AF51C93002EBB84 /* SRNowPlayingView.m */; };
@@ -120,8 +119,6 @@
 		C83745671AF26E58002EBB84 /* SRTextInputCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRTextInputCell.m; path = Source/Cells/SRTextInputCell.m; sourceTree = "<group>"; };
 		C837456A1AF28016002EBB84 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBProgressHUD.h; path = Libraries/MBProgressHud/MBProgressHUD.h; sourceTree = "<group>"; };
 		C837456B1AF28016002EBB84 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBProgressHUD.m; path = Libraries/MBProgressHud/MBProgressHUD.m; sourceTree = "<group>"; };
-		C837456E1AF292DF002EBB84 /* UIAlertView+Blocks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIAlertView+Blocks.h"; path = "Source/Categories/UIAlertView+Blocks.h"; sourceTree = "<group>"; };
-		C837456F1AF292DF002EBB84 /* UIAlertView+Blocks.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIAlertView+Blocks.m"; path = "Source/Categories/UIAlertView+Blocks.m"; sourceTree = "<group>"; };
 		C83745751AF50BC5002EBB84 /* UITableView+Separators.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UITableView+Separators.h"; path = "Source/Categories/UITableView+Separators.h"; sourceTree = "<group>"; };
 		C83745761AF50BC5002EBB84 /* UITableView+Separators.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UITableView+Separators.m"; path = "Source/Categories/UITableView+Separators.m"; sourceTree = "<group>"; };
 		C83745791AF50C83002EBB84 /* SRSeparatorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSeparatorView.h; path = Source/Views/SRSeparatorView.h; sourceTree = "<group>"; };
@@ -383,8 +380,6 @@
 		C837456D1AF292CE002EBB84 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
-				C837456E1AF292DF002EBB84 /* UIAlertView+Blocks.h */,
-				C837456F1AF292DF002EBB84 /* UIAlertView+Blocks.m */,
 				C83745751AF50BC5002EBB84 /* UITableView+Separators.h */,
 				C83745761AF50BC5002EBB84 /* UITableView+Separators.m */,
 				C837459D1AF61B0C002EBB84 /* UIImage+Color.h */,
@@ -761,7 +756,6 @@
 				C837457E1AF51C93002EBB84 /* SRNowPlayingView.m in Sources */,
 				C8B1D3961AEFF17300A5E0A0 /* MBNetworkActivityIndicatorManager.m in Sources */,
 				C8C8FA3E1AEEADAD00E5E46C /* SRMainViewController.m in Sources */,
-				C83745701AF292DF002EBB84 /* UIAlertView+Blocks.m in Sources */,
 				C81D330E1AEF83920076BF01 /* AMSlideMenuRightTableViewController.m in Sources */,
 				C8FCC29F1AF9347400DE77EC /* SRAcknowledgementsViewController.m in Sources */,
 				C837454E1AF11715002EBB84 /* SRAppearance.m in Sources */,
@@ -956,7 +950,7 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
 				INFOPLIST_FILE = SloRadio/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_LDFLAGS = "-Wl,-no_compact_unwind";
@@ -988,7 +982,7 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
 				INFOPLIST_FILE = SloRadio/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_LDFLAGS = "-Wl,-no_compact_unwind";

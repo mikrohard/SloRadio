@@ -17,7 +17,6 @@
 #import "SRSleepTimerView.h"
 #import "SRAddRadioViewController.h"
 #import "MBProgressHUD.h"
-#import "UIAlertView+Blocks.h"
 #import "UITableView+Separators.h"
 #import "SRNowPlayingView.h"
 #import "SRRadioTableViewCell.h"
@@ -860,13 +859,15 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 
 - (void)handleStationsLoadError {
 	__weak SRRadioViewController *weakSelf = self;
-	[UIAlertView showWithTitle:NSLocalizedString(@"Oops", @"Oops!")
-					   message:NSLocalizedString(@"StationsLoadFailed", @"Error message")
-			 cancelButtonTitle:NSLocalizedString(@"Retry", @"Retry")
-			 otherButtonTitles:nil
-					  tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
-						  [weakSelf loadRadioStations];
-					  }];
+	UIAlertController *controller = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Oops", @"Oops!")
+																		message:NSLocalizedString(@"StationsLoadFailed", @"Error message")
+																 preferredStyle:UIAlertControllerStyleAlert];
+	[controller addAction: [UIAlertAction actionWithTitle:NSLocalizedString(@"Retry", @"Retry")
+													style:UIAlertActionStyleCancel
+												  handler:^(UIAlertAction * _Nonnull action) {
+		[weakSelf loadRadioStations];
+	}]];
+	[self presentViewController:controller animated:YES completion:nil];
 }
 
 - (void)handlePlaybackError {
@@ -881,16 +882,22 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 		else {
 			message = [NSString stringWithFormat:NSLocalizedString(@"PlaybackErrorInternet", @""), station.name];
 		}
-		__weak SRRadioViewController *weakSelf = self;
-		[UIAlertView showWithTitle:NSLocalizedString(@"Oops", @"Oops!")
-						   message:message
-				 cancelButtonTitle:NSLocalizedString(@"Ok", @"Ok")
-				 otherButtonTitles:canReportProblem ? @[NSLocalizedString(@"Report", @"Report")] : nil
-						  tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
-							  if (buttonIndex != alertView.cancelButtonIndex) {
-								  [weakSelf reportProblemWithRadioStation:station];
-							  }
-						  }];
+
+		UIAlertController *controller = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Oops", @"Oops!")
+																			message:message
+																	 preferredStyle:UIAlertControllerStyleAlert];
+		if (canReportProblem) {
+			__weak SRRadioViewController *weakSelf = self;
+			[controller addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Report", @"Report")
+														   style:UIAlertActionStyleDefault
+														 handler:^(UIAlertAction * _Nonnull action) {
+				[weakSelf reportProblemWithRadioStation:station];
+			}]];
+		}
+		[controller addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Ok", @"Ok")
+													   style:UIAlertActionStyleCancel
+													 handler:nil]];
+		[self presentViewController:controller animated:YES completion:nil];
 	}
 }
 

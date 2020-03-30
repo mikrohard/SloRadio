@@ -10,7 +10,6 @@
 #import "SRSettingsPickerCell.h"
 #import "SRSliderTableViewCell.h"
 #import "SRDataManager.h"
-#import "UIAlertView+Blocks.h"
 #import "MBProgressHUD.h"
 #import "SRTableViewCell.h"
 
@@ -257,15 +256,18 @@
 
 - (void)presentResetAction {
 	__weak SRSettingsViewController *weakSelf = self;
-	[UIAlertView showWithTitle:NSLocalizedString(@"Reset", @"Reset")
-					   message:NSLocalizedString(@"StationsResetMessage", nil)
-			 cancelButtonTitle:NSLocalizedString(@"Cancel", @"Cancel")
-			 otherButtonTitles:@[NSLocalizedString(@"Reset", @"Reset")]
-					  tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
-						  if (alertView.cancelButtonIndex != buttonIndex) {
-							  [weakSelf performResetAction];
-						  }
-					  }];
+	UIAlertController *controller = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Reset", @"Reset")
+																		message:NSLocalizedString(@"StationsResetMessage", nil)
+																 preferredStyle:UIAlertControllerStyleAlert];
+	[controller addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Reset", @"Reset")
+												   style:UIAlertActionStyleDefault
+												 handler:^(UIAlertAction * _Nonnull action) {
+		[weakSelf performResetAction];
+	}]];
+	[controller addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel", @"Cancel")
+												   style:UIAlertActionStyleCancel
+												 handler:nil]];
+	[self presentViewController:controller animated:YES completion:nil];
 }
 
 - (void)performResetAction {
@@ -283,15 +285,18 @@
 
 - (void)handleResetError {
 	__weak SRSettingsViewController *weakSelf = self;
-	[UIAlertView showWithTitle:NSLocalizedString(@"Oops", @"Oops!")
-					   message:NSLocalizedString(@"StationsResetFailed", nil)
-			 cancelButtonTitle:NSLocalizedString(@"Ok", @"Ok")
-			 otherButtonTitles:@[NSLocalizedString(@"Retry", @"Retry")]
-					  tapBlock:^(UIAlertView *alertView, NSInteger buttonIndex) {
-						  if (alertView.cancelButtonIndex != buttonIndex) {
-							  [weakSelf performResetAction];
-						  }
-					  }];
+	UIAlertController *controller = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Oops", @"Oops!")
+																		message:NSLocalizedString(@"StationsResetFailed", nil)
+																 preferredStyle:UIAlertControllerStyleAlert];
+	[controller addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Retry", @"Retry")
+												   style:UIAlertActionStyleDefault
+												 handler:^(UIAlertAction * _Nonnull action) {
+		[weakSelf performResetAction];
+	}]];
+	[controller addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Ok", @"Ok")
+												   style:UIAlertActionStyleCancel
+												 handler:nil]];
+	[self presentViewController:controller animated:YES completion:nil];
 }
 
 @end
