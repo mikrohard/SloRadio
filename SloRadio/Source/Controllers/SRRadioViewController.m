@@ -163,7 +163,11 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 		bottomInset = CGRectGetMaxY(self.view.frame) - CGRectGetMinY(toolbar.frame);
 	}
 	self.tableView.contentInset = UIEdgeInsetsMake(topInset, 0, bottomInset, 0);
-	self.tableView.scrollIndicatorInsets = self.tableView.contentInset;
+	if (@available(iOS 13, *)) {
+		self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, bottomInset, 0);;
+	} else {
+		self.tableView.scrollIndicatorInsets = self.tableView.contentInset;
+	}
 	CGFloat newTopOffset = previousTopOffset + previousTopInset - topInset;
 	CGPoint contentOffset = self.tableView.contentOffset;
 	contentOffset.y = MAX(-topInset, MIN(newTopOffset, self.tableView.contentSize.height - CGRectGetHeight(self.tableView.frame) + bottomInset));

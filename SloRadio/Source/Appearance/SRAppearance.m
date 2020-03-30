@@ -16,7 +16,16 @@
 }
 
 + (UIColor *)navigationBarContentColor {
-	return [UIColor whiteColor];
+	if (@available(iOS 13, *)) {
+		return [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+			if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+				return [UIColor whiteColor];
+			} else {
+				return [UIColor blackColor];
+			}
+		}];
+	}
+	return [UIColor blackColor];
 }
 
 + (UIColor *)menuBackgroundColor {
@@ -44,6 +53,15 @@
 }
 
 + (UIColor *)textColor {
+	if (@available(iOS 13, *)) {
+		return [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
+			if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+				return [UIColor whiteColor];
+			} else {
+				return [UIColor blackColor];
+			}
+		}];
+	}
 	return [UIColor blackColor];
 }
 

@@ -152,8 +152,7 @@ static NSString * const SRMenuControllersCachedKey = @"SRMenuControllersCachedKe
 	else {
 		UIViewController *controller = [self controllerForIndexPath:indexPath];
 		UINavigationController *navigation = [[UINavigationController alloc] initWithRootViewController:controller];
-		[navigation.navigationBar setBarTintColor:[SRAppearance mainColor]];
-		[navigation.navigationBar setTintColor:[SRAppearance navigationBarContentColor]];
+		[navigation.navigationBar setTintColor:[SRAppearance mainColor]];
 		[navigation.navigationBar setTitleTextAttributes:@{NSForegroundColorAttributeName: [SRAppearance navigationBarContentColor]}];
 		[self openContentNavigationController:navigation];
 		self.selectedControllerIndexPath = indexPath;

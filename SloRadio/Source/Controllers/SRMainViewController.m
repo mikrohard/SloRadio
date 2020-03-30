@@ -50,7 +50,12 @@
 #pragma mark - Status bar
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
-	return UIStatusBarStyleLightContent;
+	if (@available(iOS 13, *)) {
+		if (self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
+			return UIStatusBarStyleLightContent;
+		}
+	}
+	return UIStatusBarStyleDefault;
 }
 
 @end
