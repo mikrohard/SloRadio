@@ -634,6 +634,12 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 }
 
 - (void)playActionWithSleepTimer:(BOOL)sleepTimer {
+	SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
+	if (!selectedStation) {
+		// radio stations not yet loaded
+		// ignore this playback request
+		return;
+	}
 	[self startBackgroundTask];
 	if (sleepTimer) {
 		[self setupSleepTimer];
@@ -644,7 +650,6 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 	_playbackInterrupted = NO;
 	_audioSessionInterrupted = NO;
 	_callInProgress = NO;
-	SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
 	[[SRRadioPlayer sharedPlayer] playRadioStation:selectedStation];
 }
 
@@ -812,15 +817,17 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 	[togglePlayPauseCommand removeTarget:self];
 }
 
-- (void)remotePlay {
+- (MPRemoteCommandHandlerStatus)remotePlay {
 	[self playAction];
+	return MPRemoteCommandHandlerStatusSuccess;
 }
 
-- (void)remoteStop {
+- (MPRemoteCommandHandlerStatus)remoteStop {
 	[self stopAction];
+	return MPRemoteCommandHandlerStatusSuccess;
 }
 
-- (void)remoteTogglePlayPause {
+- (MPRemoteCommandHandlerStatus)remoteTogglePlayPause {
 	SRRadioPlayerState state = [[SRRadioPlayer sharedPlayer] state];
 	if (state == SRRadioPlayerStateBuffering ||
 		state == SRRadioPlayerStateOpening ||
@@ -830,16 +837,19 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 	else {
 		[self playAction];
 	}
+	return MPRemoteCommandHandlerStatusSuccess;
 }
 
-- (void)remotePlayNext {
+- (MPRemoteCommandHandlerStatus)remotePlayNext {
 	[self selectNextStation];
 	[self playAction];
+	return MPRemoteCommandHandlerStatusSuccess;
 }
 
-- (void)remotePlayPrevious {
+- (MPRemoteCommandHandlerStatus)remotePlayPrevious {
 	[self selectPreviousStation];
 	[self playAction];
+	return MPRemoteCommandHandlerStatusSuccess;
 }
 
 #pragma mark - Error handling

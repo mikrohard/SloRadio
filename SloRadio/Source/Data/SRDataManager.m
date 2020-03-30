@@ -237,6 +237,7 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 	NSArray *localStations = [defaults objectForKey:SRDataManagerStationsKey];
 	if (localStations) {
 		self.allStations = [self stationsForArray:localStations];
+		[self selectInitialRadioStation];
 	}
 }
 
