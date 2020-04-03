@@ -47,6 +47,11 @@
 	return YES;
 }
 
+- (void)configureSlideLayer:(CALayer *)layer {
+	[super configureSlideLayer:layer];
+	layer.shadowRadius = 1.f;
+}
+
 #pragma mark - Status bar
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
