@@ -163,7 +163,7 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 	}
 	self.tableView.contentInset = UIEdgeInsetsMake(topInset, 0, bottomInset, 0);
 	if (@available(iOS 13, *)) {
-		self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, bottomInset, 0);;
+		self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, bottomInset - self.view.safeAreaInsets.bottom, 0);;
 	} else {
 		self.tableView.scrollIndicatorInsets = self.tableView.contentInset;
 	}
