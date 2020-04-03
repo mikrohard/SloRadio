@@ -307,6 +307,7 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 	[nc addObserver:self selector:@selector(stationsChanged:) name:SRDataManagerDidChangeStations object:nil];
 	[nc addObserver:self selector:@selector(sleepTimerSettingsChanged:) name:SRDataManagerDidChangeSleepTimerSettings object:nil];
 	[nc addObserver:self selector:@selector(audioSessionInterruption:) name:AVAudioSessionInterruptionNotification object:nil];
+	[nc addObserver:self selector:@selector(audioSessionRouteChanged:) name:AVAudioSessionRouteChangeNotification object:nil];
 	[nc addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
 	
 	__weak SRRadioViewController *weakSelf = self;
@@ -352,6 +353,13 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 		if (_audioSessionInterrupted && interruptionOption == AVAudioSessionInterruptionOptionShouldResume) {
 			[self audioSessionResumeByCall:NO];
 		}
+	}
+}
+
+- (void)audioSessionRouteChanged:(NSNotification *)notification {
+	AVAudioSessionRouteChangeReason reason = [[notification.userInfo objectForKey:AVAudioSessionRouteChangeReasonKey] integerValue];
+	if (reason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable) {
+		[self stopAction];
 	}
 }
 
