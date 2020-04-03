@@ -359,7 +359,9 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 - (void)audioSessionRouteChanged:(NSNotification *)notification {
 	AVAudioSessionRouteChangeReason reason = [[notification.userInfo objectForKey:AVAudioSessionRouteChangeReasonKey] integerValue];
 	if (reason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable) {
-		[self stopAction];
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[self stopAction];
+		});
 	}
 }
 
