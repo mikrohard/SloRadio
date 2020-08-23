@@ -29,7 +29,9 @@
 
 static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 
-@interface SRRadioViewController () <SRRadioPlayerDelegate, SRSleepTimerDelegate, SRSleepTimerViewDelegate, MFMailComposeViewControllerDelegate, UITableViewDataSource, UITableViewDelegate> {
+typedef void (^SRRadioPlayCompletion)(NSError *error);
+
+@interface SRRadioViewController () <SRRadioPlayerDelegate, SRSleepTimerDelegate, SRSleepTimerViewDelegate, MFMailComposeViewControllerDelegate, UITableViewDataSource, UITableViewDelegate, MPPlayableContentDelegate, MPPlayableContentDataSource> {
 	BOOL _playbackInterrupted;
 	BOOL _audioSessionInterrupted;
 	NSTimeInterval _stationsLoadedTimestamp;
@@ -47,6 +49,9 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 
 // background task
 @property (nonatomic, assign) UIBackgroundTaskIdentifier bgTask;
+
+// playable content manager completion callback
+@property (nonatomic, strong) SRRadioPlayCompletion playCompletion;
 
 @end
 
@@ -68,6 +73,13 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 		[self registerForNotifications];
 		self.title = NSLocalizedString(@"RadioStations", @"Radio Stations");
 		self.automaticallyAdjustsScrollViewInsets = NO;
+		
+		[[MPPlayableContentManager sharedContentManager] setDataSource:self];
+		[[MPPlayableContentManager sharedContentManager] setDelegate:self];
+		
+		[[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:@{}];
+		
+		[self startRemoteControlTracking];
 	}
 	return self;
 }
@@ -89,14 +101,11 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 	[self updateNavigationButtons];
 	[self updateToolbarItems];
 	[self setupAudioSession];
-	[self startRemoteControlTracking];
 	[self layoutViews];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
 	[super viewWillDisappear:animated];
-	[self stopAction];
-	[self endRemoteControlTracking];
 	[self endAudioSession];
 }
 
@@ -112,6 +121,7 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 }
 
 - (void)dealloc {
+	[self endRemoteControlTracking];
 	[self unregisterFromNotifications];
 }
 
@@ -679,6 +689,12 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 		[nowPlayingInfo setObject:selectedStation.name forKey:MPMediaItemPropertyArtist];
 	}
 	SRRadioPlayer *player = [SRRadioPlayer sharedPlayer];
+	float playRate = player.state == SRRadioPlayerStatePlaying ? 1.0 : 0.0;
+	[nowPlayingInfo setObject:@(playRate) forKey:MPNowPlayingInfoPropertyPlaybackRate];
+	if (@available(iOS 10, *)) {
+		[nowPlayingInfo setObject:@(YES) forKey:MPNowPlayingInfoPropertyIsLiveStream];
+		[nowPlayingInfo setObject:[NSString stringWithFormat:@"%ld", (long)selectedStation.stationId] forKey:MPNowPlayingInfoPropertyExternalContentIdentifier];
+	}
 	NSString *nowPlaying = [player.metaData objectForKey:SRRadioPlayerMetaDataNowPlayingKey];
 	NSString *title = [player.metaData objectForKey:SRRadioPlayerMetaDataTitleKey];
 	NSString *artist = [player.metaData objectForKey:SRRadioPlayerMetaDataArtistKey];
@@ -739,6 +755,8 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 
 - (void)radioPlayer:(SRRadioPlayer *)player didChangeState:(SRRadioPlayerState)state {
 	[self updateToolbarItems];
+	[self notifyPlayCompletion];
+	[self updateNowPlayingInfo];
 	if (state == SRRadioPlayerStateError) {
 		[self handlePlaybackError];
 		[self stopAction];
@@ -863,6 +881,22 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 	[self selectPreviousStation];
 	[self playAction];
 	return MPRemoteCommandHandlerStatusSuccess;
+}
+
+- (void)notifyPlayCompletion {
+	if (self.playCompletion != nil) {
+		SRRadioPlayerState state = [[SRRadioPlayer sharedPlayer] state];
+		if (state == SRRadioPlayerStatePlaying) {
+			self.playCompletion(nil);
+			self.playCompletion = nil;
+		} else if (state == SRRadioPlayerStateError) {
+			SRRadioStation *station = [[SRRadioPlayer sharedPlayer] currentRadioStation];
+			NSString *message = [NSString stringWithFormat:NSLocalizedString(@"PlaybackErrorStation", @""), station.name];
+			NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : message}];
+			self.playCompletion(error);
+			self.playCompletion = nil;
+		}
+	}
 }
 
 #pragma mark - Error handling
@@ -1009,6 +1043,31 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 
 - (BOOL)isInternetReachable {
 	return [[Reachability reachabilityForInternetConnection] currentReachabilityStatus] != NotReachable;
+}
+
+#pragma mark - MPPlayableContentManager
+
+- (NSInteger)numberOfChildItemsAtIndexPath:(NSIndexPath *)indexPath {
+	return [[self stations] count];
+}
+
+- (nullable MPContentItem *)contentItemAtIndexPath:(NSIndexPath *)indexPath {
+	SRRadioStation *station = [[self stations] objectAtIndex:[indexPath indexAtPosition:0]];
+	MPContentItem *item = [[MPContentItem alloc] initWithIdentifier:[NSString stringWithFormat:@"%ld", (long)station.stationId]];
+	item.title = station.name;
+	item.streamingContent = YES;
+	item.playable = YES;
+	return item;
+}
+
+- (void)playableContentManager:(MPPlayableContentManager *)contentManager initiatePlaybackOfContentItemAtIndexPath:(NSIndexPath *)indexPath completionHandler:(void(^)(NSError * __nullable))completionHandler {
+	SRRadioStation *station = [[self stations] objectAtIndex:[indexPath indexAtPosition:0]];
+	self.playCompletion = completionHandler;
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[[SRDataManager sharedManager] selectRadioStation:station];
+		[self.tableView reloadData];
+		[self playAction];
+	});
 }
 
 @end
