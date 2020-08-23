@@ -917,7 +917,10 @@
 				);
 				LIBRARY_SEARCH_PATHS = "";
 				MARKETING_VERSION = 5.6;
-				OTHER_LDFLAGS = "-Wl,-no_compact_unwind";
+				OTHER_LDFLAGS = (
+					"-Wl,-no_compact_unwind",
+					"-ObjC",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.jernej.RadioWakeUp.sloradio;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "SloRadio Development";
@@ -959,7 +962,10 @@
 				);
 				LIBRARY_SEARCH_PATHS = "";
 				MARKETING_VERSION = 5.6;
-				OTHER_LDFLAGS = "-Wl,-no_compact_unwind";
+				OTHER_LDFLAGS = (
+					"-Wl,-no_compact_unwind",
+					"-ObjC",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.jernej.RadioWakeUp.sloradio;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "SloRadio App Store";

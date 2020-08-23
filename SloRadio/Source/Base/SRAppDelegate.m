@@ -24,6 +24,7 @@
 	self.window.rootViewController = navigation;
 	[self.window makeKeyAndVisible];
 	[FIRApp configure];
+	[FIRAnalytics setAnalyticsCollectionEnabled:YES];
 	return YES;
 }
 
