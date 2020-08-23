@@ -74,6 +74,8 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 		self.title = NSLocalizedString(@"RadioStations", @"Radio Stations");
 		self.automaticallyAdjustsScrollViewInsets = NO;
 		
+		[self setupAudioSession];
+		
 		[[MPPlayableContentManager sharedContentManager] setDataSource:self];
 		[[MPPlayableContentManager sharedContentManager] setDelegate:self];
 		
@@ -100,13 +102,11 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	[super viewWillAppear:animated];
 	[self updateNavigationButtons];
 	[self updateToolbarItems];
-	[self setupAudioSession];
 	[self layoutViews];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
 	[super viewWillDisappear:animated];
-	[self endAudioSession];
 }
 
 - (void)viewSafeAreaInsetsDidChange {
@@ -123,6 +123,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 - (void)dealloc {
 	[self endRemoteControlTracking];
 	[self unregisterFromNotifications];
+	[self endAudioSession];
 }
 
 #pragma mark - Setup
@@ -219,6 +220,14 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 }
 
 #pragma mark - Audio session
+
+- (void)ensureAudioSessionForPlayback
+{
+	NSString *audioCategory = [[AVAudioSession sharedInstance] category];
+	if (![audioCategory isEqualToString:AVAudioSessionCategoryPlayback]) {
+		[self setupAudioSession];
+	}
+}
 
 - (void)setupAudioSession
 {
@@ -663,6 +672,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 		// ignore this playback request
 		return;
 	}
+	[self ensureAudioSessionForPlayback];
 	[self startBackgroundTask];
 	if (sleepTimer) {
 		[self setupSleepTimer];
