@@ -22,6 +22,7 @@
 #import "SRRadioTableViewCell.h"
 #import "UIImage+Color.h"
 #import "Reachability.h"
+#import "Firebase.h"
 
 @import AVFoundation;
 @import MediaPlayer;
@@ -925,18 +926,17 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 }
 
 - (void)handlePlaybackError {
+	SRRadioStation *station = [[SRRadioPlayer sharedPlayer] currentRadioStation];
+	BOOL canReportProblem = [self isInternetReachable] && [self canReportProblemForRadioStation:station];
+	NSString *message = nil;
+	if ([self isInternetReachable]) {
+		message = [NSString stringWithFormat:NSLocalizedString(@"PlaybackErrorStation", @""), station.name];
+	}
+	else {
+		message = [NSString stringWithFormat:NSLocalizedString(@"PlaybackErrorInternet", @""), station.name];
+	}
 	if ([self showErrorPopup]) {
 		// display error
-		SRRadioStation *station = [[SRRadioPlayer sharedPlayer] currentRadioStation];
-		BOOL canReportProblem = [self isInternetReachable] && [self canReportProblemForRadioStation:station];
-		NSString *message = nil;
-		if ([self isInternetReachable]) {
-			message = [NSString stringWithFormat:NSLocalizedString(@"PlaybackErrorStation", @""), station.name];
-		}
-		else {
-			message = [NSString stringWithFormat:NSLocalizedString(@"PlaybackErrorInternet", @""), station.name];
-		}
-
 		UIAlertController *controller = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Oops", @"Oops!")
 																			message:message
 																	 preferredStyle:UIAlertControllerStyleAlert];
@@ -952,6 +952,16 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 													   style:UIAlertActionStyleCancel
 													 handler:nil]];
 		[self presentViewController:controller animated:YES completion:nil];
+	}
+	
+	// Report error to Crashlytics
+
+	if ([self isInternetReachable] &&
+		![[SRDataManager sharedManager] isCustomRadioStation:station] &&
+		message != nil &&
+		station.url != nil) {
+		NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : message, NSURLErrorKey: station.url}];
+		[[FIRCrashlytics crashlytics] recordError:error];
 	}
 }
 
