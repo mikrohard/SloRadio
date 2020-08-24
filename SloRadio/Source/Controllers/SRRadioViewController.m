@@ -361,10 +361,12 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 
 - (void)stationsLoaded:(NSNotification *)notification {
 	[self.tableView reloadData];
+	[[MPPlayableContentManager sharedContentManager] reloadData];
 }
 
 - (void)stationsChanged:(NSNotification *)notification {
 	[self.tableView reloadData];
+	[[MPPlayableContentManager sharedContentManager] reloadData];
 }
 
 - (void)sleepTimerSettingsChanged:(NSNotification *)notification {
@@ -638,6 +640,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	}
 	[self updateNavigationButtons];
 	[self updateToolbarItems];
+	[[MPPlayableContentManager sharedContentManager] reloadData];
 }
 
 - (void)addButtonPressed:(id)sender {
@@ -712,7 +715,9 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	[nowPlayingInfo setObject:@(playRate) forKey:MPNowPlayingInfoPropertyPlaybackRate];
 	if (@available(iOS 10, *)) {
 		[nowPlayingInfo setObject:@(YES) forKey:MPNowPlayingInfoPropertyIsLiveStream];
-		[nowPlayingInfo setObject:[NSString stringWithFormat:@"%ld", (long)selectedStation.stationId] forKey:MPNowPlayingInfoPropertyExternalContentIdentifier];
+		NSString *nowPlayingIdentifier = [NSString stringWithFormat:@"%ld", (long)selectedStation.stationId];
+		[nowPlayingInfo setObject:nowPlayingIdentifier forKey:MPNowPlayingInfoPropertyExternalContentIdentifier];
+		[[MPPlayableContentManager sharedContentManager] setNowPlayingIdentifiers:@[nowPlayingIdentifier]];
 	}
 	MPMediaItemArtwork *artwork = [SRDataManager sharedManager].nowPlayingArtwork;
 	if (artwork != nil) {
