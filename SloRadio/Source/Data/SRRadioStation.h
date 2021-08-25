@@ -13,6 +13,7 @@
 @property (nonatomic, assign) NSInteger stationId;
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, strong) NSURL *url;
+@property (nonatomic, strong) NSURL *iconUrl;
 @property (nonatomic, assign) BOOL hidden;
 
 @end

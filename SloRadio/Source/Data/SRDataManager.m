@@ -9,6 +9,8 @@
 #import "SRDataManager.h"
 #import "SRRadioStation.h"
 
+@import MediaPlayer;
+
 NSString * const SRDataManagerDidLoadStations = @"SRDataManagerDidLoadStations";
 NSString * const SRDataManagerDidChangeStations = @"SRDataManagerDidChangeStations";
 NSString * const SRDataManagerDidChangeSleepTimerSettings = @"SRDataManagerDidChangeSleepTimerSettings";
@@ -27,6 +29,7 @@ static NSString * const SRDataManagerStationsKey = @"stations";
 static NSString * const SRDataManagerStationsIdKey = @"id";
 static NSString * const SRDataManagerStationsNameKey = @"name";
 static NSString * const SRDataManagerStationsUrlKey = @"url";
+static NSString * const SRDataManagerStationsIconKey = @"icon";
 static NSString * const SRDataManagerStationsHiddenKey = @"hidden";
 static NSString * const SRDataManagerStationsCustomizedKey = @"stations_customized";
 static NSString * const SRDataManagerStationsSelectedIdKey = @"selected_station_id";
@@ -159,6 +162,7 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 					// update url & name
 					station.name = existingStation.name;
 					station.url = existingStation.url;
+					station.iconUrl = existingStation.iconUrl;
 					break;
 				}
 			}
@@ -211,6 +215,7 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 		station.stationId = [[stationDict objectForKey:SRDataManagerStationsIdKey] integerValue];
 		station.name = [stationDict objectForKey:SRDataManagerStationsNameKey];
 		station.url = [NSURL URLWithString:[stationDict objectForKey:SRDataManagerStationsUrlKey]];
+		station.iconUrl = [NSURL URLWithString:[stationDict objectForKey:SRDataManagerStationsIconKey]];
 		station.hidden = [[stationDict objectForKey:SRDataManagerStationsHiddenKey] boolValue];
 		[array addObject:station];
 	}
@@ -224,6 +229,10 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 		[stationDict setObject:@(station.stationId) forKey:SRDataManagerStationsIdKey];
 		[stationDict setObject:station.name forKey:SRDataManagerStationsNameKey];
 		[stationDict setObject:[station.url absoluteString] forKey:SRDataManagerStationsUrlKey];
+		NSString *iconUrl = [station.iconUrl absoluteString];
+		if (iconUrl != nil) {
+			[stationDict setObject:iconUrl forKey:SRDataManagerStationsIconKey];
+		}
 		[stationDict setObject:@(station.hidden) forKey:SRDataManagerStationsHiddenKey];
 		[array addObject:stationDict];
 	}
@@ -341,6 +350,7 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 		}
 		stationToUpdate.name = station.name;
 		stationToUpdate.url = station.url;
+		stationToUpdate.iconUrl = station.iconUrl;
 		self.allStations = array;
 		[[NSNotificationCenter defaultCenter] postNotificationName:SRDataManagerDidChangeStations object:self];
 	}
@@ -380,6 +390,17 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	[defaults setObject:@(station.stationId) forKey:SRDataManagerStationsSelectedIdKey];
 	[defaults synchronize];
+	if (@available(iOS 10, *)) {
+		NSURL *iconUrl = station.iconUrl;
+		self->_nowPlayingArtwork = [[MPMediaItemArtwork alloc] initWithBoundsSize:CGSizeMake(1024, 1024)
+																   requestHandler:^UIImage * _Nonnull(CGSize size) {
+			UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:iconUrl]];
+			if (!image) {
+				image = [UIImage imageNamed:@"PlaceholderArtwork"];
+			}
+			return image;
+		}];
+	}
 }
 
 - (void)selectInitialRadioStation {

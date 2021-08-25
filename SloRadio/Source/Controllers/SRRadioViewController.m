@@ -714,6 +714,11 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 		[nowPlayingInfo setObject:@(YES) forKey:MPNowPlayingInfoPropertyIsLiveStream];
 		[nowPlayingInfo setObject:[NSString stringWithFormat:@"%ld", (long)selectedStation.stationId] forKey:MPNowPlayingInfoPropertyExternalContentIdentifier];
 	}
+	MPMediaItemArtwork *artwork = [SRDataManager sharedManager].nowPlayingArtwork;
+	if (artwork != nil) {
+		[nowPlayingInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
+	}
+	
 	NSString *nowPlaying = [player.metaData objectForKey:SRRadioPlayerMetaDataNowPlayingKey];
 	NSString *title = [player.metaData objectForKey:SRRadioPlayerMetaDataTitleKey];
 	NSString *artist = [player.metaData objectForKey:SRRadioPlayerMetaDataArtistKey];

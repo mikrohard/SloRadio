@@ -13,6 +13,7 @@
 @synthesize stationId = _stationId;
 @synthesize name = _name;
 @synthesize url = _url;
+@synthesize iconUrl = _iconUrl;
 @synthesize hidden = _hidden;
 
 @end
