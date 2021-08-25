@@ -104,10 +104,18 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	[self updateNavigationButtons];
 	[self updateToolbarItems];
 	[self layoutViews];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self setupTableViewInsets];
+    });
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
 	[super viewWillDisappear:animated];
+}
+
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    [self setupTableViewInsets];
 }
 
 - (void)viewSafeAreaInsetsDidChange {

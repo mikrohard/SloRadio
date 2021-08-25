@@ -57,6 +57,8 @@
         mainVC.currentActiveNVC.view.frame = openedFrame;
         navItem = destinationNVC.navigationBar.topItem;
         
+    } else {
+        destinationNVC.view.frame = mainVC.view.bounds;
     }
     
     if (mainVC.leftMenu)
