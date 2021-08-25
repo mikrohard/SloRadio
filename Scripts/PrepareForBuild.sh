@@ -1,10 +1,10 @@
 #!/bin/sh
 
 # Variables
-FRAMEWORK_NAME="MobileVLCKit.framework"
+FRAMEWORK_NAME="MobileVLCKit.xcframework"
 LIBRARIES_PATH="${SOURCE_ROOT}/Libraries/"
 VLCKIT_FRAMEWORK="${LIBRARIES_PATH}${FRAMEWORK_NAME}"
-VLCKIT_FILE="MobileVLCKit-3.3.13-4145519-7df954cb.tar.xz"
+VLCKIT_FILE="MobileVLCKit-3.3.17-21ce5c0e-cb1e02fb.tar.xz"
 VLCKIT_URL="http://download.videolan.org/pub/cocoapods/prod/${VLCKIT_FILE}"
 TEMP_PATH="${SOURCE_ROOT}/Temp"
 
