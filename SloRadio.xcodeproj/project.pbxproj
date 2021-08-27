@@ -21,6 +21,7 @@
 		C81D33121AEF83CE0076BF01 /* SRLeftMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D33111AEF83CE0076BF01 /* SRLeftMenuViewController.m */; };
 		C81D33171AEF84900076BF01 /* SRRadioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D33161AEF84900076BF01 /* SRRadioViewController.m */; };
 		C824E3811FF5226D00EF1B03 /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C824E3801FF5226D00EF1B03 /* VideoToolbox.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		C8336FFD26D972AD002D50F7 /* SRImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = C8336FFC26D972AD002D50F7 /* SRImageCache.m */; };
 		C837454E1AF11715002EBB84 /* SRAppearance.m in Sources */ = {isa = PBXBuildFile; fileRef = C837454D1AF11715002EBB84 /* SRAppearance.m */; };
 		C83745641AF24FAF002EBB84 /* SRAddRadioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745631AF24FAF002EBB84 /* SRAddRadioViewController.m */; };
 		C83745681AF26E58002EBB84 /* SRTextInputCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745671AF26E58002EBB84 /* SRTextInputCell.m */; };
@@ -121,6 +122,8 @@
 		C81D33161AEF84900076BF01 /* SRRadioViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRRadioViewController.m; path = Source/Controllers/SRRadioViewController.m; sourceTree = "<group>"; };
 		C81D33181AEF86D20076BF01 /* SRPrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SRPrefixHeader.pch; path = Source/Base/SRPrefixHeader.pch; sourceTree = "<group>"; };
 		C824E3801FF5226D00EF1B03 /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
+		C8336FFB26D972AD002D50F7 /* SRImageCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SRImageCache.h; path = Source/Data/SRImageCache.h; sourceTree = "<group>"; };
+		C8336FFC26D972AD002D50F7 /* SRImageCache.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SRImageCache.m; path = Source/Data/SRImageCache.m; sourceTree = "<group>"; };
 		C837454C1AF11715002EBB84 /* SRAppearance.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRAppearance.h; path = Source/Appearance/SRAppearance.h; sourceTree = "<group>"; };
 		C837454D1AF11715002EBB84 /* SRAppearance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRAppearance.m; path = Source/Appearance/SRAppearance.m; sourceTree = "<group>"; };
 		C83745621AF24FAF002EBB84 /* SRAddRadioViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRAddRadioViewController.h; path = Source/Controllers/SRAddRadioViewController.h; sourceTree = "<group>"; };
@@ -421,6 +424,8 @@
 			children = (
 				C8B1D39E1AEFF20E00A5E0A0 /* SRDataManager.h */,
 				C8B1D39F1AEFF20E00A5E0A0 /* SRDataManager.m */,
+				C8336FFB26D972AD002D50F7 /* SRImageCache.h */,
+				C8336FFC26D972AD002D50F7 /* SRImageCache.m */,
 				C8B1D3A11AEFF3B400A5E0A0 /* SRRadioStation.h */,
 				C8B1D3A21AEFF3B400A5E0A0 /* SRRadioStation.m */,
 			);
@@ -712,6 +717,7 @@
 				C8C8FA3E1AEEADAD00E5E46C /* SRMainViewController.m in Sources */,
 				C81D330E1AEF83920076BF01 /* AMSlideMenuRightTableViewController.m in Sources */,
 				C8FCC29F1AF9347400DE77EC /* SRAcknowledgementsViewController.m in Sources */,
+				C8336FFD26D972AD002D50F7 /* SRImageCache.m in Sources */,
 				C837454E1AF11715002EBB84 /* SRAppearance.m in Sources */,
 				C83745981AF554FD002EBB84 /* SRRadioTableViewCell.m in Sources */,
 				C8FCC28A1AF7F09500DE77EC /* SRSettingsViewController.m in Sources */,

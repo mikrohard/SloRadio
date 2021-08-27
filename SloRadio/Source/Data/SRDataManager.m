@@ -9,8 +9,6 @@
 #import "SRDataManager.h"
 #import "SRRadioStation.h"
 
-@import MediaPlayer;
-
 NSString * const SRDataManagerDidLoadStations = @"SRDataManagerDidLoadStations";
 NSString * const SRDataManagerDidChangeStations = @"SRDataManagerDidChangeStations";
 NSString * const SRDataManagerDidChangeSleepTimerSettings = @"SRDataManagerDidChangeSleepTimerSettings";
@@ -390,17 +388,6 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	[defaults setObject:@(station.stationId) forKey:SRDataManagerStationsSelectedIdKey];
 	[defaults synchronize];
-	if (@available(iOS 10, *)) {
-		NSURL *iconUrl = station.iconUrl;
-		self->_nowPlayingArtwork = [[MPMediaItemArtwork alloc] initWithBoundsSize:CGSizeMake(1024, 1024)
-																   requestHandler:^UIImage * _Nonnull(CGSize size) {
-			UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:iconUrl]];
-			if (!image) {
-				image = [UIImage imageNamed:@"PlaceholderArtwork"];
-			}
-			return image;
-		}];
-	}
 }
 
 - (void)selectInitialRadioStation {

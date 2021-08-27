@@ -15,13 +15,11 @@ extern NSString * const SRDataManagerDidChangeSleepTimerSettings;
 typedef void (^SRDataManagerCompletionHandler)(NSError *error);
 
 @class SRRadioStation;
-@class MPMediaItemArtwork;
 
 @interface SRDataManager : NSObject
 
 @property (nonatomic, readonly) NSArray *stations;
 @property (nonatomic, readonly) SRRadioStation *selectedRadioStation;
-@property (nonatomic, readonly) MPMediaItemArtwork *nowPlayingArtwork;
 @property (nonatomic, readonly) NSArray *selectableSleepTimerIntervals;
 @property (nonatomic, readonly) NSUInteger selectedSleepTimerIntervalIndex;
 @property (nonatomic, assign) NSTimeInterval sleepTimerInterval;
