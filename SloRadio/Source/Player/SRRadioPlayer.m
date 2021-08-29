@@ -9,6 +9,7 @@
 #import "SRRadioPlayer.h"
 #import "SRRadioStation.h"
 #import "SRDataManager.h"
+#import "NSString+Additions.h"
 #import <MobileVLCKit/MobileVLCKit.h>
 
 NSString * const SRRadioPlayerMetaDataArtistKey = @"SRRadioPlayerMetaDataArtistKey";
@@ -61,6 +62,7 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 	[self.listPlayer setRootMedia:media];
 	[self.listPlayer playMedia:media];
 	[self updatePlayerState];
+	[self updateMetaData];
 }
 
 - (void)stopIfPlayingAndClearStation:(BOOL)clearStation {
@@ -112,10 +114,10 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 
 - (void)updateMetaDataPreserveNowPlaying:(BOOL)preserve {
 	NSDictionary *mediaMetaData = self.media.metaDictionary;
-	NSString *genre = [mediaMetaData objectForKey:VLCMetaInformationGenre];
-	NSString *title = [mediaMetaData objectForKey:VLCMetaInformationTitle];
-	NSString *artist = [mediaMetaData objectForKey:VLCMetaInformationArtist];
-	NSString *nowPlaying = [mediaMetaData objectForKey:VLCMetaInformationNowPlaying];
+	NSString *genre = [self decodedMetadataString:[mediaMetaData objectForKey:VLCMetaInformationGenre]];
+	NSString *title = [self decodedMetadataString:[mediaMetaData objectForKey:VLCMetaInformationTitle]];
+	NSString *artist = [self decodedMetadataString:[mediaMetaData objectForKey:VLCMetaInformationArtist]];
+	NSString *nowPlaying = [self decodedMetadataString:[mediaMetaData objectForKey:VLCMetaInformationNowPlaying]];
 	if (preserve && !nowPlaying) {
 		nowPlaying = [_metaData objectForKey:SRRadioPlayerMetaDataNowPlayingKey];
 	}
@@ -136,6 +138,28 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 	if ([self.delegate respondsToSelector:@selector(radioPlayer:didChangeMetaData:)]) {
 		[self.delegate radioPlayer:self didChangeMetaData:self.metaData];
 	}
+}
+
+- (NSString *)decodedMetadataString:(NSString *)input {
+	NSString *output = [input stringByStrippingHTML];
+	if (input != nil) {
+		NSRegularExpression *expr = [NSRegularExpression regularExpressionWithPattern:@"&#[0-9]+;"
+																			  options:NSRegularExpressionCaseInsensitive
+																				error:nil];
+		if ([expr numberOfMatchesInString:input options:0 range:NSMakeRange(0, input.length)]) {
+			NSData *data = [input dataUsingEncoding:NSUTF8StringEncoding];
+			if (data != nil) {
+				NSAttributedString *attrStr = [[NSAttributedString alloc] initWithData:data
+																			   options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType}
+																	documentAttributes:nil
+																				 error:nil];
+				if (attrStr.string != nil) {
+					output = attrStr.string;
+				}
+			}
+		}
+	}
+	return output;
 }
 
 #pragma mark - Register media

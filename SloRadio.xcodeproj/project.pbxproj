@@ -36,6 +36,7 @@
 		C83745A31AF634C4002EBB84 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745A21AF634C4002EBB84 /* Reachability.m */; };
 		C83745A61AF6426D002EBB84 /* SRSleepTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745A51AF6426D002EBB84 /* SRSleepTimer.m */; };
 		C84DCC721AFD28570062C8F7 /* SRSliderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C84DCC711AFD28570062C8F7 /* SRSliderTableViewCell.m */; };
+		C84E6F9E26DB96840021B692 /* NSString+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = C84E6F9D26DB96840021B692 /* NSString+Additions.m */; };
 		C88849FA20416B1C008B0276 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C88849F920416B1C008B0276 /* CoreTelephony.framework */; };
 		C8A46F0E1AF961030031888D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C8A46F0C1AF961030031888D /* Localizable.strings */; };
 		C8B1D3A01AEFF20E00A5E0A0 /* SRDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D39F1AEFF20E00A5E0A0 /* SRDataManager.m */; };
@@ -152,6 +153,8 @@
 		C83745A51AF6426D002EBB84 /* SRSleepTimer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSleepTimer.m; path = Source/Player/SRSleepTimer.m; sourceTree = "<group>"; };
 		C84DCC701AFD28570062C8F7 /* SRSliderTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSliderTableViewCell.h; path = Source/Cells/SRSliderTableViewCell.h; sourceTree = "<group>"; };
 		C84DCC711AFD28570062C8F7 /* SRSliderTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSliderTableViewCell.m; path = Source/Cells/SRSliderTableViewCell.m; sourceTree = "<group>"; };
+		C84E6F9C26DB96840021B692 /* NSString+Additions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSString+Additions.h"; path = "Source/Categories/NSString+Additions.h"; sourceTree = "<group>"; };
+		C84E6F9D26DB96840021B692 /* NSString+Additions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSString+Additions.m"; path = "Source/Categories/NSString+Additions.m"; sourceTree = "<group>"; };
 		C88849F920416B1C008B0276 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
 		C8A46F0D1AF961030031888D /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8A46F0F1AF961130031888D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -373,6 +376,8 @@
 				C83745761AF50BC5002EBB84 /* UITableView+Separators.m */,
 				C837459D1AF61B0C002EBB84 /* UIImage+Color.h */,
 				C837459E1AF61B0C002EBB84 /* UIImage+Color.m */,
+				C84E6F9C26DB96840021B692 /* NSString+Additions.h */,
+				C84E6F9D26DB96840021B692 /* NSString+Additions.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -714,6 +719,7 @@
 				C837459C1AF56613002EBB84 /* MCSwipeTableViewCell.m in Sources */,
 				C81D33091AEF83920076BF01 /* AMSlideMenuContentSegue.m in Sources */,
 				C837457E1AF51C93002EBB84 /* SRNowPlayingView.m in Sources */,
+				C84E6F9E26DB96840021B692 /* NSString+Additions.m in Sources */,
 				C8C8FA3E1AEEADAD00E5E46C /* SRMainViewController.m in Sources */,
 				C81D330E1AEF83920076BF01 /* AMSlideMenuRightTableViewController.m in Sources */,
 				C8FCC29F1AF9347400DE77EC /* SRAcknowledgementsViewController.m in Sources */,
