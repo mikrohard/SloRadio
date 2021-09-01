@@ -27,7 +27,7 @@ static NSString * const SRDataManagerStationsKey = @"stations";
 static NSString * const SRDataManagerStationsIdKey = @"id";
 static NSString * const SRDataManagerStationsNameKey = @"name";
 static NSString * const SRDataManagerStationsUrlKey = @"url";
-static NSString * const SRDataManagerStationsIconKey = @"icon";
+static NSString * const SRDataManagerStationsLastModifiedKey = @"lastModified";
 static NSString * const SRDataManagerStationsHiddenKey = @"hidden";
 static NSString * const SRDataManagerStationsCustomizedKey = @"stations_customized";
 static NSString * const SRDataManagerStationsSelectedIdKey = @"selected_station_id";
@@ -160,7 +160,7 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 					// update url & name
 					station.name = existingStation.name;
 					station.url = existingStation.url;
-					station.iconUrl = existingStation.iconUrl;
+					station.lastModified = existingStation.lastModified;
 					break;
 				}
 			}
@@ -213,7 +213,7 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 		station.stationId = [[stationDict objectForKey:SRDataManagerStationsIdKey] integerValue];
 		station.name = [stationDict objectForKey:SRDataManagerStationsNameKey];
 		station.url = [NSURL URLWithString:[stationDict objectForKey:SRDataManagerStationsUrlKey]];
-		station.iconUrl = [NSURL URLWithString:[stationDict objectForKey:SRDataManagerStationsIconKey]];
+		station.lastModified = [[stationDict objectForKey:SRDataManagerStationsLastModifiedKey] doubleValue];
 		station.hidden = [[stationDict objectForKey:SRDataManagerStationsHiddenKey] boolValue];
 		[array addObject:station];
 	}
@@ -227,10 +227,7 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 		[stationDict setObject:@(station.stationId) forKey:SRDataManagerStationsIdKey];
 		[stationDict setObject:station.name forKey:SRDataManagerStationsNameKey];
 		[stationDict setObject:[station.url absoluteString] forKey:SRDataManagerStationsUrlKey];
-		NSString *iconUrl = [station.iconUrl absoluteString];
-		if (iconUrl != nil) {
-			[stationDict setObject:iconUrl forKey:SRDataManagerStationsIconKey];
-		}
+		[stationDict setObject:@(station.lastModified) forKey:SRDataManagerStationsLastModifiedKey];
 		[stationDict setObject:@(station.hidden) forKey:SRDataManagerStationsHiddenKey];
 		[array addObject:stationDict];
 	}
@@ -348,7 +345,7 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 		}
 		stationToUpdate.name = station.name;
 		stationToUpdate.url = station.url;
-		stationToUpdate.iconUrl = station.iconUrl;
+		stationToUpdate.lastModified = station.lastModified;
 		self.allStations = array;
 		[[NSNotificationCenter defaultCenter] postNotificationName:SRDataManagerDidChangeStations object:self];
 	}

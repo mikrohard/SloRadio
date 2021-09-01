@@ -15,8 +15,9 @@
 @property (nonatomic, assign) NSInteger stationId;
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, strong) NSURL *url;
-@property (nonatomic, strong) NSURL *iconUrl;
+@property (nonatomic, assign) NSTimeInterval lastModified;
 @property (nonatomic, assign) BOOL hidden;
-@property (nonatomic, readonly) MPMediaItemArtwork *artwork;
+
+- (MPMediaItemArtwork *)artworkForWidth:(CGFloat)width;
 
 @end

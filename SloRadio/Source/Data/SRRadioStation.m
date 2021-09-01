@@ -8,6 +8,9 @@
 
 #import "SRRadioStation.h"
 #import "SRImageCache.h"
+#import "SRDataManager.h"
+
+static NSString * const SRRadioStationIconBaseUrl = @"https://iphone.jernej.org/sloradio/icon.php";
 
 @import MediaPlayer;
 
@@ -16,16 +19,15 @@
 @synthesize stationId = _stationId;
 @synthesize name = _name;
 @synthesize url = _url;
-@synthesize iconUrl = _iconUrl;
+@synthesize lastModified = _lastModified;
 @synthesize hidden = _hidden;
-@synthesize artwork = _artwork;
 
-- (MPMediaItemArtwork *)artwork {
+- (MPMediaItemArtwork *)artworkForWidth:(CGFloat)width {
 	if (@available(iOS 10, *)) {
-		if (_artwork == nil) {
-			NSURL *iconUrl = self.iconUrl;
-			_artwork = [[MPMediaItemArtwork alloc] initWithBoundsSize:CGSizeMake(1024, 1024)
-													   requestHandler:^UIImage * _Nonnull(CGSize size) {
+		NSURL *iconUrl = [self iconUrlForWidth:width];
+		if (iconUrl != nil) {
+			return [[MPMediaItemArtwork alloc] initWithBoundsSize:CGSizeMake(width, width)
+												   requestHandler:^UIImage * _Nonnull(CGSize size) {
 				UIImage *image = nil;
 				if (iconUrl != nil) {
 					NSString *cacheKey = [SRImageCache keyForUrl:iconUrl];
@@ -42,7 +44,19 @@
 			}];
 		}
 	}
-	return _artwork;
+	return nil;
+}
+
+- (NSURL *)iconUrlForWidth:(CGFloat)width {
+	if (![[SRDataManager sharedManager] isCustomRadioStation:self]) {
+		NSString *iconUrl = [NSString stringWithFormat:@"%@?station_id=%ld&width=%.0f&lastModified=%.0f",
+							 SRRadioStationIconBaseUrl,
+							 self.stationId,
+							 width,
+							 self.lastModified];
+		return [NSURL URLWithString:iconUrl];
+	}
+	return nil;
 }
 
 @end

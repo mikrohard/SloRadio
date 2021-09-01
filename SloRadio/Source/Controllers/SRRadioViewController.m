@@ -719,7 +719,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 		[nowPlayingInfo setObject:nowPlayingIdentifier forKey:MPNowPlayingInfoPropertyExternalContentIdentifier];
 		[[MPPlayableContentManager sharedContentManager] setNowPlayingIdentifiers:@[nowPlayingIdentifier]];
 	}
-	MPMediaItemArtwork *artwork = selectedStation.artwork;
+	MPMediaItemArtwork *artwork = [selectedStation artworkForWidth:1024];
 	if (artwork != nil) {
 		[nowPlayingInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
 	}
@@ -1093,7 +1093,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	SRRadioStation *station = [[self stations] objectAtIndex:[indexPath indexAtPosition:0]];
 	MPContentItem *item = [[MPContentItem alloc] initWithIdentifier:[NSString stringWithFormat:@"%ld", (long)station.stationId]];
 	item.title = station.name;
-	item.artwork = station.artwork;
+	item.artwork = [station artworkForWidth:256];
 	item.streamingContent = YES;
 	item.playable = YES;
 	return item;
