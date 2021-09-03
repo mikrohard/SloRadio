@@ -928,6 +928,13 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	}
 }
 
+- (void)cancelPendingPlayCompletion {
+	if (self.playCompletion != nil) {
+		self.playCompletion(nil);
+		self.playCompletion = nil;
+	}
+}
+
 #pragma mark - Error handling
 
 - (void)handleStationsLoadError {
@@ -1100,8 +1107,11 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 }
 
 - (void)playableContentManager:(MPPlayableContentManager *)contentManager initiatePlaybackOfContentItemAtIndexPath:(NSIndexPath *)indexPath completionHandler:(void(^)(NSError * __nullable))completionHandler {
+	[self cancelPendingPlayCompletion];
 	SRRadioStation *station = [[self stations] objectAtIndex:[indexPath indexAtPosition:0]];
-	self.playCompletion = completionHandler;
+	self.playCompletion = ^(NSError *error) {
+		completionHandler(error);
+	};
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[[SRDataManager sharedManager] selectRadioStation:station];
 		[self.tableView reloadData];
