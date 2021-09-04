@@ -23,7 +23,6 @@
 #import "UIImage+Color.h"
 #import "Reachability.h"
 #import "Firebase.h"
-#import "SRImageCache.h"
 
 @import AVFoundation;
 @import MediaPlayer;
@@ -54,7 +53,8 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 // background task
 @property (nonatomic, assign) UIBackgroundTaskIdentifier bgTask;
 
-// playable content manager completion callback
+// carplay
+@property (nonatomic, strong) NSArray<MPContentItem *> *carPlayItems;
 @property (nonatomic, strong) SRRadioPlayCompletion playCompletion;
 
 @end
@@ -340,7 +340,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	[nc addObserver:self selector:@selector(audioSessionInterruption:) name:AVAudioSessionInterruptionNotification object:nil];
 	[nc addObserver:self selector:@selector(audioSessionRouteChanged:) name:AVAudioSessionRouteChangeNotification object:nil];
 	[nc addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
-	[nc addObserver:self selector:@selector(artworkPreloadFinished:) name:SRImageCacheDidPreloadArtwork object:nil];
+	[nc addObserver:self selector:@selector(artworkPreloadFinished:) name:SRRadioStationDidPreloadArtwork object:nil];
 	
 	__weak SRRadioViewController *weakSelf = self;
 	self.callCenter = [[CTCallCenter alloc] init];
@@ -365,13 +365,12 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 
 - (void)stationsLoaded:(NSNotification *)notification {
 	[self.tableView reloadData];
-	[[SRImageCache sharedCache] preloadArtworkForWidth:SRCarPlayArtworkWidth];
-	[[MPPlayableContentManager sharedContentManager] reloadData];
+	[self reloadCarPlayData];
 }
 
 - (void)stationsChanged:(NSNotification *)notification {
 	[self.tableView reloadData];
-	[[MPPlayableContentManager sharedContentManager] reloadData];
+	[self reloadCarPlayData];
 }
 
 - (void)sleepTimerSettingsChanged:(NSNotification *)notification {
@@ -405,7 +404,15 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 }
 
 - (void)artworkPreloadFinished:(NSNotification *)notification {
-	[[MPPlayableContentManager sharedContentManager] reloadData];
+	SRRadioStation *station = notification.object;
+	if ([station isKindOfClass:[SRRadioStation class]]) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			if (station.stationId == [[SRDataManager sharedManager] selectedRadioStation].stationId) {
+				[self updateNowPlayingInfo];
+			}
+			[self refreshCarPlayArtworkForStation:station];
+		});
+	}
 }
 
 #pragma mark - Playback interruption
@@ -649,7 +656,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	}
 	[self updateNavigationButtons];
 	[self updateToolbarItems];
-	[[MPPlayableContentManager sharedContentManager] reloadData];
+	[self reloadCarPlayData];
 }
 
 - (void)addButtonPressed:(id)sender {
@@ -1099,20 +1106,42 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	return [[Reachability reachabilityForInternetConnection] currentReachabilityStatus] != NotReachable;
 }
 
+#pragma mark - Car play data source
+
+- (void)reloadCarPlayData {
+	NSArray *stations = [self stations];
+	NSMutableArray *items = [NSMutableArray arrayWithCapacity:stations.count];
+	for (SRRadioStation *station in stations) {
+		MPContentItem *item = [[MPContentItem alloc] initWithIdentifier:[NSString stringWithFormat:@"%ld", (long)station.stationId]];
+		item.title = station.name;
+		item.artwork = [station preloadedArtworkForWidth:SRCarPlayArtworkWidth];
+		item.streamingContent = YES;
+		item.playable = YES;
+		[items addObject:item];
+	}
+	self.carPlayItems = items;
+	[[MPPlayableContentManager sharedContentManager] reloadData];
+}
+
+- (void)refreshCarPlayArtworkForStation:(SRRadioStation *)station {
+	NSString *identifier = [NSString stringWithFormat:@"%ld", (long)station.stationId];
+	for (MPContentItem *item in self.carPlayItems) {
+		if ([item.identifier isEqualToString:identifier]) {
+			item.artwork = [station preloadedArtworkForWidth:SRCarPlayArtworkWidth];
+			[[MPPlayableContentManager sharedContentManager] reloadData];
+			break;
+		}
+	}
+}
+
 #pragma mark - MPPlayableContentManager
 
 - (NSInteger)numberOfChildItemsAtIndexPath:(NSIndexPath *)indexPath {
-	return [[self stations] count];
+	return [[self carPlayItems] count];
 }
 
 - (nullable MPContentItem *)contentItemAtIndexPath:(NSIndexPath *)indexPath {
-	SRRadioStation *station = [[self stations] objectAtIndex:[indexPath indexAtPosition:0]];
-	MPContentItem *item = [[MPContentItem alloc] initWithIdentifier:[NSString stringWithFormat:@"%ld", (long)station.stationId]];
-	item.title = station.name;
-	item.artwork = [station preloadedArtworkForWidth:SRCarPlayArtworkWidth];
-	item.streamingContent = YES;
-	item.playable = YES;
-	return item;
+	return [[self carPlayItems] objectAtIndex:[indexPath indexAtPosition:0]];
 }
 
 - (void)playableContentManager:(MPPlayableContentManager *)contentManager initiatePlaybackOfContentItemAtIndexPath:(NSIndexPath *)indexPath completionHandler:(void(^)(NSError * __nullable))completionHandler {

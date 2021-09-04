@@ -8,8 +8,6 @@
 
 #import <Foundation/Foundation.h>
 
-extern NSString * const SRImageCacheDidPreloadArtwork;
-
 @interface SRImageCache : NSObject
 
 + (SRImageCache *)sharedCache;
@@ -18,7 +16,5 @@ extern NSString * const SRImageCacheDidPreloadArtwork;
 
 - (void)cacheImage:(UIImage *)image forKey:(NSString *)key;
 - (UIImage *)imageForKey:(NSString *)key;
-
-- (void)preloadArtworkForWidth:(CGFloat)width;
 
 @end

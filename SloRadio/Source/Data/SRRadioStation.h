@@ -10,6 +10,8 @@
 
 @class MPMediaItemArtwork;
 
+extern NSString * const SRRadioStationDidPreloadArtwork;
+
 @interface SRRadioStation : NSObject
 
 @property (nonatomic, assign) NSInteger stationId;

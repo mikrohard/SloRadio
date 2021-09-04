@@ -11,6 +11,7 @@
 #import "SRDataManager.h"
 
 static NSString * const SRRadioStationIconBaseUrl = @"https://iphone.jernej.org/sloradio/icon.php";
+NSString * const SRRadioStationDidPreloadArtwork = @"SRRadioStationDidPreloadArtwork";
 
 @import MediaPlayer;
 
@@ -43,6 +44,8 @@ static NSString * const SRRadioStationIconBaseUrl = @"https://iphone.jernej.org/
 				return image;
 			}];
 		}
+	} else {
+		return [self preloadedArtworkForWidth:width];
 	}
 	return nil;
 }
@@ -54,6 +57,9 @@ static NSString * const SRRadioStationIconBaseUrl = @"https://iphone.jernej.org/
 		if (iconUrl != nil) {
 			NSString *cacheKey = [SRImageCache keyForUrl:iconUrl];
 			image = [[SRImageCache sharedCache] imageForKey:cacheKey];
+			if (!image) {
+				[self preloadArtworkForUrl:iconUrl];
+			}
 		}
 		if (!image) {
 			image = [UIImage imageNamed:@"PlaceholderArtwork"];
@@ -74,5 +80,31 @@ static NSString * const SRRadioStationIconBaseUrl = @"https://iphone.jernej.org/
 	}
 	return nil;
 }
+
+#pragma mark - Artwork preload
+
++ (dispatch_queue_t)preloadQueue {
+	static dispatch_queue_t preloadQueue;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		preloadQueue = dispatch_queue_create("org.jernej.sloradio.artworkPreload", NULL);
+	});
+	return preloadQueue;
+}
+
+- (void)preloadArtworkForUrl:(NSURL *)iconUrl {
+	if (iconUrl != nil) {
+		dispatch_async([SRRadioStation preloadQueue], ^{
+			NSString *cacheKey = [SRImageCache keyForUrl:iconUrl];
+			UIImage *image = [[SRImageCache sharedCache] imageForKey:cacheKey];
+			if (!image) {
+				image = [UIImage imageWithData:[NSData dataWithContentsOfURL:iconUrl]];
+				[[SRImageCache sharedCache] cacheImage:image forKey:cacheKey];
+			}
+			[[NSNotificationCenter defaultCenter] postNotificationName:SRRadioStationDidPreloadArtwork object:self];
+		});
+	}
+}
+
 
 @end
