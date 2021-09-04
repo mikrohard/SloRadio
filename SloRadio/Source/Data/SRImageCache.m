@@ -7,6 +7,10 @@
 //
 
 #import "SRImageCache.h"
+#import "SRRadioStation.h"
+#import "SRDataManager.h"
+
+NSString * const SRImageCacheDidPreloadArtwork = @"SRImageCacheDidPreloadArtwork";
 
 @interface SRImageCache ()
 
@@ -70,6 +74,26 @@
 	NSMutableCharacterSet *set = [[NSMutableCharacterSet URLPathAllowedCharacterSet] mutableCopy];
 	[set removeCharactersInString:@"/\\;:."];
 	return [[url absoluteString] stringByAddingPercentEncodingWithAllowedCharacters:set];
+}
+
+#pragma mark - Artwork preload
+
+- (void)preloadArtworkForWidth:(CGFloat)width {
+	dispatch_queue_t preloadQueue = dispatch_queue_create("org.jernej.sloradio.artworkPreload", NULL);
+	dispatch_async(preloadQueue, ^{
+		for (SRRadioStation *station in [[SRDataManager sharedManager] stations]) {
+			NSURL *iconUrl = [station iconUrlForWidth:width];
+			if (iconUrl != nil) {
+				NSString *cacheKey = [SRImageCache keyForUrl:iconUrl];
+				UIImage *image = [self imageForKey:cacheKey];
+				if (!image) {
+					image = [UIImage imageWithData:[NSData dataWithContentsOfURL:iconUrl]];
+					[self cacheImage:image forKey:cacheKey];
+				}
+			}
+		}
+		[[NSNotificationCenter defaultCenter] postNotificationName:SRImageCacheDidPreloadArtwork object:nil];
+	});
 }
 
 @end

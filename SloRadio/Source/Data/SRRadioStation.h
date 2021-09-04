@@ -19,5 +19,7 @@
 @property (nonatomic, assign) BOOL hidden;
 
 - (MPMediaItemArtwork *)artworkForWidth:(CGFloat)width;
+- (MPMediaItemArtwork *)preloadedArtworkForWidth:(CGFloat)width;
+- (NSURL *)iconUrlForWidth:(CGFloat)width;
 
 @end

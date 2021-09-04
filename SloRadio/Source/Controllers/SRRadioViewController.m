@@ -23,12 +23,15 @@
 #import "UIImage+Color.h"
 #import "Reachability.h"
 #import "Firebase.h"
+#import "SRImageCache.h"
 
 @import AVFoundation;
 @import MediaPlayer;
 @import MessageUI;
 
 static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
+static CGFloat const SRCarPlayArtworkWidth = 256;
+static CGFloat const SRNowPlayingArtworkWidth = 1024;
 
 typedef void (^SRRadioPlayCompletion)(NSError *error);
 
@@ -337,6 +340,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	[nc addObserver:self selector:@selector(audioSessionInterruption:) name:AVAudioSessionInterruptionNotification object:nil];
 	[nc addObserver:self selector:@selector(audioSessionRouteChanged:) name:AVAudioSessionRouteChangeNotification object:nil];
 	[nc addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+	[nc addObserver:self selector:@selector(artworkPreloadFinished:) name:SRImageCacheDidPreloadArtwork object:nil];
 	
 	__weak SRRadioViewController *weakSelf = self;
 	self.callCenter = [[CTCallCenter alloc] init];
@@ -361,6 +365,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 
 - (void)stationsLoaded:(NSNotification *)notification {
 	[self.tableView reloadData];
+	[[SRImageCache sharedCache] preloadArtworkForWidth:SRCarPlayArtworkWidth];
 	[[MPPlayableContentManager sharedContentManager] reloadData];
 }
 
@@ -397,6 +402,10 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
 	[self updateRadioStations];
+}
+
+- (void)artworkPreloadFinished:(NSNotification *)notification {
+	[[MPPlayableContentManager sharedContentManager] reloadData];
 }
 
 #pragma mark - Playback interruption
@@ -719,7 +728,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 		[nowPlayingInfo setObject:nowPlayingIdentifier forKey:MPNowPlayingInfoPropertyExternalContentIdentifier];
 		[[MPPlayableContentManager sharedContentManager] setNowPlayingIdentifiers:@[nowPlayingIdentifier]];
 	}
-	MPMediaItemArtwork *artwork = [selectedStation artworkForWidth:1024];
+	MPMediaItemArtwork *artwork = [selectedStation artworkForWidth:SRNowPlayingArtworkWidth];
 	if (artwork != nil) {
 		[nowPlayingInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
 	}
@@ -1100,7 +1109,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	SRRadioStation *station = [[self stations] objectAtIndex:[indexPath indexAtPosition:0]];
 	MPContentItem *item = [[MPContentItem alloc] initWithIdentifier:[NSString stringWithFormat:@"%ld", (long)station.stationId]];
 	item.title = station.name;
-	item.artwork = [station artworkForWidth:256];
+	item.artwork = [station preloadedArtworkForWidth:SRCarPlayArtworkWidth];
 	item.streamingContent = YES;
 	item.playable = YES;
 	return item;

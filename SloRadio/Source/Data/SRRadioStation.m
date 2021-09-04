@@ -47,6 +47,22 @@ static NSString * const SRRadioStationIconBaseUrl = @"https://iphone.jernej.org/
 	return nil;
 }
 
+- (MPMediaItemArtwork *)preloadedArtworkForWidth:(CGFloat)width {
+	NSURL *iconUrl = [self iconUrlForWidth:width];
+	if (iconUrl != nil) {
+		UIImage *image = nil;
+		if (iconUrl != nil) {
+			NSString *cacheKey = [SRImageCache keyForUrl:iconUrl];
+			image = [[SRImageCache sharedCache] imageForKey:cacheKey];
+		}
+		if (!image) {
+			image = [UIImage imageNamed:@"PlaceholderArtwork"];
+		}
+		return [[MPMediaItemArtwork alloc] initWithImage:image];
+	}
+	return nil;
+}
+
 - (NSURL *)iconUrlForWidth:(CGFloat)width {
 	if (![[SRDataManager sharedManager] isCustomRadioStation:self]) {
 		NSString *iconUrl = [NSString stringWithFormat:@"%@?station_id=%ld&width=%.0f&lastModified=%.0f",
