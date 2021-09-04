@@ -73,7 +73,7 @@ NSString * const SRRadioStationDidPreloadArtwork = @"SRRadioStationDidPreloadArt
 	if (![[SRDataManager sharedManager] isCustomRadioStation:self]) {
 		NSString *iconUrl = [NSString stringWithFormat:@"%@?station_id=%ld&width=%.0f&lastModified=%.0f",
 							 SRRadioStationIconBaseUrl,
-							 self.stationId,
+							 (long)self.stationId,
 							 width,
 							 self.lastModified];
 		return [NSURL URLWithString:iconUrl];
