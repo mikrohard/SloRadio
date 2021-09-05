@@ -1115,7 +1115,9 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 		MPContentItem *item = [[MPContentItem alloc] initWithIdentifier:[NSString stringWithFormat:@"%ld", (long)station.stationId]];
 		item.title = station.name;
 		item.artwork = [station preloadedArtworkForWidth:SRCarPlayArtworkWidth];
-		item.streamingContent = YES;
+		if (@available(iOS 10.0, *)) {
+			item.streamingContent = YES;
+		}
 		item.playable = YES;
 		[items addObject:item];
 	}
