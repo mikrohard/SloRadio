@@ -12,6 +12,9 @@
 
 @import MessageUI;
 
+static NSString * const SRCopyrightText = @"© 2021 Jernej Fijačko";
+static NSString * const SRContactEmail = @"sloradio@jernej.org";
+
 @interface SRAboutViewController () <MFMailComposeViewControllerDelegate>
 
 @end
@@ -125,13 +128,13 @@
 		if (indexPath.row == 0) {
 			// copyright
 			cell.textLabel.text = NSLocalizedString(@"Copyright", nil);
-			cell.detailTextLabel.text = @"© 2020 Jernej Fijačko";
+			cell.detailTextLabel.text = SRCopyrightText;
 			cell.selectionStyle = UITableViewCellSelectionStyleNone;
 		}
 		else {
 			// contact
 			cell.textLabel.text = NSLocalizedString(@"Contact", nil);
-			cell.detailTextLabel.text = @"sloradio@jernej.org";
+			cell.detailTextLabel.text = SRContactEmail;
 			cell.selectionStyle = UITableViewCellSelectionStyleDefault;
 		}
 		return cell;
