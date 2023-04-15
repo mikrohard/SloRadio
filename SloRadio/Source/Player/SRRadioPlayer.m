@@ -113,11 +113,11 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 }
 
 - (void)updateMetaDataPreserveNowPlaying:(BOOL)preserve {
-	NSDictionary *mediaMetaData = self.media.metaDictionary;
-	NSString *genre = [self decodedMetadataString:[mediaMetaData objectForKey:VLCMetaInformationGenre]];
-	NSString *title = [self decodedMetadataString:[mediaMetaData objectForKey:VLCMetaInformationTitle]];
-	NSString *artist = [self decodedMetadataString:[mediaMetaData objectForKey:VLCMetaInformationArtist]];
-	NSString *nowPlaying = [self decodedMetadataString:[mediaMetaData objectForKey:VLCMetaInformationNowPlaying]];
+    VLCMediaMetaData *mediaMetaData = self.media.metaData;
+	NSString *genre = [self decodedMetadataString:[mediaMetaData genre]];
+	NSString *title = [self decodedMetadataString:[mediaMetaData title]];
+	NSString *artist = [self decodedMetadataString:[mediaMetaData artist]];
+	NSString *nowPlaying = [self decodedMetadataString:[mediaMetaData nowPlaying]];
 	if (preserve && !nowPlaying) {
 		nowPlaying = [_metaData objectForKey:SRRadioPlayerMetaDataNowPlayingKey];
 	}
@@ -159,7 +159,7 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 			}
 		}
 	}
-	return output;
+	return [output stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 }
 
 #pragma mark - Register media
