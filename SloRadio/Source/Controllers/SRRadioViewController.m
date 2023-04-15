@@ -703,6 +703,14 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 		// ignore this playback request
 		return;
 	}
+    SRRadioPlayer *player = [SRRadioPlayer sharedPlayer];
+    if ([[player currentRadioStation] isEqual:selectedStation] &&
+        ([player state] == SRRadioPlayerStateBuffering ||
+         [player state] == SRRadioPlayerStatePlaying)) {
+        // this radio station is already playing
+        // ignore this playback request
+        return;
+    }
 	[self ensureAudioSessionForPlayback];
 	[self startBackgroundTask];
 	if (sleepTimer) {
@@ -714,7 +722,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	_playbackInterrupted = NO;
 	_audioSessionInterrupted = NO;
 	_callInProgress = NO;
-	[[SRRadioPlayer sharedPlayer] playRadioStation:selectedStation];
+	[player playRadioStation:selectedStation];
 }
 
 - (void)stopAction {
