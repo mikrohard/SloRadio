@@ -29,6 +29,7 @@
 @import MessageUI;
 
 static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
+static NSTimeInterval const SRCarPlayDataReloadInterval = 5*60; // 5 minutes
 static CGFloat const SRCarPlayArtworkWidth = 256;
 static CGFloat const SRNowPlayingArtworkWidth = 1024;
 
@@ -56,6 +57,8 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 // carplay
 @property (nonatomic, strong) NSArray<MPContentItem *> *carPlayItems;
 @property (nonatomic, strong) SRRadioPlayCompletion playCompletion;
+@property (nonatomic, strong) NSTimer *carPlayDataReloadTimer;
+@property (nonatomic, assign) NSTimeInterval lastCarPlayDataReloadTime;
 
 @end
 
@@ -1136,6 +1139,36 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	}
 }
 
+- (void)checkIfCarPlayDataReloadIsNeeded {
+	[self setupCarPlayDataReloadTimer];
+}
+
+- (void)setupCarPlayDataReloadTimer {
+	[self invalidateCarPlayDataReloadTimer];
+	self.carPlayDataReloadTimer = [NSTimer timerWithTimeInterval:0.1
+														  target:self
+														selector:@selector(carPlayDataReloadTimerFired:)
+														userInfo:nil
+														 repeats:NO];
+	[[NSRunLoop mainRunLoop] addTimer:self.carPlayDataReloadTimer forMode:NSRunLoopCommonModes];
+}
+
+- (void)invalidateCarPlayDataReloadTimer {
+	[self.carPlayDataReloadTimer invalidate];
+	self.carPlayDataReloadTimer = nil;
+}
+
+- (void)carPlayDataReloadTimerFired:(NSTimer *)timer {
+	[self invalidateCarPlayDataReloadTimer];
+	NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
+	if (now - self.lastCarPlayDataReloadTime > SRCarPlayDataReloadInterval) {
+		self.lastCarPlayDataReloadTime = now;
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[[MPPlayableContentManager sharedContentManager] reloadData];
+		});
+	}
+}
+
 #pragma mark - MPPlayableContentManager
 
 - (NSInteger)numberOfChildItemsAtIndexPath:(NSIndexPath *)indexPath {
@@ -1143,6 +1176,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 }
 
 - (nullable MPContentItem *)contentItemAtIndexPath:(NSIndexPath *)indexPath {
+	[self checkIfCarPlayDataReloadIsNeeded];
 	return [[self carPlayItems] objectAtIndex:[indexPath indexAtPosition:0]];
 }
 
