@@ -76,7 +76,7 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 			_currentRadioStation = nil;
 		}
 		_timePlaying = 0.0;
-		[self updateMetaData];
+        [self resetMetaData];
 	}
 }
 
@@ -107,6 +107,13 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 }
 
 #pragma mark - Meta data
+
+- (void)resetMetaData {
+    _metaData = @{};
+    if ([self.delegate respondsToSelector:@selector(radioPlayer:didChangeMetaData:)]) {
+        [self.delegate radioPlayer:self didChangeMetaData:self.metaData];
+    }
+}
 
 - (void)updateMetaData {
 	[self updateMetaDataPreserveNowPlaying:NO];

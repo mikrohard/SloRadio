@@ -760,7 +760,9 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	nowPlaying = [nowPlaying stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 	if (nowPlaying.length) {
 		[nowPlayingInfo setObject:[nowPlaying capitalizedString] forKey:MPMediaItemPropertyTitle];
-	}
+    } else {
+        [nowPlayingInfo setObject:@"" forKey:MPMediaItemPropertyTitle];
+    }
 	NSInteger currentIndex = 0;
 	NSArray *stations = [self stations];
 	for (SRRadioStation *station in stations) {
