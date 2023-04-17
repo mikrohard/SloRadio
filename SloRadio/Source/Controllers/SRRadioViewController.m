@@ -6,9 +6,6 @@
 //  Copyright (c) 2015 Jernej Fijačko. All rights reserved.
 //
 
-#import <CoreTelephony/CTCallCenter.h>
-#import <CoreTelephony/CTCall.h>
-
 #import "SRRadioViewController.h"
 #import "SRDataManager.h"
 #import "SRRadioPlayer.h"
@@ -47,10 +44,6 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 @property (nonatomic, strong) UIToolbar *toolbar;
 @property (nonatomic, strong) UITableView *tableView;
 
-// call interruption handling
-@property (nonatomic, strong) CTCallCenter *callCenter;
-@property (nonatomic, assign) BOOL callInProgress;
-
 // background task
 @property (nonatomic, assign) UIBackgroundTaskIdentifier bgTask;
 
@@ -69,7 +62,6 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 @synthesize sleepTimerView = _sleepTimerView;
 @synthesize toolbar = _toolbar;
 @synthesize tableView = _tableView;
-@synthesize callInProgress = _callInProgress;
 @synthesize bgTask = _bgTask;
 
 #pragma mark - Lifecycle
@@ -79,7 +71,6 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	if (self) {
 		[self registerForNotifications];
 		self.title = NSLocalizedString(@"RadioStations", @"Radio Stations");
-		self.automaticallyAdjustsScrollViewInsets = NO;
 		
 		[self setupAudioSession];
 		
@@ -344,26 +335,10 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	[nc addObserver:self selector:@selector(audioSessionRouteChanged:) name:AVAudioSessionRouteChangeNotification object:nil];
 	[nc addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
 	[nc addObserver:self selector:@selector(artworkPreloadFinished:) name:SRRadioStationDidPreloadArtwork object:nil];
-	
-	__weak SRRadioViewController *weakSelf = self;
-	self.callCenter = [[CTCallCenter alloc] init];
-	self.callCenter.callEventHandler = ^(CTCall *call) {
-		__strong SRRadioViewController *strongSelf = weakSelf;
-		if (strongSelf) {
-			if (call.callState == CTCallStateIncoming || call.callState == CTCallStateDialing) {
-				[strongSelf audioSessionInterruptedByCall:YES];
-				[strongSelf startBackgroundTask];
-			} else if (call.callState == CTCallStateDisconnected && strongSelf.callInProgress) {
-				[strongSelf audioSessionResumeByCall:YES];
-			}
-		}
-	};
 }
 
 - (void)unregisterFromNotifications {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
-	self.callCenter.callEventHandler = nil;
-	self.callCenter = nil;
 }
 
 - (void)stationsLoaded:(NSNotification *)notification {
@@ -383,12 +358,13 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 - (void)audioSessionInterruption:(NSNotification *)notification {
 	AVAudioSessionInterruptionType interruptionType = [[notification.userInfo objectForKey:AVAudioSessionInterruptionTypeKey] integerValue];
 	if (interruptionType == AVAudioSessionInterruptionTypeBegan) {
-		[self audioSessionInterruptedByCall:NO];
-	}
-	else if (interruptionType == AVAudioSessionInterruptionTypeEnded) {
+        _audioSessionInterrupted = YES;
+		[self audioSessionInterrupted];
+	} else if (interruptionType == AVAudioSessionInterruptionTypeEnded) {
 		AVAudioSessionInterruptionOptions interruptionOption = [[notification.userInfo objectForKey:AVAudioSessionInterruptionOptionKey] integerValue];
 		if (_audioSessionInterrupted && interruptionOption == AVAudioSessionInterruptionOptionShouldResume) {
-			[self audioSessionResumeByCall:NO];
+            _audioSessionInterrupted = NO;
+			[self audioSessionResume];
 		}
 	}
 }
@@ -420,26 +396,17 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 
 #pragma mark - Playback interruption
 
-- (void)audioSessionInterruptedByCall:(BOOL)call {
-	if (call) {
-		_callInProgress = YES;
-	} else {
-		_audioSessionInterrupted = YES;
-	}
+- (void)audioSessionInterrupted {
 	if ([[SRRadioPlayer sharedPlayer] state] != SRRadioPlayerStateStopped) {
 		_playbackInterrupted = YES;
 		[self performSelectorOnMainThread:@selector(stopAction) withObject:nil waitUntilDone:YES];
 	}
 }
 
-- (void)audioSessionResumeByCall:(BOOL)call {
-	if (call) {
-		_callInProgress = NO;
-	} else {
-		_audioSessionInterrupted = NO;
-	}
-	if ([[SRRadioPlayer sharedPlayer] state] == SRRadioPlayerStateStopped && _playbackInterrupted && !_callInProgress && !_audioSessionInterrupted) {
+- (void)audioSessionResume {
+	if ([[SRRadioPlayer sharedPlayer] state] == SRRadioPlayerStateStopped && _playbackInterrupted && !_audioSessionInterrupted) {
 		// resume playback
+        [self startBackgroundTask];
 		[self performSelectorOnMainThread:@selector(playAction) withObject:nil waitUntilDone:YES];
 	}
 }
@@ -721,7 +688,6 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	}
 	_playbackInterrupted = NO;
 	_audioSessionInterrupted = NO;
-	_callInProgress = NO;
 	[player playRadioStation:selectedStation];
 }
 
