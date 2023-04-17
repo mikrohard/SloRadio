@@ -793,6 +793,18 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	}
 }
 
+- (void)updateNowPlayingState {
+    if (@available(iOS 13, *)) {
+        MPNowPlayingInfoCenter *infoCenter = [MPNowPlayingInfoCenter defaultCenter];
+        if ([[SRRadioPlayer sharedPlayer] state] == SRRadioPlayerStateBuffering ||
+            [[SRRadioPlayer sharedPlayer] state] == SRRadioPlayerStatePlaying) {
+            infoCenter.playbackState = MPNowPlayingPlaybackStatePlaying;
+        } else {
+            infoCenter.playbackState = MPNowPlayingPlaybackStateStopped;
+        }
+    }
+}
+
 #pragma mark - Presentation
 
 - (void)presentAddRadioController {
@@ -815,6 +827,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	[self updateToolbarItems];
 	[self notifyPlayCompletion];
 	[self updateNowPlayingInfo];
+    [self updateNowPlayingState];
 	if (state == SRRadioPlayerStateError) {
 		[self handlePlaybackError];
 		[self stopAction];
