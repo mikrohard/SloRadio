@@ -24,36 +24,35 @@ NSString * const SRRadioStationDidPreloadArtwork = @"SRRadioStationDidPreloadArt
 @synthesize hidden = _hidden;
 
 - (MPMediaItemArtwork *)artworkForWidth:(CGFloat)width {
-	if (@available(iOS 10, *)) {
-		NSURL *iconUrl = [self iconUrlForWidth:width];
-		if (iconUrl != nil) {
-			return [[MPMediaItemArtwork alloc] initWithBoundsSize:CGSizeMake(width, width)
-												   requestHandler:^UIImage * _Nonnull(CGSize size) {
-				UIImage *image = nil;
-				if (iconUrl != nil) {
-					NSString *cacheKey = [SRImageCache keyForUrl:iconUrl];
-					image = [[SRImageCache sharedCache] imageForKey:cacheKey];
-					if (!image) {
-						image = [UIImage imageWithData:[NSData dataWithContentsOfURL:iconUrl]];
-						[[SRImageCache sharedCache] cacheImage:image forKey:cacheKey];
-					}
-				}
-				if (!image) {
-					image = [UIImage imageNamed:@"PlaceholderArtwork"];
-				}
-				return image;
-			}];
-		}
-	} else {
-		return [self preloadedArtworkForWidth:width];
-	}
-	return nil;
+    NSURL *iconUrl = [self iconUrlForWidth:width];
+    if (iconUrl != nil) {
+        return [[MPMediaItemArtwork alloc] initWithBoundsSize:CGSizeMake(width, width)
+                                               requestHandler:^UIImage * _Nonnull(CGSize size) {
+            UIImage *image = nil;
+            if (iconUrl != nil) {
+                NSString *cacheKey = [SRImageCache keyForUrl:iconUrl];
+                image = [[SRImageCache sharedCache] imageForKey:cacheKey];
+                if (!image) {
+                    image = [UIImage imageWithData:[NSData dataWithContentsOfURL:iconUrl]];
+                    [[SRImageCache sharedCache] cacheImage:image forKey:cacheKey];
+                }
+            }
+            if (!image) {
+                image = [UIImage imageNamed:@"PlaceholderArtwork"];
+            }
+            return image;
+        }];
+    } else {
+        return [[MPMediaItemArtwork alloc] initWithBoundsSize:CGSizeMake(width, width) requestHandler:^UIImage * _Nonnull(CGSize size) {
+            return [UIImage imageNamed:@"PlaceholderArtwork"];
+        }];
+    }
 }
 
 - (MPMediaItemArtwork *)preloadedArtworkForWidth:(CGFloat)width {
+    UIImage *image = nil;
 	NSURL *iconUrl = [self iconUrlForWidth:width];
 	if (iconUrl != nil) {
-		UIImage *image = nil;
 		if (iconUrl != nil) {
 			NSString *cacheKey = [SRImageCache keyForUrl:iconUrl];
 			image = [[SRImageCache sharedCache] imageForKey:cacheKey];
@@ -61,14 +60,13 @@ NSString * const SRRadioStationDidPreloadArtwork = @"SRRadioStationDidPreloadArt
 				[self preloadArtworkForUrl:iconUrl];
 			}
 		}
-		if (!image) {
-			image = [UIImage imageNamed:@"PlaceholderArtwork"];
-		}
-        return [[MPMediaItemArtwork alloc] initWithBoundsSize:CGSizeMake(width, width) requestHandler:^UIImage * _Nonnull(CGSize size) {
-            return image;
-        }];
 	}
-	return nil;
+    if (!image) {
+        image = [UIImage imageNamed:@"PlaceholderArtwork"];
+    }
+    return [[MPMediaItemArtwork alloc] initWithBoundsSize:CGSizeMake(width, width) requestHandler:^UIImage * _Nonnull(CGSize size) {
+        return image;
+    }];
 }
 
 - (NSURL *)iconUrlForWidth:(CGFloat)width {
