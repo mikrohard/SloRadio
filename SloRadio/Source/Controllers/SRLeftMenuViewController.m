@@ -45,11 +45,7 @@ static NSString * const SRMenuControllersCachedKey = @"SRMenuControllersCachedKe
 	self.tableView.tableHeaderView.backgroundColor = [UIColor clearColor];
 	self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, 44.f)];
 	self.tableView.tableFooterView.backgroundColor = [UIColor clearColor];
-	
-	self.automaticallyAdjustsScrollViewInsets = NO;
-	if (@available(iOS 11, *)) {
-		self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-	}
+	self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
 }
 
 - (void)viewDidLoad {

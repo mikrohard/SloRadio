@@ -64,7 +64,9 @@ NSString * const SRRadioStationDidPreloadArtwork = @"SRRadioStationDidPreloadArt
 		if (!image) {
 			image = [UIImage imageNamed:@"PlaceholderArtwork"];
 		}
-		return [[MPMediaItemArtwork alloc] initWithImage:image];
+        return [[MPMediaItemArtwork alloc] initWithBoundsSize:CGSizeMake(width, width) requestHandler:^UIImage * _Nonnull(CGSize size) {
+            return image;
+        }];
 	}
 	return nil;
 }
