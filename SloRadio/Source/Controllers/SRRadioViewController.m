@@ -30,6 +30,8 @@ static NSTimeInterval const SRCarPlayDataReloadInterval = 5*60; // 5 minutes
 static CGFloat const SRCarPlayArtworkWidth = 256;
 static CGFloat const SRNowPlayingArtworkWidth = 1024;
 
+static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15 seconds for buffering
+
 typedef void (^SRRadioPlayCompletion)(NSError *error);
 
 @interface SRRadioViewController () <SRRadioPlayerDelegate, SRSleepTimerDelegate, SRSleepTimerViewDelegate, MFMailComposeViewControllerDelegate, UITableViewDataSource, UITableViewDelegate, MPPlayableContentDelegate, MPPlayableContentDataSource> {
@@ -52,6 +54,8 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 @property (nonatomic, strong) SRRadioPlayCompletion playCompletion;
 @property (nonatomic, strong) NSTimer *carPlayDataReloadTimer;
 @property (nonatomic, assign) NSTimeInterval lastCarPlayDataReloadTime;
+
+@property (nonatomic, strong) NSTimer *bufferingTimeoutTimer;
 
 @end
 
@@ -689,6 +693,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	_playbackInterrupted = NO;
 	_audioSessionInterrupted = NO;
 	[player playRadioStation:selectedStation];
+    [self setupBufferingTimeoutTimer];
 }
 
 - (void)stopAction {
@@ -771,6 +776,31 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
     }
 }
 
+#pragma mark - Buffering timeout
+
+- (void)setupBufferingTimeoutTimer {
+    [self invalidateBufferingTimeoutTimer];
+    NSTimeInterval timeout = SRRadioBufferingTimeoutInterval + [[SRDataManager sharedManager] playerCacheSize];
+    self.bufferingTimeoutTimer = [NSTimer timerWithTimeInterval:timeout target:self selector:@selector(bufferingTimeout:) userInfo:nil repeats:NO];
+    [[NSRunLoop currentRunLoop] addTimer:self.bufferingTimeoutTimer forMode:NSRunLoopCommonModes];
+}
+
+- (void)invalidateBufferingTimeoutTimer {
+    [self.bufferingTimeoutTimer invalidate];
+    self.bufferingTimeoutTimer = nil;
+}
+
+- (void)bufferingTimeout:(NSTimer *)timer {
+    // invalidate timer
+    [self invalidateBufferingTimeoutTimer];
+    
+    // retry playback
+    if ([[SRRadioPlayer sharedPlayer] state] == SRRadioPlayerStateBuffering) {
+        [self stopAction];
+        [self playAction];
+    }
+}
+
 #pragma mark - Presentation
 
 - (void)presentAddRadioController {
@@ -807,6 +837,10 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 		state == SRRadioPlayerStateStopped) {
 		[self endBackgroundTask];
 	}
+    if (state != SRRadioPlayerStateOpening &&
+        state != SRRadioPlayerStateBuffering) {
+        [self invalidateBufferingTimeoutTimer];
+    }
 }
 
 - (void)radioPlayer:(SRRadioPlayer *)player didChangeMetaData:(NSDictionary *)metadata {
