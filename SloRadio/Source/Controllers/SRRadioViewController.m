@@ -931,12 +931,8 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 
 - (MPRemoteCommandHandlerStatus)remoteTogglePlayPause {
 	SRRadioPlayerState state = [[SRRadioPlayer sharedPlayer] state];
-    if (state == SRRadioPlayerStateBuffering ||
-        state == SRRadioPlayerStateOpening) {
-        // ignore play/pause while buffering
-        return MPRemoteCommandHandlerStatusCommandFailed;
-    }
-	if (state == SRRadioPlayerStatePlaying) {
+	if (state == SRRadioPlayerStatePlaying &&
+        [[SRRadioPlayer sharedPlayer] timePlaying] > 1.0) {
 		[self stopAction];
 	} else {
 		[self playAction];
