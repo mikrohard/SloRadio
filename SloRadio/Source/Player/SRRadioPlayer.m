@@ -16,12 +16,22 @@ NSString * const SRRadioPlayerMetaDataArtistKey = @"SRRadioPlayerMetaDataArtistK
 NSString * const SRRadioPlayerMetaDataTitleKey = @"SRRadioPlayerMetaDataTitleKey";
 NSString * const SRRadioPlayerMetaDataGenreKey = @"SRRadioPlayerMetaDataGenreKey";
 NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNowPlayingKey";
+NSString * const SRRadioPlayerTimeoutStatsInputBytes = @"SRRadioPlayerTimeoutStatsInputBytes";
+NSString * const SRRadioPlayerTimeoutStatsDemuxBytes = @"SRRadioPlayerTimeoutStatsDemuxBytes";
+NSString * const SRRadioPlayerTimeoutStatsDecodedAudio = @"SRRadioPlayerTimeoutStatsDecodedAudio";
+NSString * const SRRadioPlayerTimeoutStatsInputBytesTimestamp = @"SRRadioPlayerTimeoutStatsInputBytesTimestamp";
+NSString * const SRRadioPlayerTimeoutStatsDemuxBytesTimestamp = @"SRRadioPlayerTimeoutStatsDemuxBytesTimestamp";
+NSString * const SRRadioPlayerTimeoutStatsDecodedAudioTimestamp = @"SRRadioPlayerTimeoutStatsDecodedAudioTimestamp";
+
+static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 
 @interface SRRadioPlayer () <VLCMediaDelegate, VLCMediaPlayerDelegate>
 
 @property (nonatomic, strong) VLCMediaListPlayer *listPlayer;
 @property (nonatomic, strong) VLCMediaPlayer *player;
 @property (nonatomic, strong) VLCMedia *media;
+@property (nonatomic, strong) NSTimer *timeoutObserver;
+@property (nonatomic, strong) NSMutableDictionary *timeoutStats;
 
 @end
 
@@ -173,12 +183,14 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 
 - (void)registerMedia:(VLCMedia *)media {
 	if (self.media != media) {
+		[self stopMediaTimeoutObserver];
 		[self unregisterMediaKVO];
 		self.media.delegate = nil;
 		self.media = nil;
 		self.media = media;
 		self.media.delegate = self;
 		[self registerMediaKVO];
+		[self startMediaTimeoutObserver];
 	}
 }
 
@@ -200,6 +212,76 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 		VLCMediaState newMediaState = [[change objectForKey:NSKeyValueChangeNewKey] integerValue];
 		if (oldMediaState != newMediaState) {
 			[self updatePlayerState];
+		}
+	}
+}
+
+- (void)startMediaTimeoutObserver {
+	[self stopMediaTimeoutObserver];
+	if (self.media) {
+		self.timeoutStats = [NSMutableDictionary dictionary];
+		NSTimeInterval timestamp = [[NSDate date] timeIntervalSince1970];
+		[self.timeoutStats setObject:@(self.media.numberOfReadBytesOnInput) forKey:SRRadioPlayerTimeoutStatsInputBytes];
+		[self.timeoutStats setObject:@(timestamp) forKey:SRRadioPlayerTimeoutStatsInputBytesTimestamp];
+		[self.timeoutStats setObject:@(self.media.numberOfReadBytesOnDemux) forKey:SRRadioPlayerTimeoutStatsDemuxBytes];
+		[self.timeoutStats setObject:@(timestamp) forKey:SRRadioPlayerTimeoutStatsDemuxBytesTimestamp];
+		[self.timeoutStats setObject:@(self.media.numberOfDecodedAudioBlocks) forKey:SRRadioPlayerTimeoutStatsDecodedAudio];
+		[self.timeoutStats setObject:@(timestamp) forKey:SRRadioPlayerTimeoutStatsDecodedAudioTimestamp];
+
+		self.timeoutObserver = [NSTimer timerWithTimeInterval:1.0 target:self selector:@selector(timeoutObserverFired:) userInfo:nil repeats:YES];
+		[[NSRunLoop currentRunLoop] addTimer:self.timeoutObserver forMode:NSRunLoopCommonModes];
+	}
+}
+
+- (void)stopMediaTimeoutObserver {
+	[self.timeoutObserver invalidate];
+	self.timeoutObserver = nil;
+	self.timeoutStats = nil;
+}
+
+- (void)timeoutObserverFired:(NSTimer *)timer {
+	BOOL triggerTimeout = NO;
+	NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
+	
+	NSInteger previousInputBytes = [[self.timeoutStats objectForKey:SRRadioPlayerTimeoutStatsInputBytes] integerValue];
+	if (previousInputBytes != self.media.numberOfReadBytesOnInput) {
+		[self.timeoutStats setObject:@(self.media.numberOfReadBytesOnInput) forKey:SRRadioPlayerTimeoutStatsInputBytes];
+		[self.timeoutStats setObject:@(now) forKey:SRRadioPlayerTimeoutStatsInputBytesTimestamp];
+	} else {
+		NSTimeInterval inputBytesTimestamp = [[self.timeoutStats objectForKey:SRRadioPlayerTimeoutStatsInputBytesTimestamp] doubleValue];
+		if (now - inputBytesTimestamp >= SRRadioTimeoutInterval) {
+			triggerTimeout = YES;
+		}
+	}
+	
+	NSInteger previousDemuxBytes = [[self.timeoutStats objectForKey:SRRadioPlayerTimeoutStatsDemuxBytes] integerValue];
+	if (previousDemuxBytes != self.media.numberOfReadBytesOnDemux) {
+		[self.timeoutStats setObject:@(self.media.numberOfReadBytesOnDemux) forKey:SRRadioPlayerTimeoutStatsDemuxBytes];
+		[self.timeoutStats setObject:@(now) forKey:SRRadioPlayerTimeoutStatsDemuxBytesTimestamp];
+	} else {
+		NSTimeInterval demuxBytesTimestamp = [[self.timeoutStats objectForKey:SRRadioPlayerTimeoutStatsDemuxBytesTimestamp] doubleValue];
+		if (now - demuxBytesTimestamp >= SRRadioTimeoutInterval) {
+			triggerTimeout = YES;
+		}
+	}
+	
+	NSInteger previousDecodedAudio = [[self.timeoutStats objectForKey:SRRadioPlayerTimeoutStatsDecodedAudio] integerValue];
+	if (previousDecodedAudio != self.media.numberOfDecodedAudioBlocks) {
+		[self.timeoutStats setObject:@(self.media.numberOfDecodedAudioBlocks) forKey:SRRadioPlayerTimeoutStatsDecodedAudio];
+		[self.timeoutStats setObject:@(now) forKey:SRRadioPlayerTimeoutStatsDecodedAudioTimestamp];
+	} else {
+		NSTimeInterval decodedAudioTimestamp = [[self.timeoutStats objectForKey:SRRadioPlayerTimeoutStatsDecodedAudioTimestamp] doubleValue];
+		if (now - decodedAudioTimestamp >= SRRadioTimeoutInterval) {
+			triggerTimeout = YES;
+		}
+	}
+	
+	if (triggerTimeout && (self.state == SRRadioPlayerStateBuffering || self.state == SRRadioPlayerStatePlaying)) {
+		if (self.currentRadioStation) {
+			[self playRadioStation:self.currentRadioStation];
+		} else {
+			NSURL *url = [self.media url];
+			[self playStreamAtUrl:url];
 		}
 	}
 }
