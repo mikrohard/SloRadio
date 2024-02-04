@@ -176,7 +176,23 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 			}
 		}
 	}
-	return [output stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+	
+	// trim output string
+	if (output != nil) {
+		NSMutableCharacterSet *set = [NSMutableCharacterSet characterSetWithCharactersInString:@"-"];
+		[set formUnionWithCharacterSet:[NSCharacterSet whitespaceCharacterSet]];
+		output = [output stringByTrimmingCharactersInSet:set];
+	}
+	
+	// cleanup multiple spaces
+	if (output != nil) {
+		NSString *pattern = @"\\s+";
+		NSString *replacement = @" ";
+		NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:0 error:nil];
+		output = [regex stringByReplacingMatchesInString:output options:0 range:NSMakeRange(0, output.length) withTemplate:replacement];
+	}
+	
+	return output;
 }
 
 #pragma mark - Register media
