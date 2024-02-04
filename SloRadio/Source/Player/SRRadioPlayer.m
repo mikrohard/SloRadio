@@ -150,7 +150,7 @@ NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNow
 - (NSString *)decodedMetadataString:(NSString *)input {
 	NSString *output = [input stringByStrippingHTML];
 	if (input != nil) {
-		NSRegularExpression *expr = [NSRegularExpression regularExpressionWithPattern:@"&#[0-9]+;"
+		NSRegularExpression *expr = [NSRegularExpression regularExpressionWithPattern:@"&[#a-zA-Z0-9]+;"
 																			  options:NSRegularExpressionCaseInsensitive
 																				error:nil];
 		if ([expr numberOfMatchesInString:input options:0 range:NSMakeRange(0, input.length)]) {
