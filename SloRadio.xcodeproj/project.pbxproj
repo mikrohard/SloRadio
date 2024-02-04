@@ -590,8 +590,8 @@
 				C8C8FA2E1AEEADAD00E5E46C /* Sources */,
 				C8C8FA2F1AEEADAD00E5E46C /* Frameworks */,
 				C8C8FA301AEEADAD00E5E46C /* Resources */,
-				C84DCC731AFD4B960062C8F7 /* ShellScript */,
 				19CFF83026D6CB18009299DC /* Embed Frameworks */,
+				C84DCC731AFD4B960062C8F7 /* ShellScript */,
 			);
 			buildRules = (
 			);
