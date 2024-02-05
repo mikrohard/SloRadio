@@ -11,6 +11,7 @@
 		1969137C26D6C15B0065EDC3 /* GoogleAppMeasurement.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1969137A26D6C15B0065EDC3 /* GoogleAppMeasurement.xcframework */; };
 		19CFF82E26D6CB18009299DC /* MobileVLCKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1969137D26D6C2FB0065EDC3 /* MobileVLCKit.xcframework */; };
 		19CFF82F26D6CB18009299DC /* MobileVLCKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1969137D26D6C2FB0065EDC3 /* MobileVLCKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		19F7767C2B7111DA000C1147 /* AVAudioSession+Override.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F7767B2B7111DA000C1147 /* AVAudioSession+Override.m */; };
 		C81D33091AEF83920076BF01 /* AMSlideMenuContentSegue.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D32FB1AEF83920076BF01 /* AMSlideMenuContentSegue.m */; };
 		C81D330A1AEF83920076BF01 /* AMSlideMenuLeftMenuSegue.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D32FD1AEF83920076BF01 /* AMSlideMenuLeftMenuSegue.m */; };
 		C81D330B1AEF83920076BF01 /* AMSlideMenuLeftTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D32FF1AEF83920076BF01 /* AMSlideMenuLeftTableViewController.m */; };
@@ -102,6 +103,8 @@
 		1969137926D6C15B0065EDC3 /* FirebaseAnalytics.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = FirebaseAnalytics.xcframework; path = Libraries/Firebase/FirebaseAnalytics.xcframework; sourceTree = "<group>"; };
 		1969137A26D6C15B0065EDC3 /* GoogleAppMeasurement.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = GoogleAppMeasurement.xcframework; path = Libraries/Firebase/GoogleAppMeasurement.xcframework; sourceTree = "<group>"; };
 		1969137D26D6C2FB0065EDC3 /* MobileVLCKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MobileVLCKit.xcframework; path = Libraries/MobileVLCKit.xcframework; sourceTree = "<group>"; };
+		19F7767A2B7111DA000C1147 /* AVAudioSession+Override.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "AVAudioSession+Override.h"; path = "Source/Categories/AVAudioSession+Override.h"; sourceTree = "<group>"; };
+		19F7767B2B7111DA000C1147 /* AVAudioSession+Override.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "AVAudioSession+Override.m"; path = "Source/Categories/AVAudioSession+Override.m"; sourceTree = "<group>"; };
 		C81D32FA1AEF83920076BF01 /* AMSlideMenuContentSegue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AMSlideMenuContentSegue.h; path = Libraries/AMSlideMenu/AMSlideMenuContentSegue.h; sourceTree = "<group>"; };
 		C81D32FB1AEF83920076BF01 /* AMSlideMenuContentSegue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AMSlideMenuContentSegue.m; path = Libraries/AMSlideMenu/AMSlideMenuContentSegue.m; sourceTree = "<group>"; };
 		C81D32FC1AEF83920076BF01 /* AMSlideMenuLeftMenuSegue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AMSlideMenuLeftMenuSegue.h; path = Libraries/AMSlideMenu/AMSlideMenuLeftMenuSegue.h; sourceTree = "<group>"; };
@@ -378,6 +381,8 @@
 				C837459E1AF61B0C002EBB84 /* UIImage+Color.m */,
 				C84E6F9C26DB96840021B692 /* NSString+Additions.h */,
 				C84E6F9D26DB96840021B692 /* NSString+Additions.m */,
+				19F7767A2B7111DA000C1147 /* AVAudioSession+Override.h */,
+				19F7767B2B7111DA000C1147 /* AVAudioSession+Override.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -711,6 +716,7 @@
 				C83745681AF26E58002EBB84 /* SRTextInputCell.m in Sources */,
 				C81D33171AEF84900076BF01 /* SRRadioViewController.m in Sources */,
 				C8FCC27E1AF69F9F00DE77EC /* SRSleepTimerView.m in Sources */,
+				19F7767C2B7111DA000C1147 /* AVAudioSession+Override.m in Sources */,
 				C83745A31AF634C4002EBB84 /* Reachability.m in Sources */,
 				C837457B1AF50C83002EBB84 /* SRSeparatorView.m in Sources */,
 				C83745771AF50BC5002EBB84 /* UITableView+Separators.m in Sources */,

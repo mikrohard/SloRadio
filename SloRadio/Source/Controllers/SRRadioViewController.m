@@ -233,10 +233,13 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 
 - (void)ensureAudioSessionForPlayback
 {
-	NSString *audioCategory = [[AVAudioSession sharedInstance] category];
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+	NSString *audioCategory = [session category];
 	if (![audioCategory isEqualToString:AVAudioSessionCategoryPlayback]) {
 		[self setupAudioSession];
-	}
+    } else {
+        [session setActive:YES error:nil];
+    }
 }
 
 - (void)setupAudioSession
