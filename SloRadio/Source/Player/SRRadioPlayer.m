@@ -235,13 +235,14 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 - (void)startMediaTimeoutObserver {
 	[self stopMediaTimeoutObserver];
 	if (self.media) {
+		VLCMediaStats mediaStats = self.media.statistics;
 		self.timeoutStats = [NSMutableDictionary dictionary];
 		NSTimeInterval timestamp = [[NSDate date] timeIntervalSince1970];
-		[self.timeoutStats setObject:@(self.media.numberOfReadBytesOnInput) forKey:SRRadioPlayerTimeoutStatsInputBytes];
+		[self.timeoutStats setObject:@(mediaStats.readBytes) forKey:SRRadioPlayerTimeoutStatsInputBytes];
 		[self.timeoutStats setObject:@(timestamp) forKey:SRRadioPlayerTimeoutStatsInputBytesTimestamp];
-		[self.timeoutStats setObject:@(self.media.numberOfReadBytesOnDemux) forKey:SRRadioPlayerTimeoutStatsDemuxBytes];
+		[self.timeoutStats setObject:@(mediaStats.demuxReadBytes) forKey:SRRadioPlayerTimeoutStatsDemuxBytes];
 		[self.timeoutStats setObject:@(timestamp) forKey:SRRadioPlayerTimeoutStatsDemuxBytesTimestamp];
-		[self.timeoutStats setObject:@(self.media.numberOfDecodedAudioBlocks) forKey:SRRadioPlayerTimeoutStatsDecodedAudio];
+		[self.timeoutStats setObject:@(mediaStats.decodedAudio) forKey:SRRadioPlayerTimeoutStatsDecodedAudio];
 		[self.timeoutStats setObject:@(timestamp) forKey:SRRadioPlayerTimeoutStatsDecodedAudioTimestamp];
 
 		self.timeoutObserver = [NSTimer timerWithTimeInterval:1.0 target:self selector:@selector(timeoutObserverFired:) userInfo:nil repeats:YES];
@@ -259,9 +260,10 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 	BOOL triggerTimeout = NO;
 	NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
 	
+	VLCMediaStats mediaStats = self.media.statistics;
 	NSInteger previousInputBytes = [[self.timeoutStats objectForKey:SRRadioPlayerTimeoutStatsInputBytes] integerValue];
-	if (previousInputBytes != self.media.numberOfReadBytesOnInput) {
-		[self.timeoutStats setObject:@(self.media.numberOfReadBytesOnInput) forKey:SRRadioPlayerTimeoutStatsInputBytes];
+	if (previousInputBytes != mediaStats.readBytes) {
+		[self.timeoutStats setObject:@(mediaStats.readBytes) forKey:SRRadioPlayerTimeoutStatsInputBytes];
 		[self.timeoutStats setObject:@(now) forKey:SRRadioPlayerTimeoutStatsInputBytesTimestamp];
 	} else {
 		NSTimeInterval inputBytesTimestamp = [[self.timeoutStats objectForKey:SRRadioPlayerTimeoutStatsInputBytesTimestamp] doubleValue];
@@ -271,8 +273,8 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 	}
 	
 	NSInteger previousDemuxBytes = [[self.timeoutStats objectForKey:SRRadioPlayerTimeoutStatsDemuxBytes] integerValue];
-	if (previousDemuxBytes != self.media.numberOfReadBytesOnDemux) {
-		[self.timeoutStats setObject:@(self.media.numberOfReadBytesOnDemux) forKey:SRRadioPlayerTimeoutStatsDemuxBytes];
+	if (previousDemuxBytes != mediaStats.demuxReadBytes) {
+		[self.timeoutStats setObject:@(mediaStats.demuxReadBytes) forKey:SRRadioPlayerTimeoutStatsDemuxBytes];
 		[self.timeoutStats setObject:@(now) forKey:SRRadioPlayerTimeoutStatsDemuxBytesTimestamp];
 	} else {
 		NSTimeInterval demuxBytesTimestamp = [[self.timeoutStats objectForKey:SRRadioPlayerTimeoutStatsDemuxBytesTimestamp] doubleValue];
@@ -282,8 +284,8 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 	}
 	
 	NSInteger previousDecodedAudio = [[self.timeoutStats objectForKey:SRRadioPlayerTimeoutStatsDecodedAudio] integerValue];
-	if (previousDecodedAudio != self.media.numberOfDecodedAudioBlocks) {
-		[self.timeoutStats setObject:@(self.media.numberOfDecodedAudioBlocks) forKey:SRRadioPlayerTimeoutStatsDecodedAudio];
+	if (previousDecodedAudio != mediaStats.decodedAudio) {
+		[self.timeoutStats setObject:@(mediaStats.decodedAudio) forKey:SRRadioPlayerTimeoutStatsDecodedAudio];
 		[self.timeoutStats setObject:@(now) forKey:SRRadioPlayerTimeoutStatsDecodedAudioTimestamp];
 	} else {
 		NSTimeInterval decodedAudioTimestamp = [[self.timeoutStats objectForKey:SRRadioPlayerTimeoutStatsDecodedAudioTimestamp] doubleValue];
