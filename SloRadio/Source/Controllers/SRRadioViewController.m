@@ -1188,6 +1188,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	if (now - self.lastCarPlayDataReloadTime > SRCarPlayDataReloadInterval) {
 		self.lastCarPlayDataReloadTime = now;
 		dispatch_async(dispatch_get_main_queue(), ^{
+			[self updateRadioStations];
 			[[MPPlayableContentManager sharedContentManager] reloadData];
 		});
 	}
