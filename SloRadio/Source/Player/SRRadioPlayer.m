@@ -257,6 +257,10 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 }
 
 - (void)timeoutObserverFired:(NSTimer *)timer {
+	if ([self isHlsStream]) {
+		// skip timeout logic for HLS streams
+		return;
+	}
 	BOOL triggerTimeout = NO;
 	NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
 	
@@ -302,6 +306,14 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 			[self playStreamAtUrl:url];
 		}
 	}
+}
+
+- (BOOL)isHlsStream {
+	NSString *url = [[self.media url] absoluteString];
+	if (url != nil) {
+		return [url rangeOfString:@"m3u8" options:NSCaseInsensitiveSearch].location != NSNotFound;
+	}
+	return NO;
 }
 
 #pragma mark - VLCMediaPlayerDelegate
