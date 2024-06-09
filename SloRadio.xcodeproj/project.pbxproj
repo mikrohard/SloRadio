@@ -38,6 +38,7 @@
 		C84E6F9E26DB96840021B692 /* NSString+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = C84E6F9D26DB96840021B692 /* NSString+Additions.m */; };
 		C88849FA20416B1C008B0276 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C88849F920416B1C008B0276 /* CoreTelephony.framework */; };
 		C8A46F0E1AF961030031888D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C8A46F0C1AF961030031888D /* Localizable.strings */; };
+		C8AE31B72C1613A1000E99B0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C8AE31B62C1613A1000E99B0 /* PrivacyInfo.xcprivacy */; };
 		C8B1D3A01AEFF20E00A5E0A0 /* SRDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D39F1AEFF20E00A5E0A0 /* SRDataManager.m */; };
 		C8B1D3A31AEFF3B400A5E0A0 /* SRRadioStation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3A21AEFF3B400A5E0A0 /* SRRadioStation.m */; };
 		C8B4F36C2C1611E00076FFC3 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = C8B4F36B2C1611E00076FFC3 /* FirebaseAnalyticsWithoutAdIdSupport */; };
@@ -152,6 +153,7 @@
 		C8A46F0D1AF961030031888D /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8A46F0F1AF961130031888D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8A46F101AF961150031888D /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C8AE31B62C1613A1000E99B0 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		C8B1D39E1AEFF20E00A5E0A0 /* SRDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRDataManager.h; path = Source/Data/SRDataManager.h; sourceTree = "<group>"; };
 		C8B1D39F1AEFF20E00A5E0A0 /* SRDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRDataManager.m; path = Source/Data/SRDataManager.m; sourceTree = "<group>"; };
 		C8B1D3A11AEFF3B400A5E0A0 /* SRRadioStation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRRadioStation.h; path = Source/Data/SRRadioStation.h; sourceTree = "<group>"; };
@@ -457,6 +459,7 @@
 				C8FE88FC24F2D38600BBD72D /* SloRadio.entitlements */,
 				C8C8FA361AEEADAD00E5E46C /* Info.plist */,
 				C8C8FA371AEEADAD00E5E46C /* main.mm */,
+				C8AE31B62C1613A1000E99B0 /* PrivacyInfo.xcprivacy */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -630,6 +633,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8AE31B72C1613A1000E99B0 /* PrivacyInfo.xcprivacy in Resources */,
 				C8C8FA461AEEADAD00E5E46C /* LaunchScreen.xib in Resources */,
 				C8A46F0E1AF961030031888D /* Localizable.strings in Resources */,
 				C8FE891724F2EE4900BBD72D /* GoogleService-Info.plist in Resources */,
