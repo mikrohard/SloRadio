@@ -9,6 +9,7 @@
 #import "SRAppDelegate.h"
 #import "SRMainViewController.h"
 #import "Firebase.h"
+#import <CarPlay/CarPlay.h>
 
 @interface SRAppDelegate ()
 
@@ -17,12 +18,15 @@
 @implementation SRAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-	SRMainViewController *controller = [[SRMainViewController alloc] init];
-	UINavigationController *navigation = [[UINavigationController alloc] initWithRootViewController:controller];
-	self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-	self.window.tintColor = [SRAppearance mainColor];
-	self.window.rootViewController = navigation;
-	[self.window makeKeyAndVisible];
+	if (@available(iOS 13, *)) {
+		self.mainController = [[SRMainViewController alloc] init];
+	} else {
+		self.mainController = [[SRMainViewController alloc] init];
+		self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+		self.window.tintColor = [SRAppearance mainColor];
+		self.window.rootViewController = self.mainController;
+		[self.window makeKeyAndVisible];
+	}
 	[FIRApp configure];
 	[FIRAnalytics setAnalyticsCollectionEnabled:YES];
 	return YES;
@@ -48,6 +52,23 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
 	// Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+#pragma mark - Scenes
+
+
+- (UISceneConfiguration *)application:(UIApplication *)application configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession options:(UISceneConnectionOptions *)options API_AVAILABLE(ios(13.0)) {
+	if (connectingSceneSession.role == CPTemplateApplicationSceneSessionRoleApplication) {
+		UIView *view = self.mainController.view;
+		[view layoutIfNeeded];
+		return [UISceneConfiguration configurationWithName:@"CarPlay" sessionRole:connectingSceneSession.role];
+	} else {
+		return [UISceneConfiguration configurationWithName:@"AppConfiguration" sessionRole:connectingSceneSession.role];
+	}
+}
+
+- (void)application:(UIApplication *)application didDiscardSceneSessions:(NSSet<UISceneSession *> *)sceneSessions API_AVAILABLE(ios(13.0)) {
+	
 }
 
 @end

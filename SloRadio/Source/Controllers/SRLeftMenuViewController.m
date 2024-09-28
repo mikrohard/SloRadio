@@ -36,16 +36,22 @@ static NSString * const SRMenuControllersCachedKey = @"SRMenuControllersCachedKe
 
 - (void)loadView {
 	[super loadView];
-	CGFloat statusBarHeight = [[UIApplication sharedApplication] statusBarFrame].size.height;
 	self.tableView.backgroundColor = [SRAppearance menuBackgroundColor];
 	self.tableView.separatorColor = [SRAppearance menuSeparatorColor];
 	self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 	self.tableView.separatorInset = UIEdgeInsetsMake(0.f, 15.f, 0.f, 0.f);
+	CGFloat statusBarHeight = [[UIApplication sharedApplication] statusBarFrame].size.height;
 	self.tableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, statusBarHeight + 15.f)];
 	self.tableView.tableHeaderView.backgroundColor = [UIColor clearColor];
 	self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, 44.f)];
 	self.tableView.tableFooterView.backgroundColor = [UIColor clearColor];
 	self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+}
+
+- (void)viewWillLayoutSubviews {
+	[super viewWillLayoutSubviews];
+	CGFloat statusBarHeight = [[UIApplication sharedApplication] statusBarFrame].size.height;
+	self.tableView.tableHeaderView.frame = CGRectMake(0, 0, 1.f, statusBarHeight + 15.f);
 }
 
 - (void)viewDidLoad {

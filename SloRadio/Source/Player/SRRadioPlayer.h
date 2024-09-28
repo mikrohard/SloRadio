@@ -17,6 +17,8 @@ typedef enum : NSUInteger {
     SRRadioPlayerStateError,
 } SRRadioPlayerState;
 
+extern NSString * const SRRadioPlayerStateDidChangeNotification;
+extern NSString * const SRRadioPlayerMetaDataDidChangeNotification;
 extern NSString * const SRRadioPlayerMetaDataArtistKey;
 extern NSString * const SRRadioPlayerMetaDataTitleKey;
 extern NSString * const SRRadioPlayerMetaDataGenreKey;

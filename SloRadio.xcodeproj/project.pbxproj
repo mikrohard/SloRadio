@@ -36,6 +36,9 @@
 		C83745A61AF6426D002EBB84 /* SRSleepTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745A51AF6426D002EBB84 /* SRSleepTimer.m */; };
 		C84DCC721AFD28570062C8F7 /* SRSliderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C84DCC711AFD28570062C8F7 /* SRSliderTableViewCell.m */; };
 		C84E6F9E26DB96840021B692 /* NSString+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = C84E6F9D26DB96840021B692 /* NSString+Additions.m */; };
+		C856C5D82CA86FD3003B35C2 /* SRAppSceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C856C5D72CA86FD3003B35C2 /* SRAppSceneDelegate.m */; };
+		C856C5DD2CA8709F003B35C2 /* SRCarPlaySceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C856C5DC2CA8709F003B35C2 /* SRCarPlaySceneDelegate.m */; };
+		C856C5DF2CA8710C003B35C2 /* CarPlay.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C856C5DE2CA8710C003B35C2 /* CarPlay.framework */; };
 		C88849FA20416B1C008B0276 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C88849F920416B1C008B0276 /* CoreTelephony.framework */; };
 		C8A46F0E1AF961030031888D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C8A46F0C1AF961030031888D /* Localizable.strings */; };
 		C8AE31B72C1613A1000E99B0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C8AE31B62C1613A1000E99B0 /* PrivacyInfo.xcprivacy */; };
@@ -149,6 +152,11 @@
 		C84DCC711AFD28570062C8F7 /* SRSliderTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSliderTableViewCell.m; path = Source/Cells/SRSliderTableViewCell.m; sourceTree = "<group>"; };
 		C84E6F9C26DB96840021B692 /* NSString+Additions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSString+Additions.h"; path = "Source/Categories/NSString+Additions.h"; sourceTree = "<group>"; };
 		C84E6F9D26DB96840021B692 /* NSString+Additions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSString+Additions.m"; path = "Source/Categories/NSString+Additions.m"; sourceTree = "<group>"; };
+		C856C5D62CA86FD3003B35C2 /* SRAppSceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SRAppSceneDelegate.h; path = Source/Base/SRAppSceneDelegate.h; sourceTree = "<group>"; };
+		C856C5D72CA86FD3003B35C2 /* SRAppSceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SRAppSceneDelegate.m; path = Source/Base/SRAppSceneDelegate.m; sourceTree = "<group>"; };
+		C856C5DB2CA8709F003B35C2 /* SRCarPlaySceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SRCarPlaySceneDelegate.h; sourceTree = "<group>"; };
+		C856C5DC2CA8709F003B35C2 /* SRCarPlaySceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SRCarPlaySceneDelegate.m; sourceTree = "<group>"; };
+		C856C5DE2CA8710C003B35C2 /* CarPlay.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CarPlay.framework; path = System/Library/Frameworks/CarPlay.framework; sourceTree = SDKROOT; };
 		C88849F920416B1C008B0276 /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
 		C8A46F0D1AF961030031888D /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8A46F0F1AF961130031888D /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -202,6 +210,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C856C5DF2CA8710C003B35C2 /* CarPlay.framework in Frameworks */,
 				C88849FA20416B1C008B0276 /* CoreTelephony.framework in Frameworks */,
 				C824E3811FF5226D00EF1B03 /* VideoToolbox.framework in Frameworks */,
 				C8C8FA641AEEB66500E5E46C /* AudioToolbox.framework in Frameworks */,
@@ -245,6 +254,8 @@
 				C81D33181AEF86D20076BF01 /* SRPrefixHeader.pch */,
 				C8C8FA391AEEADAD00E5E46C /* SRAppDelegate.h */,
 				C8C8FA3A1AEEADAD00E5E46C /* SRAppDelegate.m */,
+				C856C5D62CA86FD3003B35C2 /* SRAppSceneDelegate.h */,
+				C856C5D72CA86FD3003B35C2 /* SRAppSceneDelegate.m */,
 			);
 			name = Application;
 			sourceTree = "<group>";
@@ -403,6 +414,15 @@
 			name = Reachability;
 			sourceTree = "<group>";
 		};
+		C856C5DA2CA86FF6003B35C2 /* CarPlay */ = {
+			isa = PBXGroup;
+			children = (
+				C856C5DB2CA8709F003B35C2 /* SRCarPlaySceneDelegate.h */,
+				C856C5DC2CA8709F003B35C2 /* SRCarPlaySceneDelegate.m */,
+			);
+			path = CarPlay;
+			sourceTree = "<group>";
+		};
 		C8B1D39D1AEFF1F300A5E0A0 /* Data */ = {
 			isa = PBXGroup;
 			children = (
@@ -440,6 +460,7 @@
 			isa = PBXGroup;
 			children = (
 				C81D32F61AEF81810076BF01 /* Application */,
+				C856C5DA2CA86FF6003B35C2 /* CarPlay */,
 				C837454B1AF116D1002EBB84 /* Appearance */,
 				C837456D1AF292CE002EBB84 /* Categories */,
 				C81D32F51AEF816B0076BF01 /* Controllers */,
@@ -495,6 +516,7 @@
 		C8C8FA691AEEB69700E5E46C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C856C5DE2CA8710C003B35C2 /* CarPlay.framework */,
 				1969137D26D6C2FB0065EDC3 /* MobileVLCKit.xcframework */,
 				C88849F920416B1C008B0276 /* CoreTelephony.framework */,
 				C824E3801FF5226D00EF1B03 /* VideoToolbox.framework */,
@@ -691,6 +713,7 @@
 				C837457B1AF50C83002EBB84 /* SRSeparatorView.m in Sources */,
 				C83745771AF50BC5002EBB84 /* UITableView+Separators.m in Sources */,
 				C83745641AF24FAF002EBB84 /* SRAddRadioViewController.m in Sources */,
+				C856C5DD2CA8709F003B35C2 /* SRCarPlaySceneDelegate.m in Sources */,
 				C8B1D3A01AEFF20E00A5E0A0 /* SRDataManager.m in Sources */,
 				C837459F1AF61B0C002EBB84 /* UIImage+Color.m in Sources */,
 				C81D330D1AEF83920076BF01 /* AMSlideMenuRightMenuSegue.m in Sources */,
@@ -714,6 +737,7 @@
 				C81D330B1AEF83920076BF01 /* AMSlideMenuLeftTableViewController.m in Sources */,
 				C8FCC29B1AF91DDB00DE77EC /* SRAboutViewController.m in Sources */,
 				C81D330A1AEF83920076BF01 /* AMSlideMenuLeftMenuSegue.m in Sources */,
+				C856C5D82CA86FD3003B35C2 /* SRAppSceneDelegate.m in Sources */,
 				C84DCC721AFD28570062C8F7 /* SRSliderTableViewCell.m in Sources */,
 				C8C8FA5E1AEEAF5A00E5E46C /* SRRadioPlayer.m in Sources */,
 			);

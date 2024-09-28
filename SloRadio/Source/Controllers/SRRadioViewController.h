@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
+@class SRRadioStation;
+
 @interface SRRadioViewController : UIViewController
+
+- (void)playRadioStation:(SRRadioStation *)station;
 
 @end

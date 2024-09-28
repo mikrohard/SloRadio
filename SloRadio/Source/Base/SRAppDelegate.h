@@ -10,8 +10,8 @@
 
 @interface SRAppDelegate : UIResponder <UIApplicationDelegate>
 
+@property (nonatomic, strong) UIViewController *mainController;
 @property (strong, nonatomic) UIWindow *window;
-
 
 @end
 

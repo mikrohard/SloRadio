@@ -665,6 +665,12 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 
 #pragma mark - Common actions
 
+- (void)playRadioStation:(SRRadioStation *)station {
+	[[SRDataManager sharedManager] selectRadioStation:station];
+	[self.tableView reloadData];
+	[self playActionWithSleepTimer:NO];
+}
+
 - (void)playAction {
 	BOOL sleepTimer = [SRDataManager sharedManager].sleepTimerEnabledByDefault;
 	[self playActionWithSleepTimer:sleepTimer];
@@ -1212,9 +1218,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 		completionHandler(error);
 	};
 	dispatch_async(dispatch_get_main_queue(), ^{
-		[[SRDataManager sharedManager] selectRadioStation:station];
-		[self.tableView reloadData];
-		[self playAction];
+		[self playRadioStation:station];
 	});
 }
 

@@ -12,6 +12,8 @@
 #import "NSString+Additions.h"
 #import <MobileVLCKit/MobileVLCKit.h>
 
+NSString * const SRRadioPlayerStateDidChangeNotification = @"SRRadioPlayerStateDidChangeNotification";
+NSString * const SRRadioPlayerMetaDataDidChangeNotification = @"SRRadioPlayerMetaDataDidChangeNotification";
 NSString * const SRRadioPlayerMetaDataArtistKey = @"SRRadioPlayerMetaDataArtistKey";
 NSString * const SRRadioPlayerMetaDataTitleKey = @"SRRadioPlayerMetaDataTitleKey";
 NSString * const SRRadioPlayerMetaDataGenreKey = @"SRRadioPlayerMetaDataGenreKey";
@@ -123,6 +125,9 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
     if ([self.delegate respondsToSelector:@selector(radioPlayer:didChangeMetaData:)]) {
         [self.delegate radioPlayer:self didChangeMetaData:self.metaData];
     }
+	[[NSNotificationCenter defaultCenter] postNotificationName:SRRadioPlayerMetaDataDidChangeNotification
+														object:self
+													  userInfo:_metaData];
 }
 
 - (void)updateMetaData {
@@ -155,6 +160,9 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 	if ([self.delegate respondsToSelector:@selector(radioPlayer:didChangeMetaData:)]) {
 		[self.delegate radioPlayer:self didChangeMetaData:self.metaData];
 	}
+	[[NSNotificationCenter defaultCenter] postNotificationName:SRRadioPlayerMetaDataDidChangeNotification
+														object:self
+													  userInfo:_metaData];
 }
 
 - (NSString *)decodedMetadataString:(NSString *)input {
@@ -387,6 +395,8 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 		if (_state == SRRadioPlayerStatePlaying) {
 			[self.media parseWithOptions:VLCMediaParseNetwork];
 		}
+		[[NSNotificationCenter defaultCenter] postNotificationName:SRRadioPlayerStateDidChangeNotification
+															object:self];
 		if ([self.delegate respondsToSelector:@selector(radioPlayer:didChangeState:)]) {
 			[self.delegate radioPlayer:self didChangeState:_state];
 		}
