@@ -720,7 +720,9 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	SRRadioPlayer *player = [SRRadioPlayer sharedPlayer];
 	float playRate = player.state == SRRadioPlayerStatePlaying ? 1.0 : 0.0;
 	[nowPlayingInfo setObject:@(playRate) forKey:MPNowPlayingInfoPropertyPlaybackRate];
-	if (@available(iOS 10, *)) {
+	if (@available(iOS 14, *)) {
+		[nowPlayingInfo setObject:@(YES) forKey:MPNowPlayingInfoPropertyIsLiveStream];
+	} else if (@available(iOS 10, *)) {
 		[nowPlayingInfo setObject:@(YES) forKey:MPNowPlayingInfoPropertyIsLiveStream];
 		NSString *nowPlayingIdentifier = [NSString stringWithFormat:@"%ld", (long)selectedStation.stationId];
 		[nowPlayingInfo setObject:nowPlayingIdentifier forKey:MPNowPlayingInfoPropertyExternalContentIdentifier];
@@ -753,7 +755,22 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	}
 	[nowPlayingInfo setObject:@(currentIndex) forKey:MPNowPlayingInfoPropertyPlaybackQueueIndex];
 	[nowPlayingInfo setObject:@([self stations].count) forKey:MPNowPlayingInfoPropertyPlaybackQueueCount];
-	[infoCenter setNowPlayingInfo:nowPlayingInfo];
+	
+	NSString *previousArtist = [infoCenter.nowPlayingInfo objectForKey:MPMediaItemPropertyArtist];
+	if (previousArtist == nil) {
+		previousArtist = @"";
+	}
+	BOOL stationChange = ![selectedStation.name isEqualToString:previousArtist];
+	if (stationChange) {
+		NSMutableDictionary *nowPlayingWithoutTitle = [nowPlayingInfo mutableCopy];
+		[nowPlayingWithoutTitle removeObjectForKey:MPMediaItemPropertyTitle];
+		[infoCenter setNowPlayingInfo:nowPlayingWithoutTitle];
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[infoCenter setNowPlayingInfo:nowPlayingInfo];
+		});
+	} else {
+		[infoCenter setNowPlayingInfo:nowPlayingInfo];
+	}
 	
 	// update title view
 	if ([[SRRadioPlayer sharedPlayer] currentRadioStation]) {
