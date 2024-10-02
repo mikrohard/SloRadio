@@ -12,7 +12,7 @@
 
 @import MessageUI;
 
-static NSString * const SRCopyrightText = @"© 2023 Jernej Fijačko";
+static NSString * const SRCopyrightText = @"© 2024 Jernej Fijačko";
 static NSString * const SRContactEmail = @"sloradio@jernej.org";
 
 @interface SRAboutViewController () <MFMailComposeViewControllerDelegate>
