@@ -83,6 +83,8 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 		
 		[[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:@{}];
 		
+		[[SRRadioPlayer sharedPlayer] setDelegate:self];
+		
 		[self startRemoteControlTracking];
 	}
 	return self;
@@ -97,7 +99,6 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	[self loadRadioStations];
-	[[SRRadioPlayer sharedPlayer] setDelegate:self];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
