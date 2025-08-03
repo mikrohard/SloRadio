@@ -858,6 +858,10 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 		self.sleepTimer && !self.sleepTimer.isRunning) {
 		[self startSleepTimer];
 	}
+	if (state == SRRadioPlayerStateOpening ||
+		state == SRRadioPlayerStateBuffering) {
+		[self startBackgroundTask];
+	}
 	if (state == SRRadioPlayerStateError ||
 		state == SRRadioPlayerStatePlaying ||
 		state == SRRadioPlayerStateStopped) {
