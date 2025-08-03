@@ -231,17 +231,6 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 
 #pragma mark - Audio session
 
-- (void)ensureAudioSessionForPlayback
-{
-    AVAudioSession *session = [AVAudioSession sharedInstance];
-	NSString *audioCategory = [session category];
-	if (![audioCategory isEqualToString:AVAudioSessionCategoryPlayback]) {
-		[self setupAudioSession];
-    } else {
-        [session setActive:YES error:nil];
-    }
-}
-
 - (void)setupAudioSession
 {
 	NSError *error = nil;
@@ -691,7 +680,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
         // ignore this playback request
         return;
     }
-	[self ensureAudioSessionForPlayback];
+	[self setupAudioSession];
 	[self startBackgroundTask];
 	if (sleepTimer) {
 		[self setupSleepTimer];
