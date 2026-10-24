@@ -11,7 +11,7 @@
 
 @import MessageUI;
 
-static NSString * const SRCopyrightText = @"© 2024 Jernej Fijačko";
+static NSString * const SRCopyrightText = @"© 2026 Jernej Fijačko";
 static NSString * const SRContactEmail = @"sloradio@jernej.org";
 static NSString * const SRAboutCellIdentifier = @"AboutCell";
 
