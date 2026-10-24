@@ -89,3 +89,7 @@
 "AddFavorites" = "Add Favorites";
 "ChooseFavorites" = "Choose Favorites";
 "AudioOutput" = "Audio Output";
+
+"Volume" = "Volume";
+"Mute" = "Mute";
+"MaximumVolume" = "Maximum volume";

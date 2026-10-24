@@ -36,6 +36,8 @@ typedef void (^SRDataManagerCompletionHandler)(NSError *error);
 @property (nonatomic, assign) BOOL sleepTimerEnabledByDefault;
 @property (nonatomic, assign) NSTimeInterval playerCacheSize;
 @property (nonatomic, assign) BOOL playerCachingEnabled;
+// app volume (0 - 1), used on the Mac where apps have their own volume
+@property (nonatomic, assign) float playerVolume;
 
 + (SRDataManager *)sharedManager;
 

@@ -89,3 +89,7 @@
 "AddFavorites" = "Dodaj priljubljene";
 "ChooseFavorites" = "Izberi priljubljene";
 "AudioOutput" = "Izhod zvoka";
+
+"Volume" = "Glasnost";
+"Mute" = "Utišaj";
+"MaximumVolume" = "Največja glasnost";

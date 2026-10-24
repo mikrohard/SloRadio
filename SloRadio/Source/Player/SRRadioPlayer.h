@@ -41,7 +41,10 @@ extern NSString * const SRRadioPlayerMetaDataNowPlayingKey;
 - (void)playStreamAtUrl:(NSURL *)url;
 - (void)stop;
 
+// volume level (0 - 100) used by the sleep timer to fade out, combined with the app volume
 - (void)setVolume:(int)volume;
+// applies a changed app volume (-[SRDataManager playerVolume])
+- (void)updateVolume;
 
 @end
 

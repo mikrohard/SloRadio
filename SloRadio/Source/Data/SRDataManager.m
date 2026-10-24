@@ -38,6 +38,7 @@ static NSString * const SRDataManagerSleepTimerIntervalKey = @"SRSleepTimerInter
 static NSString * const SRDataManagerSleepTimerEnabledKey = @"SRSleepTimerEnabled";
 static NSString * const SRDataManagerPlayerCachingEnabledKey = @"SRPlayerCacheEnabled";
 static NSString * const SRDataManagerPlayerCacheSizeKey = @"SRPlayerCacheSize";
+static NSString * const SRDataManagerPlayerVolumeKey = @"SRPlayerVolume";
 static NSString * const SRDataManagerFavoriteStationIdsKey = @"SRFavoriteStationIds";
 static NSString * const SRDataManagerSelectedStationListKey = @"SRSelectedStationList";
 
@@ -606,6 +607,19 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 		return [[defaults objectForKey:SRDataManagerPlayerCacheSizeKey] floatValue];
 	}
 	return SRDataManagerPlayerCacheSizeDefault;
+}
+
+- (void)setPlayerVolume:(float)playerVolume {
+	// not synchronized, as it changes continuously while the volume slider is moved
+	[[NSUserDefaults standardUserDefaults] setFloat:MIN(MAX(playerVolume, 0.f), 1.f) forKey:SRDataManagerPlayerVolumeKey];
+}
+
+- (float)playerVolume {
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	if ([defaults objectForKey:SRDataManagerPlayerVolumeKey]) {
+		return [defaults floatForKey:SRDataManagerPlayerVolumeKey];
+	}
+	return 1.f;
 }
 
 #pragma mark - Data migration from old version

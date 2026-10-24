@@ -43,6 +43,7 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 @property (nonatomic, strong) NSMapTable<UIButton *, UIActivityIndicatorView *> *loadingIndicators;
 @property (nonatomic, strong) UIView *routeContainer;
 @property (nonatomic, strong) UIView *transportRow;
+@property (nonatomic, strong) UISlider *volumeSlider;
 @property (nonatomic, copy) NSString *artworkKey;
 @property (nonatomic, assign) BOOL refreshScheduled;
 
@@ -316,6 +317,11 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 
 	UIStackView *platterStack = [[UIStackView alloc] initWithArrangedSubviews:@[self.transportRow]];
 	platterStack.axis = UILayoutConstraintAxisVertical;
+	platterStack.spacing = 4.f;
+	if ([NSProcessInfo processInfo].isiOSAppOnMac) {
+		// desktop apps have their own volume, independent of the system volume
+		[platterStack addArrangedSubview:[self createVolumeRow]];
+	}
 	platterStack.layoutMarginsRelativeArrangement = YES;
 	platterStack.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(12.f, 16.f, 12.f, 16.f);
 	platterStack.translatesAutoresizingMaskIntoConstraints = NO;
@@ -370,6 +376,33 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 		[platterStack.leadingAnchor constraintEqualToAnchor:platter.contentView.leadingAnchor],
 		[platterStack.trailingAnchor constraintEqualToAnchor:platter.contentView.trailingAnchor],
 	]];
+}
+
+- (UIView *)createVolumeRow {
+	// [min] ---slider--- [max]
+	UIButton *minimumButton = [self secondaryButtonWithSymbol:@"speaker.fill" pointSize:13.f action:@selector(minimumVolumeButtonPressed:)];
+	minimumButton.accessibilityLabel = NSLocalizedString(@"Mute", @"Mute");
+	UIButton *maximumButton = [self secondaryButtonWithSymbol:@"speaker.wave.3.fill" pointSize:13.f action:@selector(maximumVolumeButtonPressed:)];
+	maximumButton.accessibilityLabel = NSLocalizedString(@"MaximumVolume", @"Maximum volume");
+	for (UIButton *button in @[minimumButton, maximumButton]) {
+		[button.widthAnchor constraintEqualToConstant:32.f].active = YES;
+		[button.heightAnchor constraintEqualToConstant:32.f].active = YES;
+	}
+
+	UISlider *volumeSlider = [[UISlider alloc] init];
+	volumeSlider.minimumValue = 0.f;
+	volumeSlider.maximumValue = 1.f;
+	volumeSlider.value = [SRDataManager sharedManager].playerVolume;
+	volumeSlider.minimumTrackTintColor = [UIColor secondaryLabelColor];
+	volumeSlider.accessibilityLabel = NSLocalizedString(@"Volume", @"Volume");
+	[volumeSlider addTarget:self action:@selector(volumeSliderChanged:) forControlEvents:UIControlEventValueChanged];
+	self.volumeSlider = volumeSlider;
+
+	UIStackView *row = [[UIStackView alloc] initWithArrangedSubviews:@[minimumButton, volumeSlider, maximumButton]];
+	row.axis = UILayoutConstraintAxisHorizontal;
+	row.alignment = UIStackViewAlignmentCenter;
+	row.spacing = 8.f;
+	return row;
 }
 
 - (UIButton *)transportButtonWithSymbol:(NSString *)name pointSize:(CGFloat)pointSize action:(SEL)action {
@@ -667,6 +700,26 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 
 - (void)nextButtonPressed:(id)sender {
 	[[SRPlaybackManager sharedManager] playNextStation];
+}
+
+- (void)volumeSliderChanged:(UISlider *)sender {
+	[self setPlayerVolume:sender.value];
+}
+
+- (void)minimumVolumeButtonPressed:(id)sender {
+	[self setPlayerVolume:0.f];
+}
+
+- (void)maximumVolumeButtonPressed:(id)sender {
+	[self setPlayerVolume:1.f];
+}
+
+- (void)setPlayerVolume:(float)volume {
+	[SRDataManager sharedManager].playerVolume = volume;
+	[[SRRadioPlayer sharedPlayer] updateVolume];
+	if (self.volumeSlider.value != volume) {
+		[self.volumeSlider setValue:volume animated:YES];
+	}
 }
 
 #pragma mark - Route picker highlight

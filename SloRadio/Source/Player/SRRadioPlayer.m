@@ -34,6 +34,7 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 @property (nonatomic, strong) VLCMedia *media;
 @property (nonatomic, strong) NSTimer *timeoutObserver;
 @property (nonatomic, strong) NSMutableDictionary *timeoutStats;
+@property (nonatomic, assign) int fadeVolume;
 
 @end
 
@@ -54,6 +55,14 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 		sharedRadioPlayer = [[self alloc] init];
 	});
 	return sharedRadioPlayer;
+}
+
+- (instancetype)init {
+	self = [super init];
+	if (self) {
+		_fadeVolume = 100;
+	}
+	return self;
 }
 
 #pragma mark - Playback control
@@ -104,7 +113,14 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 }
 
 - (void)setVolume:(int)volume {
-	self.player.audio.volume = volume;
+	self.fadeVolume = volume;
+	[self updateVolume];
+}
+
+- (void)updateVolume {
+	if (self.player) {
+		self.player.audio.volume = (int)roundf(self.fadeVolume * [SRDataManager sharedManager].playerVolume);
+	}
 }
 
 #pragma mark - Playback options
@@ -335,6 +351,10 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 
 - (void)mediaPlayerStateChanged:(NSNotification *)aNotification {
 	[self registerMedia:self.player.media];
+	if (self.player.state == VLCMediaPlayerStateESAdded || self.player.state == VLCMediaPlayerStatePlaying) {
+		// the volume only sticks once the audio output exists, each new player starts at full volume
+		[self updateVolume];
+	}
 	[self updatePlayerState];
 }
 
@@ -393,6 +413,7 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 	if (state != _state) {
 		_state = state;
 		if (_state == SRRadioPlayerStatePlaying) {
+			[self updateVolume];
 			[self.media parseWithOptions:VLCMediaParseNetwork];
 		}
 		[[NSNotificationCenter defaultCenter] postNotificationName:SRRadioPlayerStateDidChangeNotification
