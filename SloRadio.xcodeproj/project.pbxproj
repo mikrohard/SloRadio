@@ -59,6 +59,8 @@
 		E028CD5F7ED7753B1D8CBA3B /* SRPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14708530F988E8FCB4420D57 /* SRPlayerViewController.m */; };
 		EBA78B09CF47C478BC03DA4F /* SRStationTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 2836258E924576AB39903DE7 /* SRStationTableViewCell.m */; };
 		894A403B651E870CDDCB91F5 /* SRFavoritesPickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0AEB08A1AB52DBC0134F9B /* SRFavoritesPickerViewController.m */; };
+		1C7077B7F79B6E8EB5868804 /* SRMetadataFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E1B5831DA6224BF92D5024D /* SRMetadataFormatter.m */; };
+		C997CA026BA78FF10671013B /* SRTrackLookup.m in Sources */ = {isa = PBXBuildFile; fileRef = 064644AA8F19519E6EF2547E /* SRTrackLookup.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -172,6 +174,10 @@
 		2836258E924576AB39903DE7 /* SRStationTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRStationTableViewCell.m; path = Source/Cells/SRStationTableViewCell.m; sourceTree = "<group>"; };
 		1470C7345FAE16A1C7F5D232 /* SRFavoritesPickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRFavoritesPickerViewController.h; path = Source/Controllers/SRFavoritesPickerViewController.h; sourceTree = "<group>"; };
 		DA0AEB08A1AB52DBC0134F9B /* SRFavoritesPickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRFavoritesPickerViewController.m; path = Source/Controllers/SRFavoritesPickerViewController.m; sourceTree = "<group>"; };
+		16D4AEDFF57D7D1E0215CC12 /* SRMetadataFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRMetadataFormatter.h; path = Source/Player/SRMetadataFormatter.h; sourceTree = "<group>"; };
+		3E1B5831DA6224BF92D5024D /* SRMetadataFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRMetadataFormatter.m; path = Source/Player/SRMetadataFormatter.m; sourceTree = "<group>"; };
+		CFC8D280AB6F7C805A4859F2 /* SRTrackLookup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRTrackLookup.h; path = Source/Player/SRTrackLookup.h; sourceTree = "<group>"; };
+		064644AA8F19519E6EF2547E /* SRTrackLookup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRTrackLookup.m; path = Source/Player/SRTrackLookup.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -438,6 +444,10 @@
 				C8C8FA5C1AEEAF5A00E5E46C /* SRRadioPlayer.h */,
 				C8C8FA5D1AEEAF5A00E5E46C /* SRRadioPlayer.m */,
 				C83745A41AF6426D002EBB84 /* SRSleepTimer.h */,
+				064644AA8F19519E6EF2547E /* SRTrackLookup.m */,
+				CFC8D280AB6F7C805A4859F2 /* SRTrackLookup.h */,
+				3E1B5831DA6224BF92D5024D /* SRMetadataFormatter.m */,
+				16D4AEDFF57D7D1E0215CC12 /* SRMetadataFormatter.h */,
 				143585357E3002A528AE872C /* SRPlaybackManager.m */,
 				AC9D4610CB1FBE05C4D9CBB7 /* SRPlaybackManager.h */,
 				C83745A51AF6426D002EBB84 /* SRSleepTimer.m */,
@@ -632,6 +642,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C997CA026BA78FF10671013B /* SRTrackLookup.m in Sources */,
+				1C7077B7F79B6E8EB5868804 /* SRMetadataFormatter.m in Sources */,
 				894A403B651E870CDDCB91F5 /* SRFavoritesPickerViewController.m in Sources */,
 				EBA78B09CF47C478BC03DA4F /* SRStationTableViewCell.m in Sources */,
 				E028CD5F7ED7753B1D8CBA3B /* SRPlayerViewController.m in Sources */,

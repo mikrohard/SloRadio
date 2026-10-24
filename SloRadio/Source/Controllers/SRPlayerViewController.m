@@ -482,7 +482,8 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 							 SRDataManagerDidChangeStations,
 							 SRDataManagerDidChangeFavorites,
 							 SRDataManagerDidChangeStationList,
-							 SRPlaybackManagerDidChangeSleepTimer]) {
+							 SRPlaybackManagerDidChangeSleepTimer,
+							 SRPlaybackManagerDidUpdateNowPlayingText]) {
 		[nc addObserver:self selector:@selector(playbackChanged:) name:name object:nil];
 	}
 }
@@ -589,6 +590,18 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 }
 
 - (void)updateArtworkForStation:(SRRadioStation *)station {
+	// album art of the current song, when the catalog lookup found one
+	UIImage *songArtwork = [SRPlaybackManager sharedManager].songArtworkImage;
+	if (songArtwork) {
+		NSString *songArtworkKey = [NSString stringWithFormat:@"song|%p", songArtwork];
+		if (![songArtworkKey isEqualToString:self.artworkKey]) {
+			self.artworkKey = songArtworkKey;
+			[self setArtworkImage:songArtwork animated:YES];
+		}
+		return;
+	}
+	BOOL showedSongArtwork = [self.artworkKey hasPrefix:@"song|"];
+	
 	CGFloat width = self.style == SRPlayerStyleCompact ? SRCompactArtworkWidth : SRExpandedArtworkWidth;
 	// the icon url changes when the station artwork is updated on the server
 	NSString *artworkKey = [NSString stringWithFormat:@"%ld|%@", (long)station.stationId, [station iconUrlForWidth:width].absoluteString];
@@ -598,7 +611,8 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 	self.artworkKey = artworkKey;
 	UIImage *placeholder = [UIImage imageNamed:@"PlaceholderArtwork"];
 	UIImage *cachedImage = [station cachedArtworkImageForWidth:width];
-	[self setArtworkImage:cachedImage ?: placeholder animated:NO];
+	// cross-fade when going back from song artwork to the station artwork
+	[self setArtworkImage:cachedImage ?: placeholder animated:showedSongArtwork];
 	if (station && !cachedImage) {
 		__weak SRPlayerViewController *weakSelf = self;
 		[station loadArtworkImageForWidth:width completion:^(UIImage *image) {

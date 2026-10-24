@@ -6,10 +6,11 @@
 //  Copyright © 2026 Jernej Fijačko. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 extern NSString * const SRPlaybackManagerDidChangeSleepTimer;
 extern NSString * const SRPlaybackManagerDidFailPlayback;
+extern NSString * const SRPlaybackManagerDidUpdateNowPlayingText;
 
 @class SRRadioStation;
 
@@ -18,6 +19,8 @@ extern NSString * const SRPlaybackManagerDidFailPlayback;
 @property (nonatomic, readonly) BOOL sleepTimerActive;
 @property (nonatomic, readonly) NSTimeInterval sleepTimerTimeRemaining;
 @property (nonatomic, readonly) NSString *nowPlayingText;
+// album art of the currently playing song (nil when unknown, the station artwork should be used instead)
+@property (nonatomic, readonly) UIImage *songArtworkImage;
 
 + (SRPlaybackManager *)sharedManager;
 

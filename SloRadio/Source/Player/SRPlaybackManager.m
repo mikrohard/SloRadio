@@ -11,6 +11,9 @@
 #import "SRRadioPlayer.h"
 #import "SRRadioStation.h"
 #import "SRSleepTimer.h"
+#import "SRMetadataFormatter.h"
+#import "SRTrackLookup.h"
+#import "SRImageCache.h"
 #import "Reachability.h"
 #import "Firebase.h"
 
@@ -20,6 +23,7 @@
 
 NSString * const SRPlaybackManagerDidChangeSleepTimer = @"SRPlaybackManagerDidChangeSleepTimer";
 NSString * const SRPlaybackManagerDidFailPlayback = @"SRPlaybackManagerDidFailPlayback";
+NSString * const SRPlaybackManagerDidUpdateNowPlayingText = @"SRPlaybackManagerDidUpdateNowPlayingText";
 
 static CGFloat const SRNowPlayingArtworkWidth = 1024;
 
@@ -40,6 +44,12 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 // last station published to the now playing info center
 // (reading MPNowPlayingInfoCenter.nowPlayingInfo back blocks the main thread on MediaPlayer's queue)
 @property (nonatomic, copy) NSString *nowPlayingStationName;
+
+// metadata spelling corrected by the catalog lookup (for the raw metadata text it was looked up for)
+@property (nonatomic, copy) NSString *lookupRawText;
+@property (nonatomic, copy) NSString *lookupResultText;
+// album art of the song found by the lookup (only valid while lookupRawText is the current metadata)
+@property (nonatomic, strong) UIImage *lookupArtworkImage;
 
 @end
 
@@ -291,20 +301,124 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 
 #pragma mark - Now playing info
 
-- (NSString *)nowPlayingText {
+// Raw "now playing" metadata of the current station and its "artist - title" parts (when it has them).
+- (NSString *)currentMetadataTextFirstPart:(NSString **)firstPart secondPart:(NSString **)secondPart {
 	SRRadioPlayer *player = [SRRadioPlayer sharedPlayer];
 	SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
 	if (player.currentRadioStation == nil || player.currentRadioStation.stationId != selectedStation.stationId) {
 		return nil;
 	}
-	NSString *nowPlaying = [player.metaData objectForKey:SRRadioPlayerMetaDataNowPlayingKey];
-	NSString *title = [player.metaData objectForKey:SRRadioPlayerMetaDataTitleKey];
-	NSString *artist = [player.metaData objectForKey:SRRadioPlayerMetaDataArtistKey];
-	if (!nowPlaying.length && title.length && artist.length) {
-		nowPlaying = [NSString stringWithFormat:@"%@ - %@", [artist capitalizedString], [title capitalizedString]];
+	NSCharacterSet *whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+	NSString *nowPlaying = [[player.metaData objectForKey:SRRadioPlayerMetaDataNowPlayingKey] stringByTrimmingCharactersInSet:whitespace];
+	NSString *title = [[player.metaData objectForKey:SRRadioPlayerMetaDataTitleKey] stringByTrimmingCharactersInSet:whitespace];
+	NSString *artist = [[player.metaData objectForKey:SRRadioPlayerMetaDataArtistKey] stringByTrimmingCharactersInSet:whitespace];
+	
+	// stations mostly send a single "now playing" text
+	if (nowPlaying.length) {
+		NSRange separator = [nowPlaying rangeOfString:@" - "];
+		if (separator.location != NSNotFound) {
+			*firstPart = [[nowPlaying substringToIndex:separator.location] stringByTrimmingCharactersInSet:whitespace];
+			*secondPart = [[nowPlaying substringFromIndex:NSMaxRange(separator)] stringByTrimmingCharactersInSet:whitespace];
+		}
+	} else if (title.length && artist.length) {
+		*firstPart = artist;
+		*secondPart = title;
+		nowPlaying = [NSString stringWithFormat:@"%@ - %@", artist, title];
 	}
-	nowPlaying = [nowPlaying stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	return nowPlaying.length ? [nowPlaying capitalizedString] : nil;
+	return nowPlaying.length ? nowPlaying : nil;
+}
+
+- (NSString *)nowPlayingText {
+	NSString *firstPart = nil;
+	NSString *secondPart = nil;
+	NSString *nowPlaying = [self currentMetadataTextFirstPart:&firstPart secondPart:&secondPart];
+	if (!nowPlaying) {
+		return nil;
+	}
+	if ([nowPlaying isEqualToString:self.lookupRawText] && self.lookupResultText) {
+		return self.lookupResultText;
+	}
+	NSString *formattedText = nil;
+	if (firstPart.length && secondPart.length) {
+		formattedText = [NSString stringWithFormat:@"%@ - %@", [SRMetadataFormatter formattedText:firstPart], [SRMetadataFormatter formattedText:secondPart]];
+		[self lookupNowPlayingText:nowPlaying firstPart:firstPart secondPart:secondPart];
+	} else {
+		formattedText = [SRMetadataFormatter formattedText:nowPlaying];
+	}
+	return formattedText;
+}
+
+- (UIImage *)songArtworkImage {
+	// only valid for the song it was found for, otherwise the station artwork is shown
+	NSString *firstPart = nil;
+	NSString *secondPart = nil;
+	NSString *nowPlaying = [self currentMetadataTextFirstPart:&firstPart secondPart:&secondPart];
+	if (nowPlaying && [nowPlaying isEqualToString:self.lookupRawText]) {
+		return self.lookupArtworkImage;
+	}
+	return nil;
+}
+
+- (void)lookupNowPlayingText:(NSString *)nowPlaying firstPart:(NSString *)firstPart secondPart:(NSString *)secondPart {
+	if ([nowPlaying isEqualToString:self.lookupRawText]) {
+		// already looked up (or in progress)
+		return;
+	}
+	self.lookupRawText = nowPlaying;
+	self.lookupResultText = nil;
+	self.lookupArtworkImage = nil;
+	__weak SRPlaybackManager *weakSelf = self;
+	[[SRTrackLookup sharedLookup] lookupFirstPart:firstPart secondPart:secondPart completion:^(NSString *correctedFirst, NSString *correctedSecond, NSURL *artworkURL) {
+		SRPlaybackManager *strongSelf = weakSelf;
+		if (!strongSelf || ![strongSelf.lookupRawText isEqualToString:nowPlaying]) {
+			// metadata changed in the meantime
+			return;
+		}
+		if (correctedFirst || correctedSecond) {
+			strongSelf.lookupResultText = [NSString stringWithFormat:@"%@ - %@",
+										   correctedFirst ?: [SRMetadataFormatter formattedText:firstPart],
+										   correctedSecond ?: [SRMetadataFormatter formattedText:secondPart]];
+			[strongSelf nowPlayingTextDidUpdate];
+		}
+		if (artworkURL) {
+			[strongSelf loadSongArtworkFromURL:artworkURL forNowPlayingText:nowPlaying];
+		}
+	}];
+}
+
+- (void)loadSongArtworkFromURL:(NSURL *)artworkURL forNowPlayingText:(NSString *)nowPlaying {
+	NSString *cacheKey = [SRImageCache keyForUrl:artworkURL];
+	__weak SRPlaybackManager *weakSelf = self;
+	void (^applyImage)(UIImage *) = ^(UIImage *image) {
+		SRPlaybackManager *strongSelf = weakSelf;
+		if (image && [strongSelf.lookupRawText isEqualToString:nowPlaying]) {
+			strongSelf.lookupArtworkImage = image;
+			[strongSelf nowPlayingTextDidUpdate];
+		}
+	};
+	dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
+		UIImage *image = [[SRImageCache sharedCache] imageForKey:cacheKey];
+		if (image) {
+			dispatch_async(dispatch_get_main_queue(), ^{
+				applyImage(image);
+			});
+			return;
+		}
+		[[[NSURLSession sharedSession] dataTaskWithURL:artworkURL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+			UIImage *downloadedImage = data ? [UIImage imageWithData:data] : nil;
+			if (downloadedImage) {
+				[[SRImageCache sharedCache] cacheImage:downloadedImage forKey:cacheKey];
+			}
+			dispatch_async(dispatch_get_main_queue(), ^{
+				applyImage(downloadedImage);
+			});
+		}] resume];
+	});
+}
+
+- (void)nowPlayingTextDidUpdate {
+	[self updateNowPlayingInfo];
+	[[NSNotificationCenter defaultCenter] postNotificationName:SRPlaybackManagerDidUpdateNowPlayingText object:self];
 }
 
 - (void)updateNowPlayingInfo {
@@ -321,6 +435,13 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 	// never load artwork inside the artwork request handler: MediaPlayer calls it on a queue the main thread
 	// may synchronously wait on. Use the cached image (or the placeholder) and refresh once it's downloaded.
 	MPMediaItemArtwork *artwork = [selectedStation preloadedArtworkForWidth:SRNowPlayingArtworkWidth];
+	UIImage *songArtwork = [self songArtworkImage];
+	if (songArtwork) {
+		// album art of the current song (falls back to the station artwork for the next song)
+		artwork = [[MPMediaItemArtwork alloc] initWithBoundsSize:songArtwork.size requestHandler:^UIImage *(CGSize size) {
+			return songArtwork;
+		}];
+	}
 	if (artwork != nil) {
 		[nowPlayingInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
 	}
