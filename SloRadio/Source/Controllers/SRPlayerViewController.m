@@ -106,6 +106,11 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 	artworkView.layer.cornerCurve = kCACornerCurveContinuous;
 	artworkView.image = [UIImage imageNamed:@"PlaceholderArtwork"];
 	artworkView.translatesAutoresizingMaskIntoConstraints = NO;
+	// the artwork size is defined by the layout, never by the image (small images are scaled up)
+	for (NSNumber *axis in @[@(UILayoutConstraintAxisHorizontal), @(UILayoutConstraintAxisVertical)]) {
+		[artworkView setContentHuggingPriority:1 forAxis:axis.integerValue];
+		[artworkView setContentCompressionResistancePriority:1 forAxis:axis.integerValue];
+	}
 	self.artworkView = artworkView;
 
 	CBAutoScrollLabel *titleLabel = [[CBAutoScrollLabel alloc] init];
@@ -129,8 +134,8 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 	subtitleLabel.text = @" ";
 	self.subtitleLabel = subtitleLabel;
 
-	CGFloat playSize = compact ? 30.f : 38.f;
-	CGFloat skipSize = compact ? 22.f : 28.f;
+	CGFloat playSize = compact ? 30.f : 32.f;
+	CGFloat skipSize = compact ? 22.f : 24.f;
 	self.previousButton = [self transportButtonWithSymbol:@"backward.fill" pointSize:skipSize action:@selector(previousButtonPressed:)];
 	self.previousButton.accessibilityLabel = NSLocalizedString(@"Previous", @"Previous");
 	self.playButton = [self transportButtonWithSymbol:@"play.fill" pointSize:playSize action:@selector(playButtonPressed:)];
@@ -217,7 +222,7 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 	row.alignment = UIStackViewAlignmentCenter;
 	row.spacing = self.style == SRPlayerStyleCompact ? 8.f : 16.f;
 	[leadingSpacer.widthAnchor constraintEqualToAnchor:trailingSpacer.widthAnchor].active = YES;
-	CGFloat size = self.style == SRPlayerStyleCompact ? 52.f : 64.f;
+	CGFloat size = self.style == SRPlayerStyleCompact ? 52.f : 56.f;
 	for (UIButton *button in @[self.previousButton, self.playButton, self.nextButton]) {
 		[button.widthAnchor constraintEqualToConstant:size].active = YES;
 		[button.heightAnchor constraintEqualToConstant:size].active = YES;
@@ -329,7 +334,7 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 	NSLayoutConstraint *preferredWidth = [stack.widthAnchor constraintEqualToConstant:SRExpandedMaximumWidth];
 	preferredWidth.priority = UILayoutPriorityDefaultHigh;
 	NSLayoutConstraint *artworkFillWidth = [artworkContainer.widthAnchor constraintEqualToAnchor:stack.widthAnchor multiplier:0.8f];
-	artworkFillWidth.priority = UILayoutPriorityDefaultLow;
+	artworkFillWidth.priority = UILayoutPriorityDefaultHigh - 10;
 	[artworkContainer setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisVertical];
 
 	[NSLayoutConstraint activateConstraints:@[

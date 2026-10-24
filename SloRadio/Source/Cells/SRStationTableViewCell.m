@@ -25,6 +25,31 @@ static CGFloat const SRStationImageToTextPadding = 12.f;
 	return 16.f + SRStationArtworkSize + SRStationImageToTextPadding;
 }
 
++ (UIImage *)thumbnailForImage:(UIImage *)image {
+	// list content configurations only scale images down, so render every icon at the exact thumbnail size
+	CGSize size = CGSizeMake(SRStationArtworkSize, SRStationArtworkSize);
+	if (!image || CGSizeEqualToSize(image.size, size)) {
+		return image;
+	}
+	static NSMapTable<UIImage *, UIImage *> *thumbnails;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		thumbnails = [NSMapTable weakToStrongObjectsMapTable];
+	});
+	UIImage *thumbnail = [thumbnails objectForKey:image];
+	if (thumbnail) {
+		return thumbnail;
+	}
+	CGFloat scale = MAX(size.width / image.size.width, size.height / image.size.height);
+	CGSize scaledSize = CGSizeMake(image.size.width * scale, image.size.height * scale);
+	UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:size];
+	thumbnail = [renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
+		[image drawInRect:CGRectMake((size.width - scaledSize.width) / 2, (size.height - scaledSize.height) / 2, scaledSize.width, scaledSize.height)];
+	}];
+	[thumbnails setObject:thumbnail forKey:image];
+	return thumbnail;
+}
+
 - (void)prepareForReuse {
 	[super prepareForReuse];
 	self.stationId = NSNotFound;
@@ -36,7 +61,7 @@ static CGFloat const SRStationImageToTextPadding = 12.f;
 	
 	UIListContentConfiguration *content = [UIListContentConfiguration cellConfiguration];
 	content.text = station.name;
-	content.image = [station cachedArtworkImageForWidth:SRStationArtworkWidth] ?: [UIImage imageNamed:@"PlaceholderArtwork"];
+	content.image = [SRStationTableViewCell thumbnailForImage:[station cachedArtworkImageForWidth:SRStationArtworkWidth] ?: [UIImage imageNamed:@"PlaceholderArtwork"]];
 	content.imageProperties.maximumSize = CGSizeMake(SRStationArtworkSize, SRStationArtworkSize);
 	content.imageProperties.reservedLayoutSize = CGSizeMake(SRStationArtworkSize, SRStationArtworkSize);
 	content.imageProperties.cornerRadius = 8.f;
@@ -53,7 +78,7 @@ static CGFloat const SRStationImageToTextPadding = 12.f;
 			// the cell may have been reused for another station in the meantime
 			if (image && strongSelf.stationId == stationId) {
 				UIListContentConfiguration *updatedContent = (UIListContentConfiguration *)strongSelf.contentConfiguration;
-				updatedContent.image = image;
+				updatedContent.image = [SRStationTableViewCell thumbnailForImage:image];
 				strongSelf.contentConfiguration = updatedContent;
 			}
 		}];

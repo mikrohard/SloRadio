@@ -27,6 +27,7 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) UISegmentedControl *listControl;
+@property (nonatomic, strong) NSLayoutConstraint *listControlSidebarHeight;
 @property (nonatomic, strong) UIView *emptyFavoritesView;
 @property (nonatomic, assign) BOOL ignoreFavoritesChange;
 // UITableView reports editing == YES while a swipe action is shown, so track the edit mode separately
@@ -56,6 +57,26 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	[self loadRadioStations];
+}
+
+- (void)viewWillLayoutSubviews {
+	[super viewWillLayoutSubviews];
+	[self updateListControlHeight];
+}
+
+- (void)updateListControlHeight {
+	// The floating sidebar of iPadOS 26 has a shorter navigation bar than the segmented control's default height
+	// (fixed in iPadOS 27), so the control would touch the top edge of the sidebar.
+	BOOL limitHeight = NO;
+	if (@available(iOS 27, *)) {
+		limitHeight = NO;
+	} else if (@available(iOS 26, *)) {
+		UISplitViewController *splitViewController = self.splitViewController;
+		limitHeight = splitViewController != nil && !splitViewController.isCollapsed;
+	}
+	if (self.listControlSidebarHeight.active != limitHeight) {
+		self.listControlSidebarHeight.active = limitHeight;
+	}
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -91,6 +112,7 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 	[listControl addTarget:self action:@selector(listControlChanged:) forControlEvents:UIControlEventValueChanged];
 	[listControl setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
 	[listControl.widthAnchor constraintGreaterThanOrEqualToConstant:200.f].active = YES;
+	self.listControlSidebarHeight = [listControl.heightAnchor constraintEqualToConstant:32.f];
 	self.navigationItem.titleView = listControl;
 	self.listControl = listControl;
 }
