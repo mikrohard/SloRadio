@@ -8,6 +8,7 @@
 
 #import "SRAppDelegate.h"
 #import "SRMainViewController.h"
+#import "SRPlaybackManager.h"
 #import "Firebase.h"
 #import <CarPlay/CarPlay.h>
 
@@ -18,15 +19,9 @@
 @implementation SRAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-	if (@available(iOS 13, *)) {
-		self.mainController = [[SRMainViewController alloc] init];
-	} else {
-		self.mainController = [[SRMainViewController alloc] init];
-		self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-		self.window.tintColor = [SRAppearance mainColor];
-		self.window.rootViewController = self.mainController;
-		[self.window makeKeyAndVisible];
-	}
+	// sets up the audio session & remote commands (also needed when launched from CarPlay)
+	[SRPlaybackManager sharedManager];
+	self.mainController = [[SRMainViewController alloc] init];
 	[FIRApp configure];
 	[FIRAnalytics setAnalyticsCollectionEnabled:YES];
 	return YES;
@@ -57,17 +52,15 @@
 #pragma mark - Scenes
 
 
-- (UISceneConfiguration *)application:(UIApplication *)application configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession options:(UISceneConnectionOptions *)options API_AVAILABLE(ios(13.0)) {
+- (UISceneConfiguration *)application:(UIApplication *)application configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession options:(UISceneConnectionOptions *)options {
 	if (connectingSceneSession.role == CPTemplateApplicationSceneSessionRoleApplication) {
-		UIView *view = self.mainController.view;
-		[view layoutIfNeeded];
 		return [UISceneConfiguration configurationWithName:@"CarPlay" sessionRole:connectingSceneSession.role];
 	} else {
 		return [UISceneConfiguration configurationWithName:@"AppConfiguration" sessionRole:connectingSceneSession.role];
 	}
 }
 
-- (void)application:(UIApplication *)application didDiscardSceneSessions:(NSSet<UISceneSession *> *)sceneSessions API_AVAILABLE(ios(13.0)) {
+- (void)application:(UIApplication *)application didDiscardSceneSessions:(NSSet<UISceneSession *> *)sceneSessions {
 	
 }
 

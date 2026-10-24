@@ -12,6 +12,9 @@
 NSString * const SRDataManagerDidLoadStations = @"SRDataManagerDidLoadStations";
 NSString * const SRDataManagerDidChangeStations = @"SRDataManagerDidChangeStations";
 NSString * const SRDataManagerDidChangeSleepTimerSettings = @"SRDataManagerDidChangeSleepTimerSettings";
+NSString * const SRDataManagerDidSelectStation = @"SRDataManagerDidSelectStation";
+NSString * const SRDataManagerDidChangeFavorites = @"SRDataManagerDidChangeFavorites";
+NSString * const SRDataManagerDidChangeStationList = @"SRDataManagerDidChangeStationList";
 
 static NSInteger const SRDataManagerCustomStationIdOffset = 1000000;
 static BOOL const SRDataManagerSleepTimerDefaultEnabled = NO; // disabled by default
@@ -35,6 +38,8 @@ static NSString * const SRDataManagerSleepTimerIntervalKey = @"SRSleepTimerInter
 static NSString * const SRDataManagerSleepTimerEnabledKey = @"SRSleepTimerEnabled";
 static NSString * const SRDataManagerPlayerCachingEnabledKey = @"SRPlayerCacheEnabled";
 static NSString * const SRDataManagerPlayerCacheSizeKey = @"SRPlayerCacheSize";
+static NSString * const SRDataManagerFavoriteStationIdsKey = @"SRFavoriteStationIds";
+static NSString * const SRDataManagerSelectedStationListKey = @"SRSelectedStationList";
 
 static NSString * const SRLegacyStationPlaylistUrl = @"https://iphone.jernej.org/sloradio/playlist.php";
 static NSString * const SRLegacyStationsDictionaryKey = @"postaje";
@@ -43,7 +48,11 @@ static NSString * const SRLegacyStationNameKey = @"ime";
 static NSString * const SRLegacySleepTimerMinutesKey = @"SleepTime";
 static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 
-@interface SRDataManager ()
+@interface SRDataManager () {
+	// observers must not be notified while the shared instance is being created,
+	// otherwise they re-enter +sharedManager from within dispatch_once
+	BOOL _loadingInitialData;
+}
 
 @property (nonatomic, strong) NSMutableArray *allStations;
 
@@ -73,8 +82,10 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 #pragma mark - Initial load
 
 - (void)loadInitialData {
+	_loadingInitialData = YES;
 	[self loadInitialSleepTimerSettings];
 	[self loadLocalStations];
+	_loadingInitialData = NO;
 }
 
 #pragma mark - Network
@@ -286,6 +297,7 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 
 - (void)deleteRadioStation:(SRRadioStation *)station {
 	BOOL isCustomStation = [self isCustomRadioStation:station];
+	[self removeFavoriteRadioStation:station];
 	NSMutableArray *array = [NSMutableArray arrayWithArray:self.allStations];
 	SRRadioStation *stationToDelete = nil;
 	for (SRRadioStation *existingStation in array) {
@@ -385,6 +397,9 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	[defaults setObject:@(station.stationId) forKey:SRDataManagerStationsSelectedIdKey];
 	[defaults synchronize];
+	if (!_loadingInitialData) {
+		[[NSNotificationCenter defaultCenter] postNotificationName:SRDataManagerDidSelectStation object:self];
+	}
 }
 
 - (void)selectInitialRadioStation {
@@ -401,6 +416,106 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 		selectedStation = self.stations[0];
 	}
 	[self selectRadioStation:selectedStation];
+}
+
+#pragma mark - Station lists
+
+- (NSArray *)stationsForList:(SRStationList)list {
+	if (list == SRStationListFavorites) {
+		return [self favoriteStations];
+	}
+	return [self stations];
+}
+
+- (SRStationList)selectedStationList {
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	return [defaults integerForKey:SRDataManagerSelectedStationListKey] == SRStationListFavorites ? SRStationListFavorites : SRStationListAll;
+}
+
+- (void)setSelectedStationList:(SRStationList)selectedStationList {
+	if (selectedStationList != self.selectedStationList) {
+		NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+		[defaults setInteger:selectedStationList forKey:SRDataManagerSelectedStationListKey];
+		[defaults synchronize];
+		[[NSNotificationCenter defaultCenter] postNotificationName:SRDataManagerDidChangeStationList object:self];
+	}
+}
+
+#pragma mark - Favorites
+
+- (NSArray *)favoriteStationIds {
+	NSArray *ids = [[NSUserDefaults standardUserDefaults] arrayForKey:SRDataManagerFavoriteStationIdsKey];
+	return ids ?: @[];
+}
+
+- (void)setFavoriteStationIds:(NSArray *)ids {
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	[defaults setObject:ids forKey:SRDataManagerFavoriteStationIdsKey];
+	[defaults synchronize];
+	[[NSNotificationCenter defaultCenter] postNotificationName:SRDataManagerDidChangeFavorites object:self];
+}
+
+- (NSArray *)favoriteStations {
+	NSMutableArray *favorites = [NSMutableArray array];
+	for (NSNumber *stationId in [self favoriteStationIds]) {
+		for (SRRadioStation *station in self.stations) {
+			if (station.stationId == stationId.integerValue) {
+				[favorites addObject:station];
+				break;
+			}
+		}
+	}
+	return [NSArray arrayWithArray:favorites];
+}
+
+- (BOOL)isFavoriteRadioStation:(SRRadioStation *)station {
+	return station != nil && [[self favoriteStationIds] containsObject:@(station.stationId)];
+}
+
+- (void)addFavoriteRadioStation:(SRRadioStation *)station {
+	if (station != nil && ![self isFavoriteRadioStation:station]) {
+		[self setFavoriteStationIds:[[self favoriteStationIds] arrayByAddingObject:@(station.stationId)]];
+	}
+}
+
+- (void)removeFavoriteRadioStation:(SRRadioStation *)station {
+	if ([self isFavoriteRadioStation:station]) {
+		NSMutableArray *ids = [NSMutableArray arrayWithArray:[self favoriteStationIds]];
+		[ids removeObject:@(station.stationId)];
+		[self setFavoriteStationIds:ids];
+	}
+}
+
+- (void)moveFavoriteRadioStation:(SRRadioStation *)station atIndex:(NSInteger)index {
+	// reorder visible favorites and keep ids of currently unavailable stations at the end
+	NSMutableArray *ids = [NSMutableArray array];
+	for (SRRadioStation *favorite in [self favoriteStations]) {
+		[ids addObject:@(favorite.stationId)];
+	}
+	NSNumber *stationId = @(station.stationId);
+	if (![ids containsObject:stationId]) {
+		return;
+	}
+	[ids removeObject:stationId];
+	[ids insertObject:stationId atIndex:MIN(MAX(index, 0), (NSInteger)ids.count)];
+	for (NSNumber *existingId in [self favoriteStationIds]) {
+		if (![ids containsObject:existingId]) {
+			[ids addObject:existingId];
+		}
+	}
+	[self setFavoriteStationIds:ids];
+}
+
+- (void)setFavoriteRadioStations:(NSArray *)stations {
+	NSMutableArray *ids = [NSMutableArray arrayWithCapacity:stations.count];
+	for (SRRadioStation *station in stations) {
+		if (![ids containsObject:@(station.stationId)]) {
+			[ids addObject:@(station.stationId)];
+		}
+	}
+	if (![ids isEqualToArray:[self favoriteStationIds]]) {
+		[self setFavoriteStationIds:ids];
+	}
 }
 
 #pragma mark - Sleep timer
@@ -448,7 +563,9 @@ static NSString * const SRLegacySleepTimerEnabledKey = @"sleepSwitch";
 		_sleepTimerEnabledByDefault = sleepTimerEnabledByDefault;
 		[defaults setBool:_sleepTimerEnabledByDefault forKey:SRDataManagerSleepTimerEnabledKey];
 		[defaults synchronize];
-		[[NSNotificationCenter defaultCenter] postNotificationName:SRDataManagerDidChangeSleepTimerSettings object:nil];
+		if (!_loadingInitialData) {
+			[[NSNotificationCenter defaultCenter] postNotificationName:SRDataManagerDidChangeSleepTimerSettings object:nil];
+		}
 	}
 }
 

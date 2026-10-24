@@ -27,7 +27,6 @@
 "Done" = "Končaj";
 "Retry" = "Ponovi";
 "Ok" = "V redu";
-"Report" = "Poročaj";
 "Reset" = "Ponastavi";
 "Cancel" = "Prekliči";
 "Close" = "Zapri";
@@ -59,3 +58,34 @@
 "PlaybackErrorInternet" = "Pri predvajanju postaje „%@“ je prišlo do napake. Preverite vašo internetno povezavo.";
 "PlaybackErrorStation" = "Pri predvajanju postaje „%@“ je prišlo do napake. Prosimo, poskusite kasneje.";
 "StationsResetFailed" = "Seznama radijskih postaj ni bilo možno ponastaviti. Prosimo, poskusite kasneje.";
+
+// Favorites & station lists
+"AllStations" = "Vse";
+"Favorites" = "Priljubljene";
+"Favorite" = "Priljubljena";
+"Unfavorite" = "Odstrani";
+"AddToFavorites" = "Dodaj med priljubljene";
+"RemoveFromFavorites" = "Odstrani iz priljubljenih";
+"NoFavorites" = "Ni priljubljenih postaj";
+"NoFavoritesMessage" = "Izberite postaje, ki jih najpogosteje poslušate, da jih boste hitro našli.";
+"NoFavoritesCarPlayMessage" = "Na zaslonu predvajanja tapnite zvezdico, da trenutno postajo dodate med priljubljene.";
+"EditList" = "Uredi seznam";
+"EditFavorites" = "Uredi priljubljene";
+"Remove" = "Odstrani";
+"More" = "Več";
+
+// Playback controls
+"Play" = "Predvajaj";
+"Pause" = "Premor";
+"Previous" = "Prejšnja";
+"Next" = "Naslednja";
+"PlayWithSleepTimer" = "Predvajaj v načinu za spanje";
+"CancelSleepTimer" = "Prekliči način za spanje";
+
+// Settings
+"Duration" = "Trajanje";
+"SleepTimerFooter" = "Ko je vklopljeno, se način za spanje samodejno vklopi ob vsakem začetku predvajanja. Za predvajanje z obratno nastavitvijo podrsajte desno po postaji.";
+
+"AddFavorites" = "Dodaj priljubljene";
+"ChooseFavorites" = "Izberi priljubljene";
+"AudioOutput" = "Izhod zvoka";

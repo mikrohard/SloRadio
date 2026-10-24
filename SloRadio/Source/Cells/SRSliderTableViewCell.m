@@ -11,6 +11,8 @@
 @interface SRSliderTableViewCell ()
 
 @property (nonatomic, strong) UISlider *slider;
+@property (nonatomic, strong) UILabel *titleLabel;
+@property (nonatomic, strong) UILabel *valueLabel;
 
 @end
 
@@ -24,52 +26,44 @@
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
 	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
 	if (self) {
+		self.selectionStyle = UITableViewCellSelectionStyleNone;
+		
+		UILabel *titleLabel = [[UILabel alloc] init];
+		titleLabel.text = NSLocalizedString(@"CacheSize", nil);
+		titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+		titleLabel.adjustsFontForContentSizeCategory = YES;
+		self.titleLabel = titleLabel;
+		
+		UILabel *valueLabel = [[UILabel alloc] init];
+		valueLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+		valueLabel.adjustsFontForContentSizeCategory = YES;
+		valueLabel.textColor = [UIColor secondaryLabelColor];
+		valueLabel.textAlignment = NSTextAlignmentRight;
+		[valueLabel setContentHuggingPriority:UILayoutPriorityRequired forAxis:UILayoutConstraintAxisHorizontal];
+		self.valueLabel = valueLabel;
+		
 		UISlider *slider = [[UISlider alloc] init];
-		slider.backgroundColor = [UIColor clearColor];
+		slider.minimumTrackTintColor = [SRAppearance mainColor];
 		[slider addTarget:self action:@selector(sliderValueChanged:) forControlEvents:UIControlEventValueChanged];
-		[self.contentView addSubview:slider];
-		_slider = slider;
+		self.slider = slider;
 		
-		self.textLabel.text = NSLocalizedString(@"CacheSize", nil);
-		self.textLabel.font = [SRAppearance applicationFontWithSize:17.f];
-		self.textLabel.textAlignment = NSTextAlignmentLeft;
-		self.textLabel.textColor = [SRAppearance textColor];
-		
-		self.detailTextLabel.font = [SRAppearance applicationFontWithSize:17.f];
-		self.detailTextLabel.textAlignment = NSTextAlignmentRight;
-		self.detailTextLabel.textColor = [[SRAppearance textColor] colorWithAlphaComponent:0.4f];
+		UIStackView *labels = [[UIStackView alloc] initWithArrangedSubviews:@[titleLabel, valueLabel]];
+		labels.axis = UILayoutConstraintAxisHorizontal;
+		labels.spacing = 8.f;
+		UIStackView *stack = [[UIStackView alloc] initWithArrangedSubviews:@[labels, slider]];
+		stack.axis = UILayoutConstraintAxisVertical;
+		stack.spacing = 8.f;
+		stack.translatesAutoresizingMaskIntoConstraints = NO;
+		[self.contentView addSubview:stack];
+		UILayoutGuide *margins = self.contentView.layoutMarginsGuide;
+		[NSLayoutConstraint activateConstraints:@[
+			[stack.topAnchor constraintEqualToAnchor:margins.topAnchor],
+			[stack.bottomAnchor constraintEqualToAnchor:margins.bottomAnchor],
+			[stack.leadingAnchor constraintEqualToAnchor:margins.leadingAnchor],
+			[stack.trailingAnchor constraintEqualToAnchor:margins.trailingAnchor],
+		]];
 	}
 	return self;
-}
-
-- (void)layoutSubviews {
-	[super layoutSubviews];
-	CGRect bounds = self.bounds;
-	[self.textLabel sizeToFit];
-	[self.detailTextLabel sizeToFit];
-	CGFloat horizongalPadding = self.separatorInset.left;
-	CGFloat margin = 10.f;
-	CGFloat sliderHeight = 54.f;
-	CGFloat labelHeight = CGRectGetHeight(bounds) - sliderHeight + margin;
-	
-	CGRect detailLabelFrame = self.detailTextLabel.frame;
-	detailLabelFrame.origin.x = CGRectGetWidth(bounds) - CGRectGetWidth(detailLabelFrame) - horizongalPadding;
-	detailLabelFrame.origin.y = 0.f;
-	detailLabelFrame.size.height = labelHeight;
-	self.detailTextLabel.frame = detailLabelFrame;
-	
-	CGFloat availableWidth = CGRectGetWidth(bounds) - CGRectGetWidth(detailLabelFrame) - margin - 2*horizongalPadding;
-	CGRect textLabelFrame = self.textLabel.frame;
-	textLabelFrame.origin.x = horizongalPadding;
-	textLabelFrame.origin.y = 0.f;
-	textLabelFrame.size.height = labelHeight;
-	textLabelFrame.size.width = MIN(CGRectGetWidth(self.textLabel.frame), availableWidth);
-	self.textLabel.frame = textLabelFrame;
-	
-	self.slider.frame = CGRectMake(horizongalPadding,
-								   CGRectGetHeight(bounds) - sliderHeight,
-								   CGRectGetWidth(bounds) - 2*horizongalPadding,
-								   sliderHeight);
 }
 
 #pragma mark - Slider setters/accessors
@@ -107,18 +101,10 @@
 #pragma mark - Update labels
 
 - (void)updateLabels {
-	self.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"NumberOfSeconds", nil), self.sliderValue];
-	[self setNeedsLayout];
-}
-
-#pragma mark - Layout margins
-
-- (UIEdgeInsets)layoutMargins {
-	return UIEdgeInsetsZero;
-}
-
-- (NSDirectionalEdgeInsets)directionalLayoutMargins {
-	return NSDirectionalEdgeInsetsZero;
+	NSString *value = [NSString stringWithFormat:NSLocalizedString(@"NumberOfSeconds", nil), self.sliderValue];
+	self.valueLabel.text = value;
+	self.slider.accessibilityLabel = self.titleLabel.text;
+	self.slider.accessibilityValue = value;
 }
 
 @end

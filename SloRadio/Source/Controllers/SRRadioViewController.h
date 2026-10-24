@@ -8,10 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@class SRRadioStation;
-
 @interface SRRadioViewController : UIViewController
 
-- (void)playRadioStation:(SRRadioStation *)station;
+@property (nonatomic, readonly) UITableView *tableView;
+
+- (void)scrollToSelectedStationAnimated:(BOOL)animated;
 
 @end

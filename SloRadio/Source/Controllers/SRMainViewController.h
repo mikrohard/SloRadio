@@ -6,9 +6,8 @@
 //  Copyright (c) 2015 Jernej Fijačko. All rights reserved.
 //
 
-#import "AMSlideMenuMainViewController.h"
+#import <UIKit/UIKit.h>
 
-@interface SRMainViewController : AMSlideMenuMainViewController
+@interface SRMainViewController : UIViewController
 
 @end
-

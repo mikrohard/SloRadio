@@ -8,65 +8,33 @@
 
 #import "SRRadioViewController.h"
 #import "SRDataManager.h"
+#import "SRPlaybackManager.h"
 #import "SRRadioPlayer.h"
 #import "SRRadioStation.h"
-#import "SRSleepTimer.h"
-#import "SRSleepTimerView.h"
 #import "SRAddRadioViewController.h"
+#import "SRSettingsViewController.h"
+#import "SRAboutViewController.h"
+#import "SRFavoritesPickerViewController.h"
+#import "SRStationTableViewCell.h"
 #import "MBProgressHUD.h"
-#import "UITableView+Separators.h"
-#import "SRNowPlayingView.h"
-#import "SRRadioTableViewCell.h"
-#import "UIImage+Color.h"
 #import "Reachability.h"
-#import "Firebase.h"
-
-@import AVFoundation;
-@import MediaPlayer;
-@import MessageUI;
 
 static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
-static NSTimeInterval const SRCarPlayDataReloadInterval = 5*60; // 5 minutes
-static CGFloat const SRCarPlayArtworkWidth = 256;
-static CGFloat const SRNowPlayingArtworkWidth = 1024;
 
-static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15 seconds for buffering
-
-typedef void (^SRRadioPlayCompletion)(NSError *error);
-
-@interface SRRadioViewController () <SRRadioPlayerDelegate, SRSleepTimerDelegate, SRSleepTimerViewDelegate, MFMailComposeViewControllerDelegate, UITableViewDataSource, UITableViewDelegate, MPPlayableContentDelegate, MPPlayableContentDataSource> {
-	BOOL _playbackInterrupted;
-	BOOL _audioSessionInterrupted;
+@interface SRRadioViewController () <UITableViewDataSource, UITableViewDelegate> {
 	NSTimeInterval _stationsLoadedTimestamp;
 }
 
-@property (nonatomic, strong) SRNowPlayingView *nowPlayingTitleView;
-@property (nonatomic, strong) SRSleepTimer *sleepTimer;
-@property (nonatomic, strong) SRSleepTimerView *sleepTimerView;
-@property (nonatomic, strong) UIToolbar *toolbar;
 @property (nonatomic, strong) UITableView *tableView;
-
-// background task
-@property (nonatomic, assign) UIBackgroundTaskIdentifier bgTask;
-
-// carplay
-@property (nonatomic, strong) NSArray<MPContentItem *> *carPlayItems;
-@property (nonatomic, strong) SRRadioPlayCompletion playCompletion;
-@property (nonatomic, strong) NSTimer *carPlayDataReloadTimer;
-@property (nonatomic, assign) NSTimeInterval lastCarPlayDataReloadTime;
-
-@property (nonatomic, strong) NSTimer *bufferingTimeoutTimer;
+@property (nonatomic, strong) UISegmentedControl *listControl;
+@property (nonatomic, strong) UIView *emptyFavoritesView;
+@property (nonatomic, assign) BOOL ignoreFavoritesChange;
+// UITableView reports editing == YES while a swipe action is shown, so track the edit mode separately
+@property (nonatomic, assign) BOOL editingList;
 
 @end
 
 @implementation SRRadioViewController
-
-@synthesize nowPlayingTitleView = _nowPlayingTitleView;
-@synthesize sleepTimer = _sleepTimer;
-@synthesize sleepTimerView = _sleepTimerView;
-@synthesize toolbar = _toolbar;
-@synthesize tableView = _tableView;
-@synthesize bgTask = _bgTask;
 
 #pragma mark - Lifecycle
 
@@ -75,17 +43,6 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	if (self) {
 		[self registerForNotifications];
 		self.title = NSLocalizedString(@"RadioStations", @"Radio Stations");
-		
-		[self setupAudioSession];
-		
-		[[MPPlayableContentManager sharedContentManager] setDataSource:self];
-		[[MPPlayableContentManager sharedContentManager] setDelegate:self];
-		
-		[[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:@{}];
-		
-		[[SRRadioPlayer sharedPlayer] setDelegate:self];
-		
-		[self startRemoteControlTracking];
 	}
 	return self;
 }
@@ -93,7 +50,7 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 - (void)loadView {
 	[super loadView];
 	[self setupTableView];
-	[self setupToolbar];
+	[self setupListControl];
 }
 
 - (void)viewDidLoad {
@@ -104,37 +61,11 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 - (void)viewWillAppear:(BOOL)animated {
 	[super viewWillAppear:animated];
 	[self updateNavigationButtons];
-	[self updateToolbarItems];
-	[self layoutViews];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self setupTableViewInsets];
-    });
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-	[super viewWillDisappear:animated];
-}
-
-- (void)viewWillLayoutSubviews {
-    [super viewWillLayoutSubviews];
-    [self setupTableViewInsets];
-}
-
-- (void)viewSafeAreaInsetsDidChange {
-	[super viewSafeAreaInsetsDidChange];
-	[self layoutToolbar];
-	[self setupTableViewInsets];
-}
-
-- (void)didReceiveMemoryWarning {
-	[super didReceiveMemoryWarning];
-	// Dispose of any resources that can be recreated.
+	[self updateEmptyState];
 }
 
 - (void)dealloc {
-	[self endRemoteControlTracking];
 	[self unregisterFromNotifications];
-	[self endAudioSession];
 }
 
 #pragma mark - Setup
@@ -142,183 +73,102 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 - (void)setupTableView {
 	UITableView *tableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
 	tableView.allowsSelectionDuringEditing = YES;
-	tableView.separatorInset = UIEdgeInsetsMake(0, 15.f, 0, 0);
-	tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 	tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	tableView.dataSource = self;
 	tableView.delegate = self;
 	tableView.alwaysBounceVertical = YES;
-	tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-	tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 1.f, 44.f)];
-	if (@available(iOS 11, *)) {
-		tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-	}
+	tableView.separatorInset = UIEdgeInsetsMake(0, [SRStationTableViewCell separatorInsetLeft], 0, 0);
+	tableView.cellLayoutMarginsFollowReadableWidth = NO;
+	[tableView registerClass:[SRStationTableViewCell class] forCellReuseIdentifier:@"RadioStationCell"];
 	[self.view addSubview:tableView];
 	self.tableView = tableView;
 }
 
-
-- (void)setupToolbar {
-	UIToolbar *toolbar = [[UIToolbar alloc] init];
-	toolbar.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
-	toolbar.barStyle = UIBarStyleDefault;
-	[self.view addSubview:toolbar];
-	self.toolbar = toolbar;
-	[self layoutToolbar];
+- (void)setupListControl {
+	UISegmentedControl *listControl = [[UISegmentedControl alloc] initWithItems:@[NSLocalizedString(@"AllStations", @"All"),
+																				  NSLocalizedString(@"Favorites", @"Favorites")]];
+	listControl.selectedSegmentIndex = [SRDataManager sharedManager].selectedStationList;
+	[listControl addTarget:self action:@selector(listControlChanged:) forControlEvents:UIControlEventValueChanged];
+	[listControl setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
+	[listControl.widthAnchor constraintGreaterThanOrEqualToConstant:200.f].active = YES;
+	self.navigationItem.titleView = listControl;
+	self.listControl = listControl;
 }
 
-- (void)setupTableViewInsets {
-	CGFloat topInset = 0.f;
-	CGFloat bottomInset = 0.f;
-	CGFloat previousTopInset = self.tableView.contentInset.top;
-	CGFloat previousTopOffset = self.tableView.contentOffset.y;
-	if (self.sleepTimerView) {
-		topInset = CGRectGetMaxY(self.sleepTimerView.frame);
-	}
-	else {
-		UINavigationBar *bar = self.navigationController.navigationBar;
-		topInset = CGRectGetMaxY(bar.frame);
-	}
-	if (self.toolbar) {
-		UIToolbar *toolbar = self.toolbar;
-		bottomInset = CGRectGetMaxY(self.view.frame) - CGRectGetMinY(toolbar.frame);
-	}
-	self.tableView.contentInset = UIEdgeInsetsMake(topInset, 0, bottomInset, 0);
-	if (@available(iOS 13, *)) {
-		self.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, bottomInset - self.view.safeAreaInsets.bottom, 0);;
-	} else {
-		self.tableView.scrollIndicatorInsets = self.tableView.contentInset;
-	}
-	CGFloat newTopOffset = previousTopOffset + previousTopInset - topInset;
-	CGPoint contentOffset = self.tableView.contentOffset;
-	contentOffset.y = MAX(-topInset, MIN(newTopOffset, self.tableView.contentSize.height - CGRectGetHeight(self.tableView.frame) + bottomInset));
-	self.tableView.contentOffset = contentOffset;
-}
-
-#pragma mark - Layout
-
-- (void)layoutViews {
-	[self layoutSleepTimerView];
-	[self layoutToolbar];
-	[self setupTableViewInsets];
-}
-
-- (void)layoutToolbar {
-	UINavigationBar *bar = self.navigationController.navigationBar;
-	CGFloat height = CGRectGetHeight(bar.frame);
-	CGFloat safeAreaBottom = 0.f;
-	if (@available(iOS 11, *)) {
-		safeAreaBottom = self.view.safeAreaInsets.bottom;
-	}
-	self.toolbar.frame = CGRectMake(0,
-									CGRectGetHeight(self.view.frame) - height - safeAreaBottom,
-									CGRectGetWidth(self.view.frame),
-									height);
-}
-
-
-- (void)layoutSleepTimerView {
-	if (self.sleepTimerView) {
-		UINavigationBar *bar = self.navigationController.navigationBar;
-		CGRect navigationBarFrame = [bar.superview convertRect:bar.frame toView:self.view];
-		CGFloat height = CGRectGetHeight(navigationBarFrame);
-		self.sleepTimerView.frame = CGRectMake(0,
-											   CGRectGetMaxY(navigationBarFrame),
-											   CGRectGetWidth(self.view.frame),
-											   height);
-		self.sleepTimerView.horizontalPadding = self.tableView.separatorInset.left;
-	}
-}
-
-#pragma mark - Audio session
-
-- (void)setupAudioSession
-{
-	NSError *error = nil;
-	AVAudioSession *session = [AVAudioSession sharedInstance];
-	BOOL ok = [session setCategory:AVAudioSessionCategoryPlayback error:&error];
-	if (!ok) {
-		NSLog(@"Could not set audiosession category. Error: %@", error);
-	}
-	ok = [session setActive:YES error:&error];
-	if (!ok) {
-		NSLog(@"Could not set audiosession active. Error: %@", error);
-	}
-}
-
-- (void)endAudioSession
-{
-	NSError *error = nil;
-	AVAudioSession *session = [AVAudioSession sharedInstance];
-	BOOL ok = [session setCategory:AVAudioSessionCategoryAmbient error:&error];
-	if (!ok) {
-		NSLog(@"Could not set audiosession category. Error: %@", error);
-	}
-	ok = [session setActive:YES error:&error];
-	if (!ok) {
-		NSLog(@"Could not set audiosession active. Error: %@", error);
-	}
-}
-
-#pragma mark - Toolbar & navigation items
-
-- (void)updateToolbarItems {
-	UIBarButtonItem *middleItem = nil;
-	if (self.tableView.editing) {
-		middleItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed:)];
-	}
-	else {
-		switch ([[SRRadioPlayer sharedPlayer] state]) {
-			case SRRadioPlayerStateStopped:
-			case SRRadioPlayerStateError:
-			case SRRadioPlayerStatePaused:
-			{
-				// play button
-				middleItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPlay target:self action:@selector(playButtonPressed:)];
-				break;
-			}
-			case SRRadioPlayerStateOpening:
-			case SRRadioPlayerStateBuffering:
-			{
-				// loading indicator
-				UIActivityIndicatorView *loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-				[loadingIndicator setColor:[SRAppearance mainColor]];
-				[loadingIndicator startAnimating];
-				middleItem = [[UIBarButtonItem alloc] initWithCustomView:loadingIndicator];
-				break;
-			}
-			case SRRadioPlayerStatePlaying:
-			{
-				// pause button
-				middleItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemPause target:self action:@selector(pauseButtonPressed:)];
-				break;
-			}
-			default:
-				break;
-		}
-	}
-	UIBarButtonItem *flexibleItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-	NSArray *items = @[flexibleItem, middleItem, flexibleItem];
-	[self.toolbar setItems:items];
-}
+#pragma mark - Navigation items
 
 - (void)updateNavigationButtons {
-	if (self.tableView.editing) {
-		UIBarButtonItem *doneItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", @"Done")
-																	 style:UIBarButtonItemStyleDone
-																	target:self
-																	action:@selector(doneButtonPressed:)];
+	BOOL editing = self.editingList;
+	BOOL allStations = [self currentList] == SRStationListAll;
+	if (editing) {
+		UIBarButtonItem *doneItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+																				  target:self
+																				  action:@selector(doneButtonPressed:)];
 		self.navigationItem.rightBarButtonItem = doneItem;
+		if (allStations) {
+			UIBarButtonItem *addItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+																					 target:self
+																					 action:@selector(addButtonPressed:)];
+			self.navigationItem.leftBarButtonItem = addItem;
+		} else {
+			self.navigationItem.leftBarButtonItem = nil;
+		}
 	}
 	else {
-		UIImage *editIcon = [[UIImage imageNamed:@"EditIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-		UIButton *editButton = [UIButton buttonWithType:UIButtonTypeCustom];
-		[editButton setImage:editIcon forState:UIControlStateNormal];
-		[editButton addTarget:self action:@selector(editButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-		editButton.frame = CGRectMake(0, 0, editIcon.size.width, editIcon.size.height);
-		UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithCustomView:editButton];
-		self.navigationItem.rightBarButtonItem = item;
+		NSString *imageName = @"ellipsis.circle";
+		if (@available(iOS 26, *)) {
+			imageName = @"ellipsis";
+		}
+		UIBarButtonItem *moreItem = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:imageName]
+																	  menu:[self moreMenu]];
+		moreItem.accessibilityLabel = NSLocalizedString(@"More", @"More");
+		self.navigationItem.rightBarButtonItem = moreItem;
+		if (allStations) {
+			self.navigationItem.leftBarButtonItem = nil;
+		} else {
+			UIBarButtonItem *addFavoritesItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+																							  target:self
+																							  action:@selector(addFavoritesButtonPressed:)];
+			addFavoritesItem.accessibilityLabel = NSLocalizedString(@"AddFavorites", @"Add favorites");
+			self.navigationItem.leftBarButtonItem = addFavoritesItem;
+		}
 	}
+	self.listControl.enabled = !editing;
+}
+
+- (UIMenu *)moreMenu {
+	__weak SRRadioViewController *weakSelf = self;
+	NSMutableArray *listActions = [NSMutableArray array];
+	NSString *editTitle = [self currentList] == SRStationListFavorites ? NSLocalizedString(@"EditFavorites", @"Edit favorites") : NSLocalizedString(@"EditList", @"Edit list");
+	[listActions addObject:[UIAction actionWithTitle:editTitle
+											   image:[UIImage systemImageNamed:@"pencil"]
+										  identifier:nil
+											 handler:^(__kindof UIAction *action) {
+		[weakSelf editButtonPressed:nil];
+	}]];
+	if ([self currentList] == SRStationListAll) {
+		[listActions addObject:[UIAction actionWithTitle:NSLocalizedString(@"AddStation", @"Add station")
+												   image:[UIImage systemImageNamed:@"plus"]
+											  identifier:nil
+												 handler:^(__kindof UIAction *action) {
+			[weakSelf presentAddRadioController];
+		}]];
+	}
+	UIMenu *listMenu = [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:listActions];
+	UIAction *settingsAction = [UIAction actionWithTitle:NSLocalizedString(@"Settings", @"Settings")
+												   image:[UIImage systemImageNamed:@"gearshape"]
+											  identifier:nil
+												 handler:^(__kindof UIAction *action) {
+		[weakSelf presentSheetWithController:[[SRSettingsViewController alloc] init]];
+	}];
+	UIAction *aboutAction = [UIAction actionWithTitle:NSLocalizedString(@"About", @"About")
+												image:[UIImage systemImageNamed:@"info.circle"]
+										   identifier:nil
+											  handler:^(__kindof UIAction *action) {
+		[weakSelf presentSheetWithController:[[SRAboutViewController alloc] init]];
+	}];
+	UIMenu *appMenu = [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[settingsAction, aboutAction]];
+	return [UIMenu menuWithChildren:@[listMenu, appMenu]];
 }
 
 #pragma mark - Notifications
@@ -328,10 +178,11 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	[nc addObserver:self selector:@selector(stationsLoaded:) name:SRDataManagerDidLoadStations object:nil];
 	[nc addObserver:self selector:@selector(stationsChanged:) name:SRDataManagerDidChangeStations object:nil];
 	[nc addObserver:self selector:@selector(sleepTimerSettingsChanged:) name:SRDataManagerDidChangeSleepTimerSettings object:nil];
-	[nc addObserver:self selector:@selector(audioSessionInterruption:) name:AVAudioSessionInterruptionNotification object:nil];
-	[nc addObserver:self selector:@selector(audioSessionRouteChanged:) name:AVAudioSessionRouteChangeNotification object:nil];
+	[nc addObserver:self selector:@selector(selectedStationChanged:) name:SRDataManagerDidSelectStation object:nil];
+	[nc addObserver:self selector:@selector(favoritesChanged:) name:SRDataManagerDidChangeFavorites object:nil];
+	[nc addObserver:self selector:@selector(stationListChanged:) name:SRDataManagerDidChangeStationList object:nil];
+	[nc addObserver:self selector:@selector(playbackFailed:) name:SRPlaybackManagerDidFailPlayback object:nil];
 	[nc addObserver:self selector:@selector(applicationDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
-	[nc addObserver:self selector:@selector(artworkPreloadFinished:) name:SRRadioStationDidPreloadArtwork object:nil];
 }
 
 - (void)unregisterFromNotifications {
@@ -339,88 +190,66 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 }
 
 - (void)stationsLoaded:(NSNotification *)notification {
-	[self.tableView reloadData];
-	[self reloadCarPlayData];
+	[self reloadData];
 }
 
 - (void)stationsChanged:(NSNotification *)notification {
-	[self.tableView reloadData];
-	[self reloadCarPlayData];
+	[self reloadData];
 }
 
 - (void)sleepTimerSettingsChanged:(NSNotification *)notification {
 	[self.tableView reloadData];
 }
 
-- (void)audioSessionInterruption:(NSNotification *)notification {
-	AVAudioSessionInterruptionType interruptionType = [[notification.userInfo objectForKey:AVAudioSessionInterruptionTypeKey] integerValue];
-	if (interruptionType == AVAudioSessionInterruptionTypeBegan) {
-        _audioSessionInterrupted = YES;
-		[self audioSessionInterrupted];
-	} else if (interruptionType == AVAudioSessionInterruptionTypeEnded) {
-		AVAudioSessionInterruptionOptions interruptionOption = [[notification.userInfo objectForKey:AVAudioSessionInterruptionOptionKey] integerValue];
-		if (_audioSessionInterrupted && interruptionOption == AVAudioSessionInterruptionOptionShouldResume) {
-            _audioSessionInterrupted = NO;
-			[self audioSessionResume];
-		}
+- (void)selectedStationChanged:(NSNotification *)notification {
+	[self reconfigureVisibleRows];
+}
+
+- (void)favoritesChanged:(NSNotification *)notification {
+	if (self.ignoreFavoritesChange) {
+		return;
+	}
+	if ([self currentList] == SRStationListFavorites) {
+		[self reloadData];
 	}
 }
 
-- (void)audioSessionRouteChanged:(NSNotification *)notification {
-	AVAudioSessionRouteChangeReason reason = [[notification.userInfo objectForKey:AVAudioSessionRouteChangeReasonKey] integerValue];
-	if (reason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable) {
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[self stopAction];
-		});
+- (void)stationListChanged:(NSNotification *)notification {
+	SRStationList list = [SRDataManager sharedManager].selectedStationList;
+	if (self.listControl.selectedSegmentIndex != list) {
+		if (self.editingList) {
+			[self doneButtonPressed:nil];
+		}
+		self.listControl.selectedSegmentIndex = list;
+		[self updateNavigationButtons];
+		[self reloadData];
 	}
+}
+
+- (void)playbackFailed:(NSNotification *)notification {
+	SRRadioStation *station = notification.object;
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[self handlePlaybackErrorForStation:station];
+	});
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
 	[self updateRadioStations];
 }
 
-- (void)artworkPreloadFinished:(NSNotification *)notification {
-	SRRadioStation *station = notification.object;
-	if ([station isKindOfClass:[SRRadioStation class]]) {
-		dispatch_async(dispatch_get_main_queue(), ^{
-			if (station.stationId == [[SRDataManager sharedManager] selectedRadioStation].stationId) {
-				[self updateNowPlayingInfo];
-			}
-			[self refreshCarPlayArtworkForStation:station];
-		});
-	}
-}
-
-#pragma mark - Playback interruption
-
-- (void)audioSessionInterrupted {
-	if ([[SRRadioPlayer sharedPlayer] state] != SRRadioPlayerStateStopped) {
-		_playbackInterrupted = YES;
-		[self performSelectorOnMainThread:@selector(stopAction) withObject:nil waitUntilDone:YES];
-	}
-}
-
-- (void)audioSessionResume {
-	if ([[SRRadioPlayer sharedPlayer] state] == SRRadioPlayerStateStopped && _playbackInterrupted && !_audioSessionInterrupted) {
-		// resume playback
-        [self startBackgroundTask];
-		[self performSelectorOnMainThread:@selector(playAction) withObject:nil waitUntilDone:YES];
-	}
-}
-
 #pragma mark - Network
 
 - (void)loadRadioStations {
 	_stationsLoadedTimestamp = [[NSDate date] timeIntervalSince1970];
-	if ([self stations].count == 0) {
+	if ([SRDataManager sharedManager].stations.count == 0) {
 		[MBProgressHUD showHUDAddedTo:self.view animated:YES];
 	}
 	__weak SRRadioViewController *weakSelf = self;
 	[[SRDataManager sharedManager] loadStationsWithCompletionHandler:^(NSError *error) {
 		[MBProgressHUD hideHUDForView:weakSelf.view animated:YES];
-		if (error && [weakSelf stations].count == 0) {
+		if (error && [SRDataManager sharedManager].stations.count == 0) {
 			// could not load radio stations
-			[self handleStationsLoadError];
+			[weakSelf handleStationsLoadError];
 		}
 	}];
 }
@@ -434,109 +263,145 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 
 #pragma mark - Stations
 
+- (SRStationList)currentList {
+	return self.listControl.selectedSegmentIndex == SRStationListFavorites ? SRStationListFavorites : SRStationListAll;
+}
+
 - (NSArray *)stations {
-	return [[SRDataManager sharedManager] stations];
+	return [[SRDataManager sharedManager] stationsForList:[self currentList]];
 }
 
-- (void)selectStationWithOffset:(NSInteger)offset {
-	SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
-	NSInteger currentIndex = NSNotFound;
-	NSArray *stations = [self stations];
-	for (SRRadioStation *station in stations) {
-		if (station.stationId == selectedStation.stationId) {
-			currentIndex = [stations indexOfObject:station];
-			break;
-		}
-	}
-	SRRadioStation *nextStation = nil;
-	if (currentIndex != NSNotFound) {
-		NSInteger nextIndex = currentIndex + offset;
-		if (nextIndex < 0) {
-			nextIndex += stations.count;
-		}
-		else if (nextIndex >= stations.count) {
-			nextIndex -= stations.count;
-		}
-		nextStation = stations[nextIndex];
-	}
-	else if (stations.count > 0) {
-		nextStation = stations[0];
-	}
-	[[SRDataManager sharedManager] selectRadioStation:nextStation];
+- (void)reloadData {
 	[self.tableView reloadData];
+	[self updateEmptyState];
 }
 
-- (void)selectNextStation {
-	[self selectStationWithOffset:1];
-}
-
-- (void)selectPreviousStation {
-	[self selectStationWithOffset:-1];
-}
-
-- (void)markSelectedRadioStation {
-	SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
-	if (selectedStation) {
-		NSIndexPath *selectedIndexPath = nil;
-		NSArray *stations = [self stations];
-		for (SRRadioStation *existingStation in stations) {
-			if (existingStation.stationId == selectedStation.stationId) {
-				selectedIndexPath = [NSIndexPath indexPathForRow:[stations indexOfObject:existingStation] inSection:0];
-				break;
-			}
-		}
-		if (selectedIndexPath) {
-			UITableView *tableView = self.tableView;
-			for (UITableViewCell *cell in tableView.visibleCells) {
-				cell.accessoryType = [tableView indexPathForCell:cell].row == selectedIndexPath.row ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
-			}
+- (void)reconfigureVisibleRows {
+	NSArray *indexPaths = [self.tableView indexPathsForVisibleRows];
+	NSInteger count = [self stations].count;
+	for (NSIndexPath *indexPath in indexPaths) {
+		if (indexPath.row >= count) {
+			// data is out of sync with the table view
+			[self reloadData];
+			return;
 		}
 	}
+	if (indexPaths.count > 0) {
+		[self.tableView reconfigureRowsAtIndexPaths:indexPaths];
+	}
+}
+
+- (NSIndexPath *)indexPathForStation:(SRRadioStation *)station {
+	NSArray *stations = [self stations];
+	for (NSInteger i = 0; i < stations.count; i++) {
+		if ([stations[i] stationId] == station.stationId) {
+			return [NSIndexPath indexPathForRow:i inSection:0];
+		}
+	}
+	return nil;
+}
+
+- (void)scrollToSelectedStationAnimated:(BOOL)animated {
+	NSIndexPath *indexPath = [self indexPathForStation:[SRDataManager sharedManager].selectedRadioStation];
+	if (indexPath) {
+		[self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionMiddle animated:animated];
+	}
+}
+
+- (void)toggleFavoriteForStation:(SRRadioStation *)station {
+	SRDataManager *dataManager = [SRDataManager sharedManager];
+	if (![dataManager isFavoriteRadioStation:station]) {
+		[dataManager addFavoriteRadioStation:station];
+		return;
+	}
+	NSIndexPath *indexPath = [self indexPathForStation:station];
+	if ([self currentList] == SRStationListFavorites && indexPath) {
+		self.ignoreFavoritesChange = YES;
+		[dataManager removeFavoriteRadioStation:station];
+		self.ignoreFavoritesChange = NO;
+		[self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+		[self updateEmptyState];
+	} else {
+		[dataManager removeFavoriteRadioStation:station];
+	}
+}
+
+#pragma mark - Empty state
+
+- (void)updateEmptyState {
+	BOOL showEmptyState = [self currentList] == SRStationListFavorites && [self stations].count == 0;
+	if (showEmptyState && !self.emptyFavoritesView) {
+		self.emptyFavoritesView = [self createEmptyFavoritesView];
+	}
+	self.tableView.backgroundView = showEmptyState ? self.emptyFavoritesView : nil;
+}
+
+- (UIView *)createEmptyFavoritesView {
+	UIImageView *imageView = [[UIImageView alloc] initWithImage:[UIImage systemImageNamed:@"star"
+																		withConfiguration:[UIImageSymbolConfiguration configurationWithPointSize:44.f weight:UIImageSymbolWeightRegular]]];
+	imageView.tintColor = [UIColor tertiaryLabelColor];
+	imageView.contentMode = UIViewContentModeCenter;
+
+	UILabel *titleLabel = [[UILabel alloc] init];
+	titleLabel.text = NSLocalizedString(@"NoFavorites", @"No favorites");
+	titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleTitle3];
+	titleLabel.adjustsFontForContentSizeCategory = YES;
+	titleLabel.textAlignment = NSTextAlignmentCenter;
+	titleLabel.numberOfLines = 0;
+
+	UILabel *messageLabel = [[UILabel alloc] init];
+	messageLabel.text = NSLocalizedString(@"NoFavoritesMessage", @"How to add favorites");
+	messageLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+	messageLabel.adjustsFontForContentSizeCategory = YES;
+	messageLabel.textColor = [UIColor secondaryLabelColor];
+	messageLabel.textAlignment = NSTextAlignmentCenter;
+	messageLabel.numberOfLines = 0;
+
+	UIButtonConfiguration *buttonConfiguration = [UIButtonConfiguration filledButtonConfiguration];
+	buttonConfiguration.title = NSLocalizedString(@"AddFavorites", @"Add favorites");
+	buttonConfiguration.image = [UIImage systemImageNamed:@"plus"];
+	buttonConfiguration.imagePadding = 6.f;
+	buttonConfiguration.cornerStyle = UIButtonConfigurationCornerStyleCapsule;
+	buttonConfiguration.baseBackgroundColor = [SRAppearance mainColor];
+	buttonConfiguration.baseForegroundColor = [UIColor whiteColor];
+	buttonConfiguration.contentInsets = NSDirectionalEdgeInsetsMake(10.f, 18.f, 10.f, 18.f);
+	UIButton *addButton = [UIButton buttonWithConfiguration:buttonConfiguration primaryAction:nil];
+	[addButton addTarget:self action:@selector(addFavoritesButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+	
+	UIStackView *stack = [[UIStackView alloc] initWithArrangedSubviews:@[imageView, titleLabel, messageLabel, addButton]];
+	stack.axis = UILayoutConstraintAxisVertical;
+	stack.alignment = UIStackViewAlignmentCenter;
+	stack.spacing = 8.f;
+	[stack setCustomSpacing:16.f afterView:imageView];
+	[stack setCustomSpacing:24.f afterView:messageLabel];
+	stack.translatesAutoresizingMaskIntoConstraints = NO;
+
+	UIView *container = [[UIView alloc] init];
+	[container addSubview:stack];
+	[NSLayoutConstraint activateConstraints:@[
+		[stack.centerXAnchor constraintEqualToAnchor:container.safeAreaLayoutGuide.centerXAnchor],
+		[stack.centerYAnchor constraintEqualToAnchor:container.safeAreaLayoutGuide.centerYAnchor],
+		[stack.widthAnchor constraintLessThanOrEqualToAnchor:container.safeAreaLayoutGuide.widthAnchor constant:-64.f],
+		[stack.widthAnchor constraintLessThanOrEqualToConstant:320.f],
+	]];
+	return container;
 }
 
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-	// Return the number of sections.
 	return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-	// Return the number of rows in the section.
 	return [[self stations] count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-	static NSString *cellIdentifier = @"RadioStationCell";
-	SRRadioTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-	if (!cell) {
-		cell = [[SRRadioTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
-	}
+	SRStationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"RadioStationCell" forIndexPath:indexPath];
 	SRRadioStation *station = [[self stations] objectAtIndex:indexPath.row];
-	__weak SRRadioViewController *weakSelf = self;
-	
-	cell.defaultColor = [SRAppearance cellBackgroundColor];
-	
-	BOOL sleepTimerByDefault = [SRDataManager sharedManager].sleepTimerEnabledByDefault;
-	UIView *iconView = sleepTimerByDefault ? [self viewWithImageName:@"Play"] : [self viewWithImageName:@"Clock"];
-	UIColor *clockColor = [SRAppearance cellActionColor];
-	[cell setSwipeGestureWithView:iconView color:clockColor mode:MCSwipeTableViewCellModeSwitch state:MCSwipeTableViewCellState1 completionBlock:^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
-		[[SRDataManager sharedManager] selectRadioStation:station];
-		[weakSelf markSelectedRadioStation];
-		[weakSelf playActionWithSleepTimer:!sleepTimerByDefault];
-	}];
-	
-	if ([self canReportProblemForRadioStation:station]) {
-		UIView *reportView = [self viewWithImageName:@"Warning"];
-		UIColor *reportColor = [SRAppearance cellReportColor];
-		[cell setSwipeGestureWithView:reportView color:reportColor mode:MCSwipeTableViewCellModeSwitch state:MCSwipeTableViewCellState2 completionBlock:^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
-			[weakSelf reportProblemWithRadioStation:station];
-		}];
-	}
-	
-	SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
-	cell.textLabel.text = station.name;
-	cell.accessoryType = station.stationId == selectedStation.stationId ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+	[cell configureWithStation:station];
+	cell.checked = station.stationId == [SRDataManager sharedManager].selectedRadioStation.stationId;
 	return cell;
 }
 
@@ -548,24 +413,37 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	return YES;
 }
 
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
+	// deleting is only possible in edit mode, swiping shows the station actions instead
+	return self.editingList ? UITableViewCellEditingStyleDelete : UITableViewCellEditingStyleNone;
+}
+
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
 	SRRadioStation *station = [[self stations] objectAtIndex:sourceIndexPath.row];
-	[[SRDataManager sharedManager] moveRadioStation:station atIndex:destinationIndexPath.row];
+	if ([self currentList] == SRStationListFavorites) {
+		self.ignoreFavoritesChange = YES;
+		[[SRDataManager sharedManager] moveFavoriteRadioStation:station atIndex:destinationIndexPath.row];
+		self.ignoreFavoritesChange = NO;
+	} else {
+		[[SRDataManager sharedManager] moveRadioStation:station atIndex:destinationIndexPath.row];
+	}
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
 	if (editingStyle == UITableViewCellEditingStyleDelete) {
 		@synchronized(self) {
 			SRRadioStation *station = [[self stations] objectAtIndex:indexPath.row];
-			BOOL stationWasSelected = station.stationId == [[SRDataManager sharedManager] selectedRadioStation].stationId;
+			if ([self currentList] == SRStationListFavorites) {
+				[self toggleFavoriteForStation:station];
+				return;
+			}
+			self.ignoreFavoritesChange = YES;
 			[[SRDataManager sharedManager] deleteRadioStation:station];
+			self.ignoreFavoritesChange = NO;
 			[tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
 			if (station.stationId == [[SRRadioPlayer sharedPlayer] currentRadioStation].stationId) {
 				// deleted station currently playing... stop it
-				[self stopAction];
-			}
-			if (stationWasSelected) {
-				[self markSelectedRadioStation];
+				[[SRPlaybackManager sharedManager] stop];
 			}
 		}
 	}
@@ -575,246 +453,161 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	SRRadioStation *station = [[self stations] objectAtIndex:indexPath.row];
-	if (tableView.editing) {
+	if (self.editingList) {
 		[self presentEditRadioControllerForStation:station];
 	}
 	else {
-		for (UITableViewCell *cell in tableView.visibleCells) {
-			cell.accessoryType = [tableView indexPathForCell:cell].row == indexPath.row ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
-		}
 		[[SRDataManager sharedManager] selectRadioStation:station];
 		if ([[SRRadioPlayer sharedPlayer] currentRadioStation] != nil) {
-			[self playAction];
+			[[SRPlaybackManager sharedManager] play];
 		}
 	}
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath {
+	if ([self currentList] == SRStationListFavorites) {
+		return NSLocalizedString(@"Remove", @"Remove");
+	}
 	return NSLocalizedString(@"Delete", nil);
 }
 
-- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-	[tableView configureSeparatorForCell:cell];
+- (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView leadingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath {
+	if (self.editingList) {
+		return nil;
+	}
+	SRRadioStation *station = [[self stations] objectAtIndex:indexPath.row];
+	__weak SRRadioViewController *weakSelf = self;
+	BOOL sleepTimerByDefault = [SRDataManager sharedManager].sleepTimerEnabledByDefault;
+	UIContextualAction *playAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal
+																			 title:sleepTimerByDefault ? NSLocalizedString(@"Play", @"Play") : NSLocalizedString(@"SleepTimer", @"Sleep timer")
+																		   handler:^(UIContextualAction *action, UIView *sourceView, void (^completionHandler)(BOOL)) {
+		completionHandler(YES);
+		[weakSelf performAfterSwipe:^{
+			[[SRPlaybackManager sharedManager] playRadioStation:station withSleepTimer:!sleepTimerByDefault];
+		}];
+	}];
+	playAction.image = [UIImage systemImageNamed:sleepTimerByDefault ? @"play.fill" : @"moon.zzz.fill"];
+	playAction.backgroundColor = [UIColor systemIndigoColor];
+	UISwipeActionsConfiguration *configuration = [UISwipeActionsConfiguration configurationWithActions:@[playAction]];
+	configuration.performsFirstActionWithFullSwipe = YES;
+	return configuration;
+}
+
+- (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView trailingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath {
+	if (self.editingList) {
+		// default delete action
+		return nil;
+	}
+	SRRadioStation *station = [[self stations] objectAtIndex:indexPath.row];
+	__weak SRRadioViewController *weakSelf = self;
+	NSMutableArray *actions = [NSMutableArray array];
+
+	BOOL favorite = [[SRDataManager sharedManager] isFavoriteRadioStation:station];
+	UIContextualAction *favoriteAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal
+																				 title:favorite ? NSLocalizedString(@"Unfavorite", @"Unfavorite") : NSLocalizedString(@"Favorite", @"Favorite")
+																			   handler:^(UIContextualAction *action, UIView *sourceView, void (^completionHandler)(BOOL)) {
+		completionHandler(YES);
+		[weakSelf performAfterSwipe:^{
+			[weakSelf toggleFavoriteForStation:station];
+		}];
+	}];
+	favoriteAction.image = [UIImage systemImageNamed:favorite ? @"star.slash.fill" : @"star.fill"];
+	favoriteAction.backgroundColor = favorite ? [UIColor systemGrayColor] : [UIColor systemOrangeColor];
+	[actions addObject:favoriteAction];
+
+	UISwipeActionsConfiguration *configuration = [UISwipeActionsConfiguration configurationWithActions:actions];
+	configuration.performsFirstActionWithFullSwipe = YES;
+	return configuration;
+}
+
+- (void)performAfterSwipe:(dispatch_block_t)block {
+	// let the swipe actions close before the rows are updated, otherwise the row stays highlighted
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+		block();
+		for (UITableViewCell *cell in self.tableView.visibleCells) {
+			[cell setHighlighted:NO animated:YES];
+		}
+	});
+}
+
+- (UIContextMenuConfiguration *)tableView:(UITableView *)tableView contextMenuConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point {
+	if (self.editingList) {
+		return nil;
+	}
+	SRRadioStation *station = [[self stations] objectAtIndex:indexPath.row];
+	__weak SRRadioViewController *weakSelf = self;
+	return [UIContextMenuConfiguration configurationWithIdentifier:nil previewProvider:nil actionProvider:^UIMenu *(NSArray<UIMenuElement *> *suggestedActions) {
+		UIAction *playAction = [UIAction actionWithTitle:NSLocalizedString(@"Play", @"Play")
+												   image:[UIImage systemImageNamed:@"play.fill"]
+											  identifier:nil
+												 handler:^(__kindof UIAction *action) {
+			[[SRPlaybackManager sharedManager] playRadioStation:station withSleepTimer:NO];
+		}];
+		UIAction *sleepTimerAction = [UIAction actionWithTitle:NSLocalizedString(@"PlayWithSleepTimer", @"Play with sleep timer")
+														 image:[UIImage systemImageNamed:@"moon.zzz.fill"]
+													identifier:nil
+													   handler:^(__kindof UIAction *action) {
+			[[SRPlaybackManager sharedManager] playRadioStation:station withSleepTimer:YES];
+		}];
+		UIMenu *playMenu = [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[playAction, sleepTimerAction]];
+
+		BOOL favorite = [[SRDataManager sharedManager] isFavoriteRadioStation:station];
+		UIAction *favoriteAction = [UIAction actionWithTitle:favorite ? NSLocalizedString(@"RemoveFromFavorites", nil) : NSLocalizedString(@"AddToFavorites", nil)
+													   image:[UIImage systemImageNamed:favorite ? @"star.slash" : @"star"]
+												  identifier:nil
+													 handler:^(__kindof UIAction *action) {
+			[weakSelf toggleFavoriteForStation:station];
+		}];
+		NSMutableArray *otherActions = [NSMutableArray arrayWithObject:favoriteAction];
+		if ([[SRDataManager sharedManager] isCustomRadioStation:station]) {
+			[otherActions addObject:[UIAction actionWithTitle:NSLocalizedString(@"EditStation", @"Edit station")
+														image:[UIImage systemImageNamed:@"pencil"]
+												   identifier:nil
+													  handler:^(__kindof UIAction *action) {
+				[weakSelf presentEditRadioControllerForStation:station];
+			}]];
+		}
+		UIMenu *otherMenu = [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:otherActions];
+		return [UIMenu menuWithTitle:station.name children:@[playMenu, otherMenu]];
+	}];
 }
 
 #pragma mark - Button actions
 
-- (void)playButtonPressed:(id)sender {
-	[self playAction];
-}
-
-- (void)pauseButtonPressed:(id)sender {
-	[self stopAction];
+- (void)listControlChanged:(UISegmentedControl *)sender {
+	[SRDataManager sharedManager].selectedStationList = [self currentList];
+	[self updateNavigationButtons];
+	[self reloadData];
+	[self.tableView setContentOffset:CGPointMake(0, -self.tableView.adjustedContentInset.top) animated:NO];
 }
 
 - (void)editButtonPressed:(id)sender {
-	if (!self.tableView.editing) {
-		[self.tableView setEditing:YES animated:YES];
-	}
-	[self stopAction];
+	self.editingList = YES;
+	[self.tableView setEditing:NO animated:NO];
+	[self.tableView setEditing:YES animated:YES];
 	[self updateNavigationButtons];
-	[self updateToolbarItems];
 }
 
 - (void)doneButtonPressed:(id)sender {
+	self.editingList = NO;
 	if (self.tableView.editing) {
 		[self.tableView setEditing:NO animated:YES];
 	}
 	[self updateNavigationButtons];
-	[self updateToolbarItems];
-	[self reloadCarPlayData];
+	// stations order or favorites may have changed while editing
+	[[NSNotificationCenter defaultCenter] postNotificationName:SRDataManagerDidChangeStations object:[SRDataManager sharedManager]];
 }
 
 - (void)addButtonPressed:(id)sender {
 	[self presentAddRadioController];
 }
 
-#pragma mark - Background task
-
-- (void)startBackgroundTask {
-	UIApplication *application = [UIApplication sharedApplication];
-	if (_bgTask != UIBackgroundTaskInvalid) {
-		[application endBackgroundTask:_bgTask];
-		_bgTask = UIBackgroundTaskInvalid;
-	}
-	__weak SRRadioViewController *weakSelf = self;
-	_bgTask = [application beginBackgroundTaskWithExpirationHandler:^{
-		[application endBackgroundTask:weakSelf.bgTask];
-		weakSelf.bgTask = UIBackgroundTaskInvalid;
-	}];
-}
-
-- (void)endBackgroundTask {
-	if (_bgTask != UIBackgroundTaskInvalid) {
-		[[UIApplication sharedApplication] endBackgroundTask:_bgTask];
-		_bgTask = UIBackgroundTaskInvalid;
-	}
-}
-
-
-#pragma mark - Common actions
-
-- (void)playRadioStation:(SRRadioStation *)station {
-	[[SRDataManager sharedManager] selectRadioStation:station];
-	[self.tableView reloadData];
-	[self playActionWithSleepTimer:NO];
-}
-
-- (void)playAction {
-	BOOL sleepTimer = [SRDataManager sharedManager].sleepTimerEnabledByDefault;
-	[self playActionWithSleepTimer:sleepTimer];
-}
-
-- (void)playActionWithSleepTimer:(BOOL)sleepTimer {
-	SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
-	if (!selectedStation) {
-		// radio stations not yet loaded
-		// ignore this playback request
-		return;
-	}
-    SRRadioPlayer *player = [SRRadioPlayer sharedPlayer];
-    if ([[player currentRadioStation] isEqual:selectedStation] &&
-        ([player state] == SRRadioPlayerStateBuffering ||
-         [player state] == SRRadioPlayerStatePlaying)) {
-        // this radio station is already playing
-        // ignore this playback request
-        return;
-    }
-	[self setupAudioSession];
-	[self startBackgroundTask];
-	if (sleepTimer) {
-		[self setupSleepTimer];
-	}
-	else {
-		[self clearSleepTimer];
-	}
-	_playbackInterrupted = NO;
-	_audioSessionInterrupted = NO;
-	[player playRadioStation:selectedStation];
-    [self setupBufferingTimeoutTimer];
-}
-
-- (void)stopAction {
-	[[SRRadioPlayer sharedPlayer] stop];
-	[self clearSleepTimer];
-}
-
-- (void)updateNowPlayingInfo {
-	MPNowPlayingInfoCenter *infoCenter = [MPNowPlayingInfoCenter defaultCenter];
-	NSMutableDictionary *nowPlayingInfo = [NSMutableDictionary dictionary];
-	SRRadioStation *selectedStation = [[SRDataManager sharedManager] selectedRadioStation];
-	if (selectedStation.name) {
-		[nowPlayingInfo setObject:selectedStation.name forKey:MPMediaItemPropertyArtist];
-	}
-	SRRadioPlayer *player = [SRRadioPlayer sharedPlayer];
-	float playRate = player.state == SRRadioPlayerStatePlaying ? 1.0 : 0.0;
-	[nowPlayingInfo setObject:@(playRate) forKey:MPNowPlayingInfoPropertyPlaybackRate];
-	if (@available(iOS 14, *)) {
-		[nowPlayingInfo setObject:@(YES) forKey:MPNowPlayingInfoPropertyIsLiveStream];
-	} else if (@available(iOS 10, *)) {
-		[nowPlayingInfo setObject:@(YES) forKey:MPNowPlayingInfoPropertyIsLiveStream];
-		NSString *nowPlayingIdentifier = [NSString stringWithFormat:@"%ld", (long)selectedStation.stationId];
-		[nowPlayingInfo setObject:nowPlayingIdentifier forKey:MPNowPlayingInfoPropertyExternalContentIdentifier];
-		[[MPPlayableContentManager sharedContentManager] setNowPlayingIdentifiers:@[nowPlayingIdentifier]];
-	}
-	MPMediaItemArtwork *artwork = [selectedStation artworkForWidth:SRNowPlayingArtworkWidth];
-	if (artwork != nil) {
-		[nowPlayingInfo setObject:artwork forKey:MPMediaItemPropertyArtwork];
-	}
-	
-	NSString *nowPlaying = [player.metaData objectForKey:SRRadioPlayerMetaDataNowPlayingKey];
-	NSString *title = [player.metaData objectForKey:SRRadioPlayerMetaDataTitleKey];
-	NSString *artist = [player.metaData objectForKey:SRRadioPlayerMetaDataArtistKey];
-	if (!nowPlaying.length && title.length && artist.length) {
-		nowPlaying = [NSString stringWithFormat:@"%@ - %@", [artist capitalizedString], [title capitalizedString]];
-	}
-	nowPlaying = [nowPlaying stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-	if (nowPlaying.length) {
-		[nowPlayingInfo setObject:[nowPlaying capitalizedString] forKey:MPMediaItemPropertyTitle];
-    } else {
-        [nowPlayingInfo setObject:@"" forKey:MPMediaItemPropertyTitle];
-    }
-	NSInteger currentIndex = 0;
-	NSArray *stations = [self stations];
-	for (SRRadioStation *station in stations) {
-		if (station.stationId == selectedStation.stationId) {
-			currentIndex = [stations indexOfObject:station];
-			break;
-		}
-	}
-	[nowPlayingInfo setObject:@(currentIndex) forKey:MPNowPlayingInfoPropertyPlaybackQueueIndex];
-	[nowPlayingInfo setObject:@([self stations].count) forKey:MPNowPlayingInfoPropertyPlaybackQueueCount];
-	
-	NSString *previousArtist = [infoCenter.nowPlayingInfo objectForKey:MPMediaItemPropertyArtist];
-	if (previousArtist == nil) {
-		previousArtist = @"";
-	}
-	BOOL stationChange = ![selectedStation.name isEqualToString:previousArtist];
-	if (stationChange) {
-		NSMutableDictionary *nowPlayingWithoutTitle = [nowPlayingInfo mutableCopy];
-		[nowPlayingWithoutTitle removeObjectForKey:MPMediaItemPropertyTitle];
-		[infoCenter setNowPlayingInfo:nowPlayingWithoutTitle];
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[infoCenter setNowPlayingInfo:nowPlayingInfo];
-		});
-	} else {
-		[infoCenter setNowPlayingInfo:nowPlayingInfo];
-	}
-	
-	// update title view
-	if ([[SRRadioPlayer sharedPlayer] currentRadioStation]) {
-		CGSize nowPlayingSize = CGSizeMake(240.f, CGRectGetHeight(self.navigationController.navigationBar.frame));
-		if (!self.nowPlayingTitleView) {
-			self.nowPlayingTitleView = [[SRNowPlayingView alloc] initWithFrame:CGRectMake(0, 0, nowPlayingSize.width, nowPlayingSize.height)];
-			self.nowPlayingTitleView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-		}
-		self.nowPlayingTitleView.titleString = selectedStation.name;
-		self.nowPlayingTitleView.subtitleString = nowPlaying.length ? [nowPlaying capitalizedString] : nil;
-		CGSize size = [self.nowPlayingTitleView sizeThatFits:nowPlayingSize];
-		self.nowPlayingTitleView.frame = CGRectMake(0, 0, size.width, size.height);
-		self.navigationItem.titleView = self.nowPlayingTitleView;
-	}
-	else {
-		self.navigationItem.titleView = nil;
-	}
-}
-
-- (void)updateNowPlayingState {
-    if (@available(iOS 13, *)) {
-        MPNowPlayingInfoCenter *infoCenter = [MPNowPlayingInfoCenter defaultCenter];
-        if ([[SRRadioPlayer sharedPlayer] state] == SRRadioPlayerStateBuffering ||
-            [[SRRadioPlayer sharedPlayer] state] == SRRadioPlayerStatePlaying) {
-            infoCenter.playbackState = MPNowPlayingPlaybackStatePlaying;
-        } else {
-            infoCenter.playbackState = MPNowPlayingPlaybackStateStopped;
-        }
-    }
-}
-
-#pragma mark - Buffering timeout
-
-- (void)setupBufferingTimeoutTimer {
-    [self invalidateBufferingTimeoutTimer];
-    NSTimeInterval timeout = SRRadioBufferingTimeoutInterval + [[SRDataManager sharedManager] playerCacheSize];
-    self.bufferingTimeoutTimer = [NSTimer timerWithTimeInterval:timeout target:self selector:@selector(bufferingTimeout:) userInfo:nil repeats:NO];
-    [[NSRunLoop currentRunLoop] addTimer:self.bufferingTimeoutTimer forMode:NSRunLoopCommonModes];
-}
-
-- (void)invalidateBufferingTimeoutTimer {
-    [self.bufferingTimeoutTimer invalidate];
-    self.bufferingTimeoutTimer = nil;
-}
-
-- (void)bufferingTimeout:(NSTimer *)timer {
-    // invalidate timer
-    [self invalidateBufferingTimeoutTimer];
-    
-    // retry playback
-    if ([[SRRadioPlayer sharedPlayer] state] == SRRadioPlayerStateBuffering) {
-        [self stopAction];
-        [self playAction];
-    }
+- (void)addFavoritesButtonPressed:(id)sender {
+	SRFavoritesPickerViewController *controller = [[SRFavoritesPickerViewController alloc] init];
+	UINavigationController *navigation = [[UINavigationController alloc] initWithRootViewController:controller];
+	navigation.modalPresentationStyle = UIModalPresentationFormSheet;
+	[self presentViewController:navigation animated:YES completion:NULL];
 }
 
 #pragma mark - Presentation
@@ -833,166 +626,17 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	[self presentViewController:navigation animated:YES completion:NULL];
 }
 
-#pragma mark - SRRadioPlayerDelegate
-
-- (void)radioPlayer:(SRRadioPlayer *)player didChangeState:(SRRadioPlayerState)state {
-	[self updateToolbarItems];
-	[self notifyPlayCompletion];
-	[self updateNowPlayingInfo];
-    [self updateNowPlayingState];
-	if (state == SRRadioPlayerStateError) {
-		[self handlePlaybackError];
-		[self stopAction];
-	}
-	if (state == SRRadioPlayerStatePlaying &&
-		self.sleepTimer && !self.sleepTimer.isRunning) {
-		[self startSleepTimer];
-	}
-	if (state == SRRadioPlayerStateOpening ||
-		state == SRRadioPlayerStateBuffering) {
-		[self startBackgroundTask];
-	}
-	if (state == SRRadioPlayerStateError ||
-		state == SRRadioPlayerStatePlaying ||
-		state == SRRadioPlayerStateStopped) {
-		[self endBackgroundTask];
-	}
-    if (state != SRRadioPlayerStateOpening &&
-        state != SRRadioPlayerStateBuffering) {
-        [self invalidateBufferingTimeoutTimer];
-    }
+- (void)presentSheetWithController:(UIViewController *)controller {
+	controller.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+																								  target:self
+																								  action:@selector(dismissSheet:)];
+	UINavigationController *navigation = [[UINavigationController alloc] initWithRootViewController:controller];
+	navigation.modalPresentationStyle = UIModalPresentationFormSheet;
+	[self presentViewController:navigation animated:YES completion:NULL];
 }
 
-- (void)radioPlayer:(SRRadioPlayer *)player didChangeMetaData:(NSDictionary *)metadata {
-	[self updateNowPlayingInfo];
-}
-
-#pragma mark - SRSleepTimerDelegate
-
-- (void)sleepTimer:(SRSleepTimer *)timer changeVolumeLevel:(float)volume {
-	int playerVolume = (int)(volume * 100.0);
-	[[SRRadioPlayer sharedPlayer] setVolume:playerVolume];
-}
-
-- (void)sleepTimer:(SRSleepTimer *)timer timeRemaining:(NSTimeInterval)timeRemaining {
-	self.sleepTimerView.timeRemaining = timeRemaining;
-}
-
-- (void)sleepTimerDidEnd:(SRSleepTimer *)timer {
-	[self stopAction];
-}
-
-#pragma mark - SRSleepTimerViewDelegate
-
-- (void)sleepTimerViewCancelButtonPressed:(SRSleepTimerView *)view {
-	[self clearSleepTimer];
-	[[SRRadioPlayer sharedPlayer] setVolume:100];
-}
-
-#pragma mark - Remote control events
-
-- (void)startRemoteControlTracking {
-	MPRemoteCommandCenter *commandCenter = [MPRemoteCommandCenter sharedCommandCenter];
-	
-	MPRemoteCommand *nextTrackCommand = [commandCenter nextTrackCommand];
-	[nextTrackCommand setEnabled:YES];
-	[nextTrackCommand addTarget:self action:@selector(remotePlayNext)];
-	
-	MPRemoteCommand *previousTrackCommand = [commandCenter previousTrackCommand];
-	[previousTrackCommand setEnabled:YES];
-	[previousTrackCommand addTarget:self action:@selector(remotePlayPrevious)];
-	
-	MPRemoteCommand *pauseCommand = [commandCenter pauseCommand];
-	[pauseCommand setEnabled:YES];
-	[pauseCommand addTarget:self action:@selector(remoteStop)];
-	
-	MPRemoteCommand *playCommand = [commandCenter playCommand];
-	[playCommand setEnabled:YES];
-	[playCommand addTarget:self action:@selector(remotePlay)];
-	
-	MPRemoteCommand *togglePlayPauseCommand = [commandCenter togglePlayPauseCommand];
-	[togglePlayPauseCommand setEnabled:YES];
-	[togglePlayPauseCommand addTarget:self action:@selector(remoteTogglePlayPause)];
-}
-
-- (void)endRemoteControlTracking {
-	MPRemoteCommandCenter *commandCenter = [MPRemoteCommandCenter sharedCommandCenter];
-	
-	MPRemoteCommand *nextTrackCommand = [commandCenter nextTrackCommand];
-	[nextTrackCommand setEnabled:NO];
-	[nextTrackCommand removeTarget:self];
-	
-	MPRemoteCommand *previousTrackCommand = [commandCenter previousTrackCommand];
-	[previousTrackCommand setEnabled:NO];
-	[previousTrackCommand removeTarget:self];
-	
-	MPRemoteCommand *pauseCommand = [commandCenter pauseCommand];
-	[pauseCommand setEnabled:NO];
-	[pauseCommand removeTarget:self];
-	
-	MPRemoteCommand *playCommand = [commandCenter playCommand];
-	[playCommand setEnabled:NO];
-	[playCommand removeTarget:self];
-	
-	MPRemoteCommand *togglePlayPauseCommand = [commandCenter togglePlayPauseCommand];
-	[togglePlayPauseCommand setEnabled:NO];
-	[togglePlayPauseCommand removeTarget:self];
-}
-
-- (MPRemoteCommandHandlerStatus)remotePlay {
-	[self playAction];
-	return MPRemoteCommandHandlerStatusSuccess;
-}
-
-- (MPRemoteCommandHandlerStatus)remoteStop {
-	[self stopAction];
-	return MPRemoteCommandHandlerStatusSuccess;
-}
-
-- (MPRemoteCommandHandlerStatus)remoteTogglePlayPause {
-	SRRadioPlayerState state = [[SRRadioPlayer sharedPlayer] state];
-	if (state == SRRadioPlayerStatePlaying &&
-        [[SRRadioPlayer sharedPlayer] timePlaying] > 1.0) {
-		[self stopAction];
-	} else {
-		[self playAction];
-	}
-	return MPRemoteCommandHandlerStatusSuccess;
-}
-
-- (MPRemoteCommandHandlerStatus)remotePlayNext {
-	[self selectNextStation];
-	[self playAction];
-	return MPRemoteCommandHandlerStatusSuccess;
-}
-
-- (MPRemoteCommandHandlerStatus)remotePlayPrevious {
-	[self selectPreviousStation];
-	[self playAction];
-	return MPRemoteCommandHandlerStatusSuccess;
-}
-
-- (void)notifyPlayCompletion {
-	if (self.playCompletion != nil) {
-		SRRadioPlayerState state = [[SRRadioPlayer sharedPlayer] state];
-		if (state == SRRadioPlayerStatePlaying) {
-			self.playCompletion(nil);
-			self.playCompletion = nil;
-		} else if (state == SRRadioPlayerStateError) {
-			SRRadioStation *station = [[SRRadioPlayer sharedPlayer] currentRadioStation];
-			NSString *message = [NSString stringWithFormat:NSLocalizedString(@"PlaybackErrorStation", @""), station.name];
-			NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : message}];
-			self.playCompletion(error);
-			self.playCompletion = nil;
-		}
-	}
-}
-
-- (void)cancelPendingPlayCompletion {
-	if (self.playCompletion != nil) {
-		self.playCompletion(nil);
-		self.playCompletion = nil;
-	}
+- (void)dismissSheet:(id)sender {
+	[self dismissViewControllerAnimated:YES completion:NULL];
 }
 
 #pragma mark - Error handling
@@ -1007,12 +651,13 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 												  handler:^(UIAlertAction * _Nonnull action) {
 		[weakSelf loadRadioStations];
 	}]];
-	[self presentViewController:controller animated:YES completion:nil];
+	[self presentOnTop:controller];
 }
 
-- (void)handlePlaybackError {
-	SRRadioStation *station = [[SRRadioPlayer sharedPlayer] currentRadioStation];
-	BOOL canReportProblem = [self isInternetReachable] && [self canReportProblemForRadioStation:station];
+- (void)handlePlaybackErrorForStation:(SRRadioStation *)station {
+	if ([[UIApplication sharedApplication] applicationState] != UIApplicationStateActive) {
+		return;
+	}
 	NSString *message = nil;
 	if ([self isInternetReachable]) {
 		message = [NSString stringWithFormat:NSLocalizedString(@"PlaybackErrorStation", @""), station.name];
@@ -1020,217 +665,28 @@ typedef void (^SRRadioPlayCompletion)(NSError *error);
 	else {
 		message = [NSString stringWithFormat:NSLocalizedString(@"PlaybackErrorInternet", @""), station.name];
 	}
-	if ([self showErrorPopup]) {
-		// display error
-		UIAlertController *controller = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Oops", @"Oops!")
-																			message:message
-																	 preferredStyle:UIAlertControllerStyleAlert];
-		if (canReportProblem) {
-			__weak SRRadioViewController *weakSelf = self;
-			[controller addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Report", @"Report")
-														   style:UIAlertActionStyleDefault
-														 handler:^(UIAlertAction * _Nonnull action) {
-				[weakSelf reportProblemWithRadioStation:station];
-			}]];
-		}
-		[controller addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Ok", @"Ok")
-													   style:UIAlertActionStyleCancel
-													 handler:nil]];
-		[self presentViewController:controller animated:YES completion:nil];
+	UIAlertController *controller = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Oops", @"Oops!")
+																		message:message
+																 preferredStyle:UIAlertControllerStyleAlert];
+	[controller addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Ok", @"Ok")
+												   style:UIAlertActionStyleCancel
+												 handler:nil]];
+	[self presentOnTop:controller];
+}
+
+- (void)presentOnTop:(UIViewController *)controller {
+	// present on top of any sheet that might be visible
+	UIViewController *presenter = self;
+	while (presenter.presentedViewController && !presenter.presentedViewController.isBeingDismissed) {
+		presenter = presenter.presentedViewController;
 	}
-	
-	// Report error to Crashlytics
-
-	if ([self isInternetReachable] &&
-		![[SRDataManager sharedManager] isCustomRadioStation:station] &&
-		message != nil &&
-		station.url != nil) {
-		NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : message, NSURLErrorKey: station.url}];
-		[[FIRCrashlytics crashlytics] recordError:error];
-	}
-}
-
-- (BOOL)showErrorPopup {
-	return [[UIApplication sharedApplication] applicationState] == UIApplicationStateActive;
-}
-
-#pragma mark - Sleep timer
-
-- (void)setupSleepTimer {
-	[self.sleepTimer invalidate];
-	NSTimeInterval interval = [SRDataManager sharedManager].sleepTimerInterval;
-	self.sleepTimer = [[SRSleepTimer alloc] initWithInterval:interval delegate:self];
-	[self showSleepTimerViewAnimated:YES];
-}
-
-- (void)startSleepTimer {
-	[self.sleepTimer startTimer];
-}
-
-- (void)clearSleepTimer {
-	[self.sleepTimer invalidate];
-	self.sleepTimer = nil;
-	[self hideSleepTimerViewAnimated:YES];
-}
-
-- (void)showSleepTimerViewAnimated:(BOOL)animated {
-	if (!self.sleepTimerView) {
-		self.sleepTimerView = [[SRSleepTimerView alloc] init];
-		self.sleepTimerView.timeRemaining = self.sleepTimer.timeRemaining;
-		self.sleepTimerView.delegate = self;
-		self.sleepTimerView.alpha = 0.f;
-		[self layoutSleepTimerView];
-		CGRect sleepTimerViewFrame = self.sleepTimerView.frame;
-		sleepTimerViewFrame.size.height = 0.f;
-		self.sleepTimerView.frame = sleepTimerViewFrame;
-		[self.view addSubview:self.sleepTimerView];
-	}
-	
-	[UIView animateWithDuration:animated ? 0.3f : 0.f animations:^{
-		self.sleepTimerView.alpha = 1.f;
-		[self layoutSleepTimerView];
-		[self setupTableViewInsets];
-	}];
-}
-
-- (void)hideSleepTimerViewAnimated:(BOOL)animated {
-	if (self.sleepTimerView) {
-		UIView *sleepTimerView = self.sleepTimerView;
-		self.sleepTimerView = nil;
-		[UIView animateWithDuration:animated ? 0.3f : 0.f
-						 animations:^{
-							 sleepTimerView.alpha = 0.f;
-							 [self setupTableViewInsets];
-						 }
-						 completion:^(BOOL finished) {
-							 [sleepTimerView removeFromSuperview];
-						 }];
-	}
-}
-
-#pragma mark - Report problem
-
-- (BOOL)canReportProblemForRadioStation:(SRRadioStation *)station {
-	return [MFMailComposeViewController canSendMail] && ![[SRDataManager sharedManager] isCustomRadioStation:station];
-}
-
-- (void)reportProblemWithRadioStation:(SRRadioStation *)station {
-	MFMailComposeViewController *mailController = [[MFMailComposeViewController alloc] init];
-	mailController.modalPresentationStyle = UIModalPresentationFormSheet;
-	mailController.mailComposeDelegate = self;
-	[mailController setSubject:[NSString stringWithFormat:@"Report problem [%@]", station.name]];
-	[mailController setToRecipients:@[@"sloradio@jernej.org"]];
-	NSString *message = [NSString stringWithFormat:@"There is a problem with the following radio station.\n\nID: %ld\nName: %@\nURL: %@", (long)station.stationId, station.name, station.url];
-	[mailController setMessageBody:message isHTML:NO];
-	[self presentViewController:mailController animated:YES completion:NULL];
-}
-
-- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
-	[self dismissViewControllerAnimated:YES completion:NULL];
-}
-
-#pragma mark - Screen rotation
-
-- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
-	[coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
-		[self layoutViews];
-	} completion:nil];
+	[presenter presentViewController:controller animated:YES completion:nil];
 }
 
 #pragma mark - Utils
 
-- (UIView *)viewWithImageName:(NSString *)imageName {
-	UIImage *image = [[UIImage imageNamed:imageName] imageWithColor:[UIColor whiteColor]];
-	UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-	imageView.contentMode = UIViewContentModeCenter;
-	return imageView;
-}
-
 - (BOOL)isInternetReachable {
 	return [[Reachability reachabilityForInternetConnection] currentReachabilityStatus] != NotReachable;
-}
-
-#pragma mark - Car play data source
-
-- (void)reloadCarPlayData {
-	NSArray *stations = [self stations];
-	NSMutableArray *items = [NSMutableArray arrayWithCapacity:stations.count];
-	for (SRRadioStation *station in stations) {
-		MPContentItem *item = [[MPContentItem alloc] initWithIdentifier:[NSString stringWithFormat:@"%ld", (long)station.stationId]];
-		item.title = station.name;
-		item.artwork = [station preloadedArtworkForWidth:SRCarPlayArtworkWidth];
-		if (@available(iOS 10.0, *)) {
-			item.streamingContent = YES;
-		}
-		item.playable = YES;
-		[items addObject:item];
-	}
-	self.carPlayItems = items;
-	[[MPPlayableContentManager sharedContentManager] reloadData];
-}
-
-- (void)refreshCarPlayArtworkForStation:(SRRadioStation *)station {
-	NSString *identifier = [NSString stringWithFormat:@"%ld", (long)station.stationId];
-	for (MPContentItem *item in self.carPlayItems) {
-		if ([item.identifier isEqualToString:identifier]) {
-			item.artwork = [station preloadedArtworkForWidth:SRCarPlayArtworkWidth];
-			[[MPPlayableContentManager sharedContentManager] reloadData];
-			break;
-		}
-	}
-}
-
-- (void)checkIfCarPlayDataReloadIsNeeded {
-	[self setupCarPlayDataReloadTimer];
-}
-
-- (void)setupCarPlayDataReloadTimer {
-	[self invalidateCarPlayDataReloadTimer];
-	self.carPlayDataReloadTimer = [NSTimer timerWithTimeInterval:0.1
-														  target:self
-														selector:@selector(carPlayDataReloadTimerFired:)
-														userInfo:nil
-														 repeats:NO];
-	[[NSRunLoop mainRunLoop] addTimer:self.carPlayDataReloadTimer forMode:NSRunLoopCommonModes];
-}
-
-- (void)invalidateCarPlayDataReloadTimer {
-	[self.carPlayDataReloadTimer invalidate];
-	self.carPlayDataReloadTimer = nil;
-}
-
-- (void)carPlayDataReloadTimerFired:(NSTimer *)timer {
-	[self invalidateCarPlayDataReloadTimer];
-	NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
-	if (now - self.lastCarPlayDataReloadTime > SRCarPlayDataReloadInterval) {
-		self.lastCarPlayDataReloadTime = now;
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[self updateRadioStations];
-			[[MPPlayableContentManager sharedContentManager] reloadData];
-		});
-	}
-}
-
-#pragma mark - MPPlayableContentManager
-
-- (NSInteger)numberOfChildItemsAtIndexPath:(NSIndexPath *)indexPath {
-	return [[self carPlayItems] count];
-}
-
-- (nullable MPContentItem *)contentItemAtIndexPath:(NSIndexPath *)indexPath {
-	[self checkIfCarPlayDataReloadIsNeeded];
-	return [[self carPlayItems] objectAtIndex:[indexPath indexAtPosition:0]];
-}
-
-- (void)playableContentManager:(MPPlayableContentManager *)contentManager initiatePlaybackOfContentItemAtIndexPath:(NSIndexPath *)indexPath completionHandler:(void(^)(NSError * __nullable))completionHandler {
-	[self cancelPendingPlayCompletion];
-	SRRadioStation *station = [[self stations] objectAtIndex:[indexPath indexAtPosition:0]];
-	self.playCompletion = ^(NSError *error) {
-		completionHandler(error);
-	};
-	dispatch_async(dispatch_get_main_queue(), ^{
-		[self playRadioStation:station];
-	});
 }
 
 @end

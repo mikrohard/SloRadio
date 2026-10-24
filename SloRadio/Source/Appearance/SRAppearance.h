@@ -11,21 +11,8 @@
 @interface SRAppearance : NSObject
 
 + (UIColor *)mainColor;
-+ (UIColor *)navigationBarContentColor;
-+ (UIColor *)menuBackgroundColor;
-+ (UIColor *)menuContentColor;
-+ (UIColor *)menuSeparatorColor;
 
-+ (UIColor *)cellBackgroundColor;
-+ (UIColor *)cellActionColor;
-+ (UIColor *)cellReportColor;
-
-+ (UIColor *)textColor;
-+ (UIColor *)disabledTextColor;
-
-+ (UIFont *)applicationFontWithSize:(CGFloat)size;
-+ (UIFont *)boldApplicationFontWithSize:(CGFloat)size;
-+ (UIFont *)mediumApplicationFontWithSize:(CGFloat)size;
-+ (UIFont *)lightApplicationFontWithSize:(CGFloat)size;
+// Settings style icon: a white symbol on a rounded, colored square
++ (UIImage *)iconWithSymbolName:(NSString *)symbolName backgroundColor:(UIColor *)backgroundColor;
 
 @end

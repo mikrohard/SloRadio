@@ -8,6 +8,10 @@
 
 #import "SRAppearance.h"
 
+static CGFloat const SRIconSize = 30.f;
+static CGFloat const SRIconCornerRadius = 7.f;
+static CGFloat const SRIconSymbolPointSize = 15.f;
+
 @implementation SRAppearance
 
 + (UIColor *)mainColor {
@@ -15,83 +19,21 @@
 	return [UIColor colorWithRed:255.0/255.0 green:150.0/255.0 blue:0.0/255.0 alpha:1.0];
 }
 
-+ (UIColor *)navigationBarContentColor {
-	if (@available(iOS 13, *)) {
-		return [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
-			if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
-				return [UIColor whiteColor];
-			} else {
-				return [UIColor blackColor];
-			}
-		}];
-	}
-	return [UIColor blackColor];
-}
-
-+ (UIColor *)menuBackgroundColor {
-	return [UIColor blackColor];
-}
-
-+ (UIColor *)menuContentColor {
-	return [UIColor colorWithWhite:1.f alpha:0.6f];
-}
-
-+ (UIColor *)menuSeparatorColor {
-	return [UIColor colorWithWhite:1.f alpha:0.2f];
-}
-
-+ (UIColor *)cellBackgroundColor {
-	if (@available(iOS 13, *)) {
-		return [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
-			if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
-				return [UIColor colorWithRed:55.0/255.0 green:55.0/255.0 blue:55.0/255.0 alpha:1.0];
-			} else {
-				return [UIColor colorWithRed:210.0/255.0 green:210.0/255.0 blue:210.0/255.0 alpha:1.0];
-			}
-		}];
-	}
-	return [UIColor colorWithRed:210.0/255.0 green:210.0/255.0 blue:210.0/255.0 alpha:1.0];
-}
-
-+ (UIColor *)cellActionColor {
-	return [self mainColor];
-}
-
-+ (UIColor *)cellReportColor {
-	return [UIColor redColor];
-}
-
-+ (UIColor *)textColor {
-	if (@available(iOS 13, *)) {
-		return [UIColor colorWithDynamicProvider:^UIColor * _Nonnull(UITraitCollection * _Nonnull traitCollection) {
-			if (traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) {
-				return [UIColor whiteColor];
-			} else {
-				return [UIColor blackColor];
-			}
-		}];
-	}
-	return [UIColor blackColor];
-}
-
-+ (UIColor *)disabledTextColor {
-	return [UIColor colorWithWhite:0.f alpha:0.4f];
-}
-
-+ (UIFont *)applicationFontWithSize:(CGFloat)size {
-	return [UIFont fontWithName:@"HelveticaNeue" size:size];
-}
-
-+ (UIFont *)boldApplicationFontWithSize:(CGFloat)size {
-	return [UIFont fontWithName:@"HelveticaNeue-Bold" size:size];
-}
-
-+ (UIFont *)mediumApplicationFontWithSize:(CGFloat)size {
-	return [UIFont fontWithName:@"HelveticaNeue-Medium" size:size];
-}
-
-+ (UIFont *)lightApplicationFontWithSize:(CGFloat)size {
-	return [UIFont fontWithName:@"HelveticaNeue-Light" size:size];
++ (UIImage *)iconWithSymbolName:(NSString *)symbolName backgroundColor:(UIColor *)backgroundColor {
+	UIImageSymbolConfiguration *configuration = [UIImageSymbolConfiguration configurationWithPointSize:SRIconSymbolPointSize weight:UIImageSymbolWeightSemibold];
+	UIImage *symbol = [[UIImage systemImageNamed:symbolName withConfiguration:configuration] imageWithTintColor:[UIColor whiteColor] renderingMode:UIImageRenderingModeAlwaysOriginal];
+	CGRect bounds = CGRectMake(0, 0, SRIconSize, SRIconSize);
+	UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:bounds.size];
+	UIImage *icon = [renderer imageWithActions:^(UIGraphicsImageRendererContext *context) {
+		[backgroundColor setFill];
+		[[UIBezierPath bezierPathWithRoundedRect:bounds cornerRadius:SRIconCornerRadius] fill];
+		CGSize symbolSize = symbol.size;
+		[symbol drawInRect:CGRectMake((SRIconSize - symbolSize.width) / 2,
+									  (SRIconSize - symbolSize.height) / 2,
+									  symbolSize.width,
+									  symbolSize.height)];
+	}];
+	return [icon imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
 }
 
 @end

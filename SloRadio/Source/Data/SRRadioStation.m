@@ -23,32 +23,6 @@ NSString * const SRRadioStationDidPreloadArtwork = @"SRRadioStationDidPreloadArt
 @synthesize lastModified = _lastModified;
 @synthesize hidden = _hidden;
 
-- (MPMediaItemArtwork *)artworkForWidth:(CGFloat)width {
-    NSURL *iconUrl = [self iconUrlForWidth:width];
-    if (iconUrl != nil) {
-        return [[MPMediaItemArtwork alloc] initWithBoundsSize:CGSizeMake(width, width)
-                                               requestHandler:^UIImage * _Nonnull(CGSize size) {
-            UIImage *image = nil;
-            if (iconUrl != nil) {
-                NSString *cacheKey = [SRImageCache keyForUrl:iconUrl];
-                image = [[SRImageCache sharedCache] imageForKey:cacheKey];
-                if (!image) {
-                    image = [UIImage imageWithData:[NSData dataWithContentsOfURL:iconUrl]];
-                    [[SRImageCache sharedCache] cacheImage:image forKey:cacheKey];
-                }
-            }
-            if (!image) {
-                image = [UIImage imageNamed:@"PlaceholderArtwork"];
-            }
-            return image;
-        }];
-    } else {
-        return [[MPMediaItemArtwork alloc] initWithBoundsSize:CGSizeMake(width, width) requestHandler:^UIImage * _Nonnull(CGSize size) {
-            return [UIImage imageNamed:@"PlaceholderArtwork"];
-        }];
-    }
-}
-
 - (MPMediaItemArtwork *)preloadedArtworkForWidth:(CGFloat)width {
     UIImage *image = nil;
 	NSURL *iconUrl = [self iconUrlForWidth:width];
@@ -79,6 +53,40 @@ NSString * const SRRadioStationDidPreloadArtwork = @"SRRadioStationDidPreloadArt
 		return [NSURL URLWithString:iconUrl];
 	}
 	return nil;
+}
+
+#pragma mark - Artwork images
+
+- (UIImage *)cachedArtworkImageForWidth:(CGFloat)width {
+	NSURL *iconUrl = [self iconUrlForWidth:width];
+	if (iconUrl != nil) {
+		return [[SRImageCache sharedCache] imageForKey:[SRImageCache keyForUrl:iconUrl]];
+	}
+	return nil;
+}
+
+- (void)loadArtworkImageForWidth:(CGFloat)width completion:(void (^)(UIImage *image))completion {
+	NSURL *iconUrl = [self iconUrlForWidth:width];
+	if (iconUrl == nil) {
+		completion(nil);
+		return;
+	}
+	UIImage *cachedImage = [self cachedArtworkImageForWidth:width];
+	if (cachedImage != nil) {
+		completion(cachedImage);
+		return;
+	}
+	dispatch_async([SRRadioStation preloadQueue], ^{
+		NSString *cacheKey = [SRImageCache keyForUrl:iconUrl];
+		UIImage *image = [[SRImageCache sharedCache] imageForKey:cacheKey];
+		if (!image) {
+			image = [UIImage imageWithData:[NSData dataWithContentsOfURL:iconUrl]];
+			[[SRImageCache sharedCache] cacheImage:image forKey:cacheKey];
+		}
+		dispatch_async(dispatch_get_main_queue(), ^{
+			completion(image);
+		});
+	});
 }
 
 #pragma mark - Artwork preload

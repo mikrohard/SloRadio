@@ -30,6 +30,10 @@
 	UITextView *textView = [[UITextView alloc] initWithFrame:self.view.bounds];
 	textView.editable = NO;
 	textView.dataDetectorTypes = UIDataDetectorTypeLink;
+	textView.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
+	textView.adjustsFontForContentSizeCategory = YES;
+	textView.textColor = [UIColor secondaryLabelColor];
+	textView.textContainerInset = UIEdgeInsetsMake(16.f, 12.f, 16.f, 12.f);
 	textView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 	NSString *path = [[NSBundle mainBundle] pathForResource:@"acknowledgements" ofType:@"txt"];
 	NSString *text = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];

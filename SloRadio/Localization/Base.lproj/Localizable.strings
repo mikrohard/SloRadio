@@ -27,7 +27,6 @@
 "Done" = "Done";
 "Retry" = "Retry";
 "Ok" = "OK";
-"Report" = "Report";
 "Reset" = "Reset";
 "Cancel" = "Cancel";
 "Close" = "Close";
@@ -59,3 +58,34 @@
 "PlaybackErrorInternet" = "An error occured while trying to play “%@”. Please check your internet connection.";
 "PlaybackErrorStation" = "An error occured while trying to play “%@”. Please try again later.";
 "StationsResetFailed" = "Could not reset radio station list. Please try again later.";
+
+// Favorites & station lists
+"AllStations" = "All";
+"Favorites" = "Favorites";
+"Favorite" = "Favorite";
+"Unfavorite" = "Unfavorite";
+"AddToFavorites" = "Add to Favorites";
+"RemoveFromFavorites" = "Remove from Favorites";
+"NoFavorites" = "No Favorites Yet";
+"NoFavoritesMessage" = "Pick the stations you listen to the most to find them quickly.";
+"NoFavoritesCarPlayMessage" = "Tap the star on the Now Playing screen to add the current station to your favorites.";
+"EditList" = "Edit List";
+"EditFavorites" = "Edit Favorites";
+"Remove" = "Remove";
+"More" = "More";
+
+// Playback controls
+"Play" = "Play";
+"Pause" = "Pause";
+"Previous" = "Previous";
+"Next" = "Next";
+"PlayWithSleepTimer" = "Play with Sleep Timer";
+"CancelSleepTimer" = "Cancel Sleep Timer";
+
+// Settings
+"Duration" = "Duration";
+"SleepTimerFooter" = "When enabled, the sleep timer starts automatically every time playback starts. Swipe right on a station to start playback with the opposite setting.";
+
+"AddFavorites" = "Add Favorites";
+"ChooseFavorites" = "Choose Favorites";
+"AudioOutput" = "Audio Output";

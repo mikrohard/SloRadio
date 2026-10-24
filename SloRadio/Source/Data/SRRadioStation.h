@@ -20,8 +20,9 @@ extern NSString * const SRRadioStationDidPreloadArtwork;
 @property (nonatomic, assign) NSTimeInterval lastModified;
 @property (nonatomic, assign) BOOL hidden;
 
-- (MPMediaItemArtwork *)artworkForWidth:(CGFloat)width;
 - (MPMediaItemArtwork *)preloadedArtworkForWidth:(CGFloat)width;
 - (NSURL *)iconUrlForWidth:(CGFloat)width;
+- (UIImage *)cachedArtworkImageForWidth:(CGFloat)width;
+- (void)loadArtworkImageForWidth:(CGFloat)width completion:(void (^)(UIImage *image))completion;
 
 @end

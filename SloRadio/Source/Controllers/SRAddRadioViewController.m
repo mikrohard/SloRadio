@@ -11,7 +11,6 @@
 #import "SRRadioPlayer.h"
 #import "SRDataManager.h"
 #import "SRRadioStation.h"
-#import "MBProgressHUD.h"
 
 @interface SRAddRadioViewController () <UITextFieldDelegate, SRRadioPlayerDelegate>
 
@@ -32,7 +31,7 @@
 }
 
 - (instancetype)initWithRadioStation:(SRRadioStation *)station {
-	self = [self initWithStyle:UITableViewStyleGrouped];
+	self = [self initWithStyle:UITableViewStyleInsetGrouped];
 	if (self) {
 		self.station = station;
 		self.title = station.stationId > 0 ? NSLocalizedString(@"EditStation", nil) : NSLocalizedString(@"AddStation", nil);
@@ -132,17 +131,19 @@
 		cell.textInputField.returnKeyType = [self canEditStationUrl] ? UIReturnKeyNext : UIReturnKeyDone;
 		cell.textInputField.autocapitalizationType = UITextAutocapitalizationTypeWords;
 		cell.textInputField.enabled = [self canEditStationName];
-		cell.textInputField.textColor = [self canEditStationName] ? [SRAppearance textColor] : [SRAppearance disabledTextColor];
+		cell.textInputField.textColor = [self canEditStationName] ? [UIColor labelColor] : [UIColor secondaryLabelColor];
 	}
 	else if (indexPath.row == [self indexPathForRadioUrl].row &&
 			 indexPath.section == [self indexPathForRadioUrl].section) {
 		cell.textInputField.text = self.station.url.absoluteString;
 		cell.textInputField.placeholder = NSLocalizedString(@"ExampleUrl", nil);
 		cell.textInputField.keyboardType = UIKeyboardTypeURL;
+		cell.textInputField.autocorrectionType = UITextAutocorrectionTypeNo;
+		cell.textInputField.textContentType = UITextContentTypeURL;
 		cell.textInputField.returnKeyType = UIReturnKeyDone;
 		cell.textInputField.autocapitalizationType = UITextAutocapitalizationTypeNone;
 		cell.textInputField.enabled = [self canEditStationUrl];
-		cell.textInputField.textColor = [self canEditStationUrl] ? [SRAppearance textColor] : [SRAppearance disabledTextColor];
+		cell.textInputField.textColor = [self canEditStationUrl] ? [UIColor labelColor] : [UIColor secondaryLabelColor];
 	}
 	return cell;
 }
@@ -186,7 +187,7 @@
 	}
 	self.player.delegate = self;
 	[self.player playStreamAtUrl:url];
-	[self showProgressHUD];
+	[self showProgressIndicator];
 }
 
 - (void)stopPlaying {
@@ -195,15 +196,22 @@
 	self.player = nil;
 }
 
-#pragma mark - Progress HUD
+#pragma mark - Progress indicator
 
-- (void)showProgressHUD {
-	MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.navigationController.view animated:YES];
-	hud.dimBackground = YES;
+- (void)showProgressIndicator {
+	// the stream is being tested: show progress in place of the save button
+	[self.view endEditing:YES];
+	UIActivityIndicatorView *indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
+	[indicator startAnimating];
+	self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:indicator];
+	self.tableView.userInteractionEnabled = NO;
+	self.tableView.alpha = 0.6f;
 }
 
-- (void)hideProgressHUD {
-	[MBProgressHUD hideHUDForView:self.navigationController.view animated:YES];
+- (void)hideProgressIndicator {
+	self.tableView.userInteractionEnabled = YES;
+	self.tableView.alpha = 1.f;
+	[self setupNavigationButtons];
 }
 
 #pragma mark - UITextFieldDelegate
@@ -249,7 +257,7 @@
 - (void)radioPlayer:(SRRadioPlayer *)player didChangeState:(SRRadioPlayerState)state {
 	if (state == SRRadioPlayerStatePlaying) {
 		[[SRDataManager sharedManager] addRadioStation:self.station];
-		[self hideProgressHUD];
+		[self hideProgressIndicator];
 		__weak SRAddRadioViewController *weakSelf = self;
 		NSString *message = [NSString stringWithFormat:NSLocalizedString(@"StationAddedMessage", nil), self.station.name];
 		[self showAlertWithTitle:NSLocalizedString(@"Added", nil)
@@ -260,7 +268,7 @@
 	}
 	else if (state == SRRadioPlayerStateError || state == SRRadioPlayerStateStopped) {
 		[self stopPlaying];
-		[self hideProgressHUD];
+		[self hideProgressIndicator];
 		NSString *message = [NSString stringWithFormat:NSLocalizedString(@"StationNotAddedMessage", nil), self.station.name];
 		[self showAlertWithTitle:NSLocalizedString(@"Oops", @"Oops!")
 						 message:message

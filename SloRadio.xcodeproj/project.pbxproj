@@ -10,14 +10,7 @@
 		19CFF82E26D6CB18009299DC /* MobileVLCKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1969137D26D6C2FB0065EDC3 /* MobileVLCKit.xcframework */; };
 		19CFF82F26D6CB18009299DC /* MobileVLCKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1969137D26D6C2FB0065EDC3 /* MobileVLCKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		19F7767C2B7111DA000C1147 /* AVAudioSession+Override.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F7767B2B7111DA000C1147 /* AVAudioSession+Override.m */; };
-		C81D33091AEF83920076BF01 /* AMSlideMenuContentSegue.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D32FB1AEF83920076BF01 /* AMSlideMenuContentSegue.m */; };
-		C81D330A1AEF83920076BF01 /* AMSlideMenuLeftMenuSegue.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D32FD1AEF83920076BF01 /* AMSlideMenuLeftMenuSegue.m */; };
-		C81D330B1AEF83920076BF01 /* AMSlideMenuLeftTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D32FF1AEF83920076BF01 /* AMSlideMenuLeftTableViewController.m */; };
-		C81D330C1AEF83920076BF01 /* AMSlideMenuMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D33011AEF83920076BF01 /* AMSlideMenuMainViewController.m */; };
-		C81D330D1AEF83920076BF01 /* AMSlideMenuRightMenuSegue.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D33041AEF83920076BF01 /* AMSlideMenuRightMenuSegue.m */; };
-		C81D330E1AEF83920076BF01 /* AMSlideMenuRightTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D33061AEF83920076BF01 /* AMSlideMenuRightTableViewController.m */; };
-		C81D330F1AEF83920076BF01 /* UIViewController+AMSlideMenu.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D33081AEF83920076BF01 /* UIViewController+AMSlideMenu.m */; };
-		C81D33121AEF83CE0076BF01 /* SRLeftMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D33111AEF83CE0076BF01 /* SRLeftMenuViewController.m */; };
+		C79A30A67CD51E560B1ADDDD /* SRPlaybackManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 143585357E3002A528AE872C /* SRPlaybackManager.m */; };
 		C81D33171AEF84900076BF01 /* SRRadioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D33161AEF84900076BF01 /* SRRadioViewController.m */; };
 		C824E3811FF5226D00EF1B03 /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C824E3801FF5226D00EF1B03 /* VideoToolbox.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		C8336FFD26D972AD002D50F7 /* SRImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = C8336FFC26D972AD002D50F7 /* SRImageCache.m */; };
@@ -25,12 +18,7 @@
 		C83745641AF24FAF002EBB84 /* SRAddRadioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745631AF24FAF002EBB84 /* SRAddRadioViewController.m */; };
 		C83745681AF26E58002EBB84 /* SRTextInputCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745671AF26E58002EBB84 /* SRTextInputCell.m */; };
 		C837456C1AF28016002EBB84 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = C837456B1AF28016002EBB84 /* MBProgressHUD.m */; };
-		C83745771AF50BC5002EBB84 /* UITableView+Separators.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745761AF50BC5002EBB84 /* UITableView+Separators.m */; };
-		C837457B1AF50C83002EBB84 /* SRSeparatorView.m in Sources */ = {isa = PBXBuildFile; fileRef = C837457A1AF50C83002EBB84 /* SRSeparatorView.m */; };
-		C837457E1AF51C93002EBB84 /* SRNowPlayingView.m in Sources */ = {isa = PBXBuildFile; fileRef = C837457D1AF51C93002EBB84 /* SRNowPlayingView.m */; };
 		C83745821AF51D9B002EBB84 /* CBAutoScrollLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745811AF51D9B002EBB84 /* CBAutoScrollLabel.m */; };
-		C83745981AF554FD002EBB84 /* SRRadioTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745971AF554FD002EBB84 /* SRRadioTableViewCell.m */; };
-		C837459C1AF56613002EBB84 /* MCSwipeTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C837459B1AF56613002EBB84 /* MCSwipeTableViewCell.m */; };
 		C837459F1AF61B0C002EBB84 /* UIImage+Color.m in Sources */ = {isa = PBXBuildFile; fileRef = C837459E1AF61B0C002EBB84 /* UIImage+Color.m */; };
 		C83745A31AF634C4002EBB84 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745A21AF634C4002EBB84 /* Reachability.m */; };
 		C83745A61AF6426D002EBB84 /* SRSleepTimer.m in Sources */ = {isa = PBXBuildFile; fileRef = C83745A51AF6426D002EBB84 /* SRSleepTimer.m */; };
@@ -46,7 +34,6 @@
 		C8B1D3A31AEFF3B400A5E0A0 /* SRRadioStation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1D3A21AEFF3B400A5E0A0 /* SRRadioStation.m */; };
 		C8B4F36C2C1611E00076FFC3 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = C8B4F36B2C1611E00076FFC3 /* FirebaseAnalyticsWithoutAdIdSupport */; };
 		C8B4F36E2C1611E00076FFC3 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = C8B4F36D2C1611E00076FFC3 /* FirebaseCrashlytics */; };
-		C8BA48791FF5A5E100EA457A /* SRTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BA48781FF5A5E100EA457A /* SRTableViewCell.m */; };
 		C8C8FA381AEEADAD00E5E46C /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = C8C8FA371AEEADAD00E5E46C /* main.mm */; };
 		C8C8FA3B1AEEADAD00E5E46C /* SRAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C8FA3A1AEEADAD00E5E46C /* SRAppDelegate.m */; };
 		C8C8FA3E1AEEADAD00E5E46C /* SRMainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C8FA3D1AEEADAD00E5E46C /* SRMainViewController.m */; };
@@ -62,13 +49,16 @@
 		C8C8FA711AEEB70A00E5E46C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C8FA701AEEB70A00E5E46C /* UIKit.framework */; };
 		C8C8FA731AEEB71F00E5E46C /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C8FA721AEEB71F00E5E46C /* SystemConfiguration.framework */; };
 		C8C8FA791AEEB8B000E5E46C /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8C8FA781AEEB8B000E5E46C /* Security.framework */; };
-		C8FCC27E1AF69F9F00DE77EC /* SRSleepTimerView.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FCC27D1AF69F9F00DE77EC /* SRSleepTimerView.m */; };
 		C8FCC28A1AF7F09500DE77EC /* SRSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FCC2891AF7F09500DE77EC /* SRSettingsViewController.m */; };
 		C8FCC28E1AF7F68C00DE77EC /* SRSettingsPickerCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FCC28D1AF7F68C00DE77EC /* SRSettingsPickerCell.m */; };
 		C8FCC29B1AF91DDB00DE77EC /* SRAboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FCC2991AF91DDB00DE77EC /* SRAboutViewController.m */; };
 		C8FCC29F1AF9347400DE77EC /* SRAcknowledgementsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FCC29E1AF9347400DE77EC /* SRAcknowledgementsViewController.m */; };
 		C8FCC2A11AF938B300DE77EC /* acknowledgements.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8FCC2A01AF938B300DE77EC /* acknowledgements.txt */; };
 		C8FE891724F2EE4900BBD72D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C8FE891624F2EE4900BBD72D /* GoogleService-Info.plist */; };
+		DFFA8CD6F13ACA149D7F5EA1 /* SRPlatterView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D4659D9F7CC353361D2DCE4 /* SRPlatterView.m */; };
+		E028CD5F7ED7753B1D8CBA3B /* SRPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14708530F988E8FCB4420D57 /* SRPlayerViewController.m */; };
+		EBA78B09CF47C478BC03DA4F /* SRStationTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 2836258E924576AB39903DE7 /* SRStationTableViewCell.m */; };
+		894A403B651E870CDDCB91F5 /* SRFavoritesPickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0AEB08A1AB52DBC0134F9B /* SRFavoritesPickerViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,26 +86,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		018658C9A54CE7A51E301E63 /* SRPlatterView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRPlatterView.h; path = Source/Views/SRPlatterView.h; sourceTree = "<group>"; };
+		0D4659D9F7CC353361D2DCE4 /* SRPlatterView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRPlatterView.m; path = Source/Views/SRPlatterView.m; sourceTree = "<group>"; };
+		143585357E3002A528AE872C /* SRPlaybackManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRPlaybackManager.m; path = Source/Player/SRPlaybackManager.m; sourceTree = "<group>"; };
+		14708530F988E8FCB4420D57 /* SRPlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRPlayerViewController.m; path = Source/Controllers/SRPlayerViewController.m; sourceTree = "<group>"; };
 		1969137D26D6C2FB0065EDC3 /* MobileVLCKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MobileVLCKit.xcframework; path = Libraries/MobileVLCKit.xcframework; sourceTree = "<group>"; };
 		19F7767A2B7111DA000C1147 /* AVAudioSession+Override.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "AVAudioSession+Override.h"; path = "Source/Categories/AVAudioSession+Override.h"; sourceTree = "<group>"; };
 		19F7767B2B7111DA000C1147 /* AVAudioSession+Override.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "AVAudioSession+Override.m"; path = "Source/Categories/AVAudioSession+Override.m"; sourceTree = "<group>"; };
-		C81D32FA1AEF83920076BF01 /* AMSlideMenuContentSegue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AMSlideMenuContentSegue.h; path = Libraries/AMSlideMenu/AMSlideMenuContentSegue.h; sourceTree = "<group>"; };
-		C81D32FB1AEF83920076BF01 /* AMSlideMenuContentSegue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AMSlideMenuContentSegue.m; path = Libraries/AMSlideMenu/AMSlideMenuContentSegue.m; sourceTree = "<group>"; };
-		C81D32FC1AEF83920076BF01 /* AMSlideMenuLeftMenuSegue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AMSlideMenuLeftMenuSegue.h; path = Libraries/AMSlideMenu/AMSlideMenuLeftMenuSegue.h; sourceTree = "<group>"; };
-		C81D32FD1AEF83920076BF01 /* AMSlideMenuLeftMenuSegue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AMSlideMenuLeftMenuSegue.m; path = Libraries/AMSlideMenu/AMSlideMenuLeftMenuSegue.m; sourceTree = "<group>"; };
-		C81D32FE1AEF83920076BF01 /* AMSlideMenuLeftTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AMSlideMenuLeftTableViewController.h; path = Libraries/AMSlideMenu/AMSlideMenuLeftTableViewController.h; sourceTree = "<group>"; };
-		C81D32FF1AEF83920076BF01 /* AMSlideMenuLeftTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AMSlideMenuLeftTableViewController.m; path = Libraries/AMSlideMenu/AMSlideMenuLeftTableViewController.m; sourceTree = "<group>"; };
-		C81D33001AEF83920076BF01 /* AMSlideMenuMainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AMSlideMenuMainViewController.h; path = Libraries/AMSlideMenu/AMSlideMenuMainViewController.h; sourceTree = "<group>"; };
-		C81D33011AEF83920076BF01 /* AMSlideMenuMainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AMSlideMenuMainViewController.m; path = Libraries/AMSlideMenu/AMSlideMenuMainViewController.m; sourceTree = "<group>"; };
-		C81D33021AEF83920076BF01 /* AMSlideMenuProtocols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AMSlideMenuProtocols.h; path = Libraries/AMSlideMenu/AMSlideMenuProtocols.h; sourceTree = "<group>"; };
-		C81D33031AEF83920076BF01 /* AMSlideMenuRightMenuSegue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AMSlideMenuRightMenuSegue.h; path = Libraries/AMSlideMenu/AMSlideMenuRightMenuSegue.h; sourceTree = "<group>"; };
-		C81D33041AEF83920076BF01 /* AMSlideMenuRightMenuSegue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AMSlideMenuRightMenuSegue.m; path = Libraries/AMSlideMenu/AMSlideMenuRightMenuSegue.m; sourceTree = "<group>"; };
-		C81D33051AEF83920076BF01 /* AMSlideMenuRightTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AMSlideMenuRightTableViewController.h; path = Libraries/AMSlideMenu/AMSlideMenuRightTableViewController.h; sourceTree = "<group>"; };
-		C81D33061AEF83920076BF01 /* AMSlideMenuRightTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AMSlideMenuRightTableViewController.m; path = Libraries/AMSlideMenu/AMSlideMenuRightTableViewController.m; sourceTree = "<group>"; };
-		C81D33071AEF83920076BF01 /* UIViewController+AMSlideMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIViewController+AMSlideMenu.h"; path = "Libraries/AMSlideMenu/UIViewController+AMSlideMenu.h"; sourceTree = "<group>"; };
-		C81D33081AEF83920076BF01 /* UIViewController+AMSlideMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIViewController+AMSlideMenu.m"; path = "Libraries/AMSlideMenu/UIViewController+AMSlideMenu.m"; sourceTree = "<group>"; };
-		C81D33101AEF83CE0076BF01 /* SRLeftMenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRLeftMenuViewController.h; path = Source/Controllers/SRLeftMenuViewController.h; sourceTree = "<group>"; };
-		C81D33111AEF83CE0076BF01 /* SRLeftMenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRLeftMenuViewController.m; path = Source/Controllers/SRLeftMenuViewController.m; sourceTree = "<group>"; };
+		AC9D4610CB1FBE05C4D9CBB7 /* SRPlaybackManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRPlaybackManager.h; path = Source/Player/SRPlaybackManager.h; sourceTree = "<group>"; };
 		C81D33151AEF84900076BF01 /* SRRadioViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRRadioViewController.h; path = Source/Controllers/SRRadioViewController.h; sourceTree = "<group>"; };
 		C81D33161AEF84900076BF01 /* SRRadioViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRRadioViewController.m; path = Source/Controllers/SRRadioViewController.m; sourceTree = "<group>"; };
 		C81D33181AEF86D20076BF01 /* SRPrefixHeader.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SRPrefixHeader.pch; path = Source/Base/SRPrefixHeader.pch; sourceTree = "<group>"; };
@@ -130,18 +108,8 @@
 		C83745671AF26E58002EBB84 /* SRTextInputCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRTextInputCell.m; path = Source/Cells/SRTextInputCell.m; sourceTree = "<group>"; };
 		C837456A1AF28016002EBB84 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MBProgressHUD.h; path = Libraries/MBProgressHud/MBProgressHUD.h; sourceTree = "<group>"; };
 		C837456B1AF28016002EBB84 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MBProgressHUD.m; path = Libraries/MBProgressHud/MBProgressHUD.m; sourceTree = "<group>"; };
-		C83745751AF50BC5002EBB84 /* UITableView+Separators.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UITableView+Separators.h"; path = "Source/Categories/UITableView+Separators.h"; sourceTree = "<group>"; };
-		C83745761AF50BC5002EBB84 /* UITableView+Separators.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UITableView+Separators.m"; path = "Source/Categories/UITableView+Separators.m"; sourceTree = "<group>"; };
-		C83745791AF50C83002EBB84 /* SRSeparatorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSeparatorView.h; path = Source/Views/SRSeparatorView.h; sourceTree = "<group>"; };
-		C837457A1AF50C83002EBB84 /* SRSeparatorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSeparatorView.m; path = Source/Views/SRSeparatorView.m; sourceTree = "<group>"; };
-		C837457C1AF51C93002EBB84 /* SRNowPlayingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRNowPlayingView.h; path = Source/Views/SRNowPlayingView.h; sourceTree = "<group>"; };
-		C837457D1AF51C93002EBB84 /* SRNowPlayingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRNowPlayingView.m; path = Source/Views/SRNowPlayingView.m; sourceTree = "<group>"; };
 		C83745801AF51D9B002EBB84 /* CBAutoScrollLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CBAutoScrollLabel.h; path = Libraries/CBAutoScrollLabel/CBAutoScrollLabel.h; sourceTree = "<group>"; };
 		C83745811AF51D9B002EBB84 /* CBAutoScrollLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CBAutoScrollLabel.m; path = Libraries/CBAutoScrollLabel/CBAutoScrollLabel.m; sourceTree = "<group>"; };
-		C83745961AF554FD002EBB84 /* SRRadioTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRRadioTableViewCell.h; path = Source/Cells/SRRadioTableViewCell.h; sourceTree = "<group>"; };
-		C83745971AF554FD002EBB84 /* SRRadioTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRRadioTableViewCell.m; path = Source/Cells/SRRadioTableViewCell.m; sourceTree = "<group>"; };
-		C837459A1AF56613002EBB84 /* MCSwipeTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MCSwipeTableViewCell.h; path = Libraries/MCSwipeTableViewCell/MCSwipeTableViewCell.h; sourceTree = "<group>"; };
-		C837459B1AF56613002EBB84 /* MCSwipeTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MCSwipeTableViewCell.m; path = Libraries/MCSwipeTableViewCell/MCSwipeTableViewCell.m; sourceTree = "<group>"; };
 		C837459D1AF61B0C002EBB84 /* UIImage+Color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+Color.h"; path = "Source/Categories/UIImage+Color.h"; sourceTree = "<group>"; };
 		C837459E1AF61B0C002EBB84 /* UIImage+Color.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+Color.m"; path = "Source/Categories/UIImage+Color.m"; sourceTree = "<group>"; };
 		C83745A11AF634C4002EBB84 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Reachability.h; path = Libraries/Reachability/Reachability.h; sourceTree = "<group>"; };
@@ -166,8 +134,6 @@
 		C8B1D39F1AEFF20E00A5E0A0 /* SRDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRDataManager.m; path = Source/Data/SRDataManager.m; sourceTree = "<group>"; };
 		C8B1D3A11AEFF3B400A5E0A0 /* SRRadioStation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRRadioStation.h; path = Source/Data/SRRadioStation.h; sourceTree = "<group>"; };
 		C8B1D3A21AEFF3B400A5E0A0 /* SRRadioStation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRRadioStation.m; path = Source/Data/SRRadioStation.m; sourceTree = "<group>"; };
-		C8BA48771FF5A5E100EA457A /* SRTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SRTableViewCell.h; path = Source/Views/SRTableViewCell.h; sourceTree = "<group>"; };
-		C8BA48781FF5A5E100EA457A /* SRTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SRTableViewCell.m; path = Source/Views/SRTableViewCell.m; sourceTree = "<group>"; };
 		C8C8FA321AEEADAD00E5E46C /* SloRadio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SloRadio.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8C8FA361AEEADAD00E5E46C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C8C8FA371AEEADAD00E5E46C /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = main.mm; path = Source/Base/main.mm; sourceTree = "<group>"; };
@@ -190,8 +156,6 @@
 		C8C8FA701AEEB70A00E5E46C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		C8C8FA721AEEB71F00E5E46C /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		C8C8FA781AEEB8B000E5E46C /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
-		C8FCC27C1AF69F9F00DE77EC /* SRSleepTimerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSleepTimerView.h; path = Source/Views/SRSleepTimerView.h; sourceTree = "<group>"; };
-		C8FCC27D1AF69F9F00DE77EC /* SRSleepTimerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSleepTimerView.m; path = Source/Views/SRSleepTimerView.m; sourceTree = "<group>"; };
 		C8FCC2881AF7F09500DE77EC /* SRSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSettingsViewController.h; path = Source/Controllers/SRSettingsViewController.h; sourceTree = "<group>"; };
 		C8FCC2891AF7F09500DE77EC /* SRSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRSettingsViewController.m; path = Source/Controllers/SRSettingsViewController.m; sourceTree = "<group>"; };
 		C8FCC28C1AF7F68C00DE77EC /* SRSettingsPickerCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRSettingsPickerCell.h; path = Source/Cells/SRSettingsPickerCell.h; sourceTree = "<group>"; };
@@ -203,6 +167,11 @@
 		C8FCC2A01AF938B300DE77EC /* acknowledgements.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = acknowledgements.txt; path = Resources/acknowledgements.txt; sourceTree = "<group>"; };
 		C8FE88FC24F2D38600BBD72D /* SloRadio.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SloRadio.entitlements; sourceTree = "<group>"; };
 		C8FE891624F2EE4900BBD72D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		F0052D70F57953CA1870BA05 /* SRPlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRPlayerViewController.h; path = Source/Controllers/SRPlayerViewController.h; sourceTree = "<group>"; };
+		65943644198EADA5C4002E3E /* SRStationTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRStationTableViewCell.h; path = Source/Cells/SRStationTableViewCell.h; sourceTree = "<group>"; };
+		2836258E924576AB39903DE7 /* SRStationTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRStationTableViewCell.m; path = Source/Cells/SRStationTableViewCell.m; sourceTree = "<group>"; };
+		1470C7345FAE16A1C7F5D232 /* SRFavoritesPickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRFavoritesPickerViewController.h; path = Source/Controllers/SRFavoritesPickerViewController.h; sourceTree = "<group>"; };
+		DA0AEB08A1AB52DBC0134F9B /* SRFavoritesPickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRFavoritesPickerViewController.m; path = Source/Controllers/SRFavoritesPickerViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -274,44 +243,22 @@
 		C81D32F81AEF83680076BF01 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				C81D32F91AEF83810076BF01 /* AMSlideMenu */,
 				C837457F1AF51D89002EBB84 /* CBAutoScrollLabel */,
 				C83745691AF27FFA002EBB84 /* MBProgressHud */,
-				C83745991AF56606002EBB84 /* MCSwipeTableViewCell */,
 				C83745A01AF634B1002EBB84 /* Reachability */,
 			);
 			name = Libraries;
-			sourceTree = "<group>";
-		};
-		C81D32F91AEF83810076BF01 /* AMSlideMenu */ = {
-			isa = PBXGroup;
-			children = (
-				C81D32FA1AEF83920076BF01 /* AMSlideMenuContentSegue.h */,
-				C81D32FB1AEF83920076BF01 /* AMSlideMenuContentSegue.m */,
-				C81D32FC1AEF83920076BF01 /* AMSlideMenuLeftMenuSegue.h */,
-				C81D32FD1AEF83920076BF01 /* AMSlideMenuLeftMenuSegue.m */,
-				C81D32FE1AEF83920076BF01 /* AMSlideMenuLeftTableViewController.h */,
-				C81D32FF1AEF83920076BF01 /* AMSlideMenuLeftTableViewController.m */,
-				C81D33001AEF83920076BF01 /* AMSlideMenuMainViewController.h */,
-				C81D33011AEF83920076BF01 /* AMSlideMenuMainViewController.m */,
-				C81D33021AEF83920076BF01 /* AMSlideMenuProtocols.h */,
-				C81D33031AEF83920076BF01 /* AMSlideMenuRightMenuSegue.h */,
-				C81D33041AEF83920076BF01 /* AMSlideMenuRightMenuSegue.m */,
-				C81D33051AEF83920076BF01 /* AMSlideMenuRightTableViewController.h */,
-				C81D33061AEF83920076BF01 /* AMSlideMenuRightTableViewController.m */,
-				C81D33071AEF83920076BF01 /* UIViewController+AMSlideMenu.h */,
-				C81D33081AEF83920076BF01 /* UIViewController+AMSlideMenu.m */,
-			);
-			name = AMSlideMenu;
 			sourceTree = "<group>";
 		};
 		C81D33131AEF845A0076BF01 /* Menu */ = {
 			isa = PBXGroup;
 			children = (
 				C8C8FA3C1AEEADAD00E5E46C /* SRMainViewController.h */,
+				14708530F988E8FCB4420D57 /* SRPlayerViewController.m */,
+				F0052D70F57953CA1870BA05 /* SRPlayerViewController.h */,
+				DA0AEB08A1AB52DBC0134F9B /* SRFavoritesPickerViewController.m */,
+				1470C7345FAE16A1C7F5D232 /* SRFavoritesPickerViewController.h */,
 				C8C8FA3D1AEEADAD00E5E46C /* SRMainViewController.m */,
-				C81D33101AEF83CE0076BF01 /* SRLeftMenuViewController.h */,
-				C81D33111AEF83CE0076BF01 /* SRLeftMenuViewController.m */,
 			);
 			name = Menu;
 			sourceTree = "<group>";
@@ -341,9 +288,9 @@
 			isa = PBXGroup;
 			children = (
 				C83745661AF26E58002EBB84 /* SRTextInputCell.h */,
+				2836258E924576AB39903DE7 /* SRStationTableViewCell.m */,
+				65943644198EADA5C4002E3E /* SRStationTableViewCell.h */,
 				C83745671AF26E58002EBB84 /* SRTextInputCell.m */,
-				C83745961AF554FD002EBB84 /* SRRadioTableViewCell.h */,
-				C83745971AF554FD002EBB84 /* SRRadioTableViewCell.m */,
 			);
 			name = Cells;
 			sourceTree = "<group>";
@@ -360,8 +307,6 @@
 		C837456D1AF292CE002EBB84 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
-				C83745751AF50BC5002EBB84 /* UITableView+Separators.h */,
-				C83745761AF50BC5002EBB84 /* UITableView+Separators.m */,
 				C837459D1AF61B0C002EBB84 /* UIImage+Color.h */,
 				C837459E1AF61B0C002EBB84 /* UIImage+Color.m */,
 				C84E6F9C26DB96840021B692 /* NSString+Additions.h */,
@@ -375,14 +320,8 @@
 		C83745781AF50C4B002EBB84 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				C83745791AF50C83002EBB84 /* SRSeparatorView.h */,
-				C837457A1AF50C83002EBB84 /* SRSeparatorView.m */,
-				C837457C1AF51C93002EBB84 /* SRNowPlayingView.h */,
-				C837457D1AF51C93002EBB84 /* SRNowPlayingView.m */,
-				C8FCC27C1AF69F9F00DE77EC /* SRSleepTimerView.h */,
-				C8FCC27D1AF69F9F00DE77EC /* SRSleepTimerView.m */,
-				C8BA48771FF5A5E100EA457A /* SRTableViewCell.h */,
-				C8BA48781FF5A5E100EA457A /* SRTableViewCell.m */,
+				0D4659D9F7CC353361D2DCE4 /* SRPlatterView.m */,
+				018658C9A54CE7A51E301E63 /* SRPlatterView.h */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -394,15 +333,6 @@
 				C83745811AF51D9B002EBB84 /* CBAutoScrollLabel.m */,
 			);
 			name = CBAutoScrollLabel;
-			sourceTree = "<group>";
-		};
-		C83745991AF56606002EBB84 /* MCSwipeTableViewCell */ = {
-			isa = PBXGroup;
-			children = (
-				C837459A1AF56613002EBB84 /* MCSwipeTableViewCell.h */,
-				C837459B1AF56613002EBB84 /* MCSwipeTableViewCell.m */,
-			);
-			name = MCSwipeTableViewCell;
 			sourceTree = "<group>";
 		};
 		C83745A01AF634B1002EBB84 /* Reachability */ = {
@@ -508,6 +438,8 @@
 				C8C8FA5C1AEEAF5A00E5E46C /* SRRadioPlayer.h */,
 				C8C8FA5D1AEEAF5A00E5E46C /* SRRadioPlayer.m */,
 				C83745A41AF6426D002EBB84 /* SRSleepTimer.h */,
+				143585357E3002A528AE872C /* SRPlaybackManager.m */,
+				AC9D4610CB1FBE05C4D9CBB7 /* SRPlaybackManager.h */,
 				C83745A51AF6426D002EBB84 /* SRSleepTimer.m */,
 			);
 			name = Player;
@@ -700,43 +632,33 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				894A403B651E870CDDCB91F5 /* SRFavoritesPickerViewController.m in Sources */,
+				EBA78B09CF47C478BC03DA4F /* SRStationTableViewCell.m in Sources */,
+				E028CD5F7ED7753B1D8CBA3B /* SRPlayerViewController.m in Sources */,
+				DFFA8CD6F13ACA149D7F5EA1 /* SRPlatterView.m in Sources */,
+				C79A30A67CD51E560B1ADDDD /* SRPlaybackManager.m in Sources */,
 				C83745821AF51D9B002EBB84 /* CBAutoScrollLabel.m in Sources */,
-				C8BA48791FF5A5E100EA457A /* SRTableViewCell.m in Sources */,
 				C837456C1AF28016002EBB84 /* MBProgressHUD.m in Sources */,
 				C83745A61AF6426D002EBB84 /* SRSleepTimer.m in Sources */,
-				C81D330F1AEF83920076BF01 /* UIViewController+AMSlideMenu.m in Sources */,
 				C83745681AF26E58002EBB84 /* SRTextInputCell.m in Sources */,
 				C81D33171AEF84900076BF01 /* SRRadioViewController.m in Sources */,
-				C8FCC27E1AF69F9F00DE77EC /* SRSleepTimerView.m in Sources */,
 				19F7767C2B7111DA000C1147 /* AVAudioSession+Override.m in Sources */,
 				C83745A31AF634C4002EBB84 /* Reachability.m in Sources */,
-				C837457B1AF50C83002EBB84 /* SRSeparatorView.m in Sources */,
-				C83745771AF50BC5002EBB84 /* UITableView+Separators.m in Sources */,
 				C83745641AF24FAF002EBB84 /* SRAddRadioViewController.m in Sources */,
 				C856C5DD2CA8709F003B35C2 /* SRCarPlaySceneDelegate.m in Sources */,
 				C8B1D3A01AEFF20E00A5E0A0 /* SRDataManager.m in Sources */,
 				C837459F1AF61B0C002EBB84 /* UIImage+Color.m in Sources */,
-				C81D330D1AEF83920076BF01 /* AMSlideMenuRightMenuSegue.m in Sources */,
-				C837459C1AF56613002EBB84 /* MCSwipeTableViewCell.m in Sources */,
-				C81D33091AEF83920076BF01 /* AMSlideMenuContentSegue.m in Sources */,
-				C837457E1AF51C93002EBB84 /* SRNowPlayingView.m in Sources */,
 				C84E6F9E26DB96840021B692 /* NSString+Additions.m in Sources */,
 				C8C8FA3E1AEEADAD00E5E46C /* SRMainViewController.m in Sources */,
-				C81D330E1AEF83920076BF01 /* AMSlideMenuRightTableViewController.m in Sources */,
 				C8FCC29F1AF9347400DE77EC /* SRAcknowledgementsViewController.m in Sources */,
 				C8336FFD26D972AD002D50F7 /* SRImageCache.m in Sources */,
 				C837454E1AF11715002EBB84 /* SRAppearance.m in Sources */,
-				C83745981AF554FD002EBB84 /* SRRadioTableViewCell.m in Sources */,
 				C8FCC28A1AF7F09500DE77EC /* SRSettingsViewController.m in Sources */,
 				C8FCC28E1AF7F68C00DE77EC /* SRSettingsPickerCell.m in Sources */,
-				C81D33121AEF83CE0076BF01 /* SRLeftMenuViewController.m in Sources */,
-				C81D330C1AEF83920076BF01 /* AMSlideMenuMainViewController.m in Sources */,
 				C8C8FA3B1AEEADAD00E5E46C /* SRAppDelegate.m in Sources */,
 				C8C8FA381AEEADAD00E5E46C /* main.mm in Sources */,
 				C8B1D3A31AEFF3B400A5E0A0 /* SRRadioStation.m in Sources */,
-				C81D330B1AEF83920076BF01 /* AMSlideMenuLeftTableViewController.m in Sources */,
 				C8FCC29B1AF91DDB00DE77EC /* SRAboutViewController.m in Sources */,
-				C81D330A1AEF83920076BF01 /* AMSlideMenuLeftMenuSegue.m in Sources */,
 				C856C5D82CA86FD3003B35C2 /* SRAppSceneDelegate.m in Sources */,
 				C84DCC721AFD28570062C8F7 /* SRSliderTableViewCell.m in Sources */,
 				C8C8FA5E1AEEAF5A00E5E46C /* SRRadioPlayer.m in Sources */,
@@ -833,7 +755,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -882,7 +804,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -897,8 +819,8 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = SloRadio/SloRadio.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 44;
 				DEVELOPMENT_TEAM = 4PZ2UBJ583;
 				ENABLE_BITCODE = NO;
@@ -919,7 +841,7 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
 				INFOPLIST_FILE = SloRadio/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -932,7 +854,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.jernej.RadioWakeUp.sloradio;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "SloRadio Development";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Debug;
 		};
@@ -943,8 +865,8 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = SloRadio/SloRadio.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 44;
 				DEVELOPMENT_TEAM = 4PZ2UBJ583;
 				ENABLE_BITCODE = NO;
@@ -965,7 +887,7 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
 				INFOPLIST_FILE = SloRadio/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -978,7 +900,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.jernej.RadioWakeUp.sloradio;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "SloRadio App Store";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Release;
 		};

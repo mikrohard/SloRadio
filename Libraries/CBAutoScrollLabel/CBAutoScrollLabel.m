@@ -141,6 +141,9 @@ static void each_object(NSArray *objects, void (^block)(id object)) {
 
     EACH_LABEL(text, theText)
 
+    // the intrinsic height depends on the text (an empty label has no height)
+    [self invalidateIntrinsicContentSize];
+
     if (refresh)
         [self refreshLabels];
 }
@@ -159,6 +162,9 @@ static void each_object(NSArray *objects, void (^block)(id object)) {
         return;
 
     EACH_LABEL(attributedText, theText)
+
+    // the intrinsic height depends on the text (an empty label has no height)
+    [self invalidateIntrinsicContentSize];
 
     if (refresh)
         [self refreshLabels];

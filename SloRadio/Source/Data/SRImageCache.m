@@ -63,6 +63,9 @@
 		NSString *path = [fileUrl path];
 		if ([self.fileManager fileExistsAtPath:path]) {
 			image = [UIImage imageWithContentsOfFile:path];
+			if (image) {
+				[self.imageCache setObject:image forKey:key];
+			}
 		}
 	}
 	return image;

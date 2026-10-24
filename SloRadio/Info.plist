@@ -29,6 +29,34 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>CPTemplateApplicationSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneClassName</key>
+					<string>CPTemplateApplicationScene</string>
+					<key>UISceneConfigurationName</key>
+					<string>CarPlay</string>
+					<key>UISceneDelegateClassName</key>
+					<string>SRCarPlaySceneDelegate</string>
+				</dict>
+			</array>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneConfigurationName</key>
+					<string>AppConfiguration</string>
+					<key>UISceneDelegateClassName</key>
+					<string>SRAppSceneDelegate</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
@@ -52,33 +80,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>UIApplicationSceneManifest</key>
-	<dict>
-		<key>UIApplicationSupportsMultipleScenes</key>
-		<false/>
-		<key>UISceneConfigurations</key>
-		<dict>
-			<key>UIWindowSceneSessionRoleApplication</key>
-			<array>
-				<dict>
-					<key>UISceneConfigurationName</key>
-					<string>AppConfiguration</string>
-					<key>UISceneDelegateClassName</key>
-					<string>SRAppSceneDelegate</string>
-				</dict>
-			</array>
-			<key>CPTemplateApplicationSceneSessionRoleApplication</key>
-			<array>
-				<dict>
-					<key>UISceneClassName</key>
-					<string>CPTemplateApplicationScene</string>
-					<key>UISceneConfigurationName</key>
-					<string>CarPlay</string>
-					<key>UISceneDelegateClassName</key>
-					<string>SRCarPlaySceneDelegate</string>
-				</dict>
-			</array>
-		</dict>
-	</dict>
 </dict>
 </plist>

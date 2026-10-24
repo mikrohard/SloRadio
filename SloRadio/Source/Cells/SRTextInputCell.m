@@ -17,26 +17,24 @@
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
 	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
 	if (self) {
+		self.selectionStyle = UITableViewCellSelectionStyleNone;
 		UITextField *textField = [[UITextField alloc] init];
+		textField.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+		textField.adjustsFontForContentSizeCategory = YES;
+		textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+		textField.translatesAutoresizingMaskIntoConstraints = NO;
 		[self.contentView addSubview:textField];
+		UILayoutGuide *margins = self.contentView.layoutMarginsGuide;
+		[NSLayoutConstraint activateConstraints:@[
+			[textField.topAnchor constraintEqualToAnchor:self.contentView.topAnchor],
+			[textField.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor],
+			[textField.leadingAnchor constraintEqualToAnchor:margins.leadingAnchor],
+			[textField.trailingAnchor constraintEqualToAnchor:margins.trailingAnchor],
+			[textField.heightAnchor constraintGreaterThanOrEqualToConstant:44.f],
+		]];
 		_textInputField = textField;
 	}
 	return self;
-}
-
-- (void)layoutSubviews {
-	[super layoutSubviews];
-	CGRect bounds = self.contentView.bounds;
-	CGFloat horizontalPadding = self.separatorInset.left;
-	_textInputField.frame = CGRectMake(horizontalPadding, 0, CGRectGetWidth(bounds) - horizontalPadding, CGRectGetHeight(bounds));
-}
-
-- (UIEdgeInsets)layoutMargins {
-	return UIEdgeInsetsZero;
-}
-
-- (NSDirectionalEdgeInsets)directionalLayoutMargins {
-	return NSDirectionalEdgeInsetsZero;
 }
 
 @end
