@@ -128,6 +128,26 @@
 	return capitalized;
 }
 
+#pragma mark - Placeholders
+
++ (BOOL)isPlaceholderText:(NSString *)text {
+	NSString *trimmed = [[text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] lowercaseString];
+	// text without at least two letters or digits (e.g. "-", "...", "?")
+	if ([self comparableText:trimmed].length < 2) {
+		return YES;
+	}
+	for (NSString *placeholder in @[@"(null)", @"null", @"(none)", @"none", @"unknown", @"n/a", @"undefined"]) {
+		if ([trimmed isEqualToString:placeholder]) {
+			return YES;
+		}
+	}
+	// servers that truncate a "(null)" title (e.g. "(n" or "(nul")
+	if (trimmed.length < @"(null)".length && [@"(null)" hasPrefix:trimmed]) {
+		return YES;
+	}
+	return NO;
+}
+
 #pragma mark - Comparing
 
 + (NSString *)comparableText:(NSString *)text {

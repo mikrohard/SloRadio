@@ -325,7 +325,15 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 		*secondPart = title;
 		nowPlaying = [NSString stringWithFormat:@"%@ - %@", artist, title];
 	}
-	return nowPlaying.length ? nowPlaying : nil;
+	if (!nowPlaying.length || [SRMetadataFormatter isPlaceholderText:nowPlaying]) {
+		return nil;
+	}
+	// some stations only send their own name, which is already shown
+	NSString *comparableNowPlaying = [SRMetadataFormatter comparableText:nowPlaying];
+	if ([comparableNowPlaying isEqualToString:[SRMetadataFormatter comparableText:selectedStation.name]]) {
+		return nil;
+	}
+	return nowPlaying;
 }
 
 - (NSString *)nowPlayingText {
