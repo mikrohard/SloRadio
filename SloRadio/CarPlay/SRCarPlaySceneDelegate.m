@@ -15,6 +15,8 @@
 #import <MediaPlayer/MediaPlayer.h>
 
 static CGFloat const SRCarPlayArtworkWidth = 256;
+// how long the last used list is enforced after connecting, in case CarPlay never shows it
+static NSTimeInterval const SRCarPlayRestoreListTimeout = 3.0;
 
 @interface SRCarPlaySceneDelegate () <CPTemplateApplicationSceneDelegate, CPInterfaceControllerDelegate, CPTabBarTemplateDelegate>
 
@@ -25,6 +27,8 @@ static CGFloat const SRCarPlayArtworkWidth = 256;
 @property (nonatomic, strong) CPListTemplate *favoritesTemplate;
 @property (nonatomic, assign) BOOL isActive;
 @property (nonatomic, assign) BOOL nowPlayingTemplateIsBeingPresented;
+// tab selections are ignored until the root template is shown and the last used list is restored
+@property (nonatomic, assign) BOOL restoredStationList;
 @property (nonatomic, strong) dispatch_block_t handlerCompletion;
 
 @end
@@ -47,6 +51,9 @@ static CGFloat const SRCarPlayArtworkWidth = 256;
 
 - (void)sceneDidBecomeActive:(UIScene *)scene {
 	self.isActive = YES;
+	if (!self.restoredStationList) {
+		[self selectCurrentStationList];
+	}
 }
 
 - (void)sceneDidEnterBackground:(UIScene *)scene {
@@ -120,6 +127,14 @@ static CGFloat const SRCarPlayArtworkWidth = 256;
 	if (aTemplate == self.nowPlayingTemplate) {
 		self.nowPlayingTemplateIsBeingPresented = NO;
 	}
+	if (!self.restoredStationList && (aTemplate == self.stationsTemplate || aTemplate == self.favoritesTemplate)) {
+		// on a cold start CarPlay can show the first tab after the last used list was selected
+		if (aTemplate == [self templateForCurrentStationList]) {
+			self.restoredStationList = YES;
+		} else {
+			[self selectCurrentStationList];
+		}
+	}
 }
 
 - (void)templateWillDisappear:(CPTemplate *)aTemplate animated:(BOOL)animated {
@@ -133,6 +148,10 @@ static CGFloat const SRCarPlayArtworkWidth = 256;
 #pragma mark - Tab bar template delegate
 
 - (void)tabBarTemplate:(CPTabBarTemplate *)tabBarTemplate didSelectTemplate:(__kindof CPTemplate *)selectedTemplate {
+	if (!self.restoredStationList) {
+		// the tab bar reports its initial (first) tab while it is being set up
+		return;
+	}
 	// remember the last used list (it is also used as the playback queue)
 	SRStationList list = selectedTemplate == self.favoritesTemplate ? SRStationListFavorites : SRStationListAll;
 	[SRDataManager sharedManager].selectedStationList = list;
@@ -151,19 +170,30 @@ static CGFloat const SRCarPlayArtworkWidth = 256;
 														  sections:@[]];
 	self.favoritesTemplate.tabTitle = NSLocalizedString(@"Favorites", @"Favorites");
 	self.favoritesTemplate.tabImage = [UIImage systemImageNamed:@"star.fill"];
-	self.favoritesTemplate.emptyViewTitleVariants = @[NSLocalizedString(@"NoFavorites", @"No favorites")];
-	self.favoritesTemplate.emptyViewSubtitleVariants = @[NSLocalizedString(@"NoFavoritesCarPlayMessage", @"How to add favorites")];
+	// the last used list is selected until CarPlay shows it (or the timeout passes)
+	self.restoredStationList = NO;
+	// fill the lists before showing them, so the restored list doesn't flash its empty state
+	[self reloadStationTemplates];
 
 	self.tabBarTemplate = [[CPTabBarTemplate alloc] initWithTemplates:@[self.stationsTemplate, self.favoritesTemplate]];
 	self.tabBarTemplate.delegate = self;
-	[self.interfaceController setRootTemplate:self.tabBarTemplate animated:NO completion:nil];
-	[self selectCurrentStationList];
+	__weak SRCarPlaySceneDelegate *weakSelf = self;
+	[self.interfaceController setRootTemplate:self.tabBarTemplate animated:NO completion:^(BOOL success, NSError *error) {
+		__strong SRCarPlaySceneDelegate *strongSelf = weakSelf;
+		if (strongSelf != nil) {
+			[strongSelf selectCurrentStationList];
+		}
+	}];
+	CPTabBarTemplate *tabBarTemplate = self.tabBarTemplate;
+	dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(SRCarPlayRestoreListTimeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+		__strong SRCarPlaySceneDelegate *strongSelf = weakSelf;
+		if (strongSelf != nil && strongSelf.tabBarTemplate == tabBarTemplate && !strongSelf.restoredStationList) {
+			strongSelf.restoredStationList = YES;
+		}
+	});
 	[self setupNowPlayingTemplate];
 
-	if ([SRDataManager sharedManager].stations.count > 0) {
-		[self reloadStationTemplates];
-	} else {
-		__weak SRCarPlaySceneDelegate *weakSelf = self;
+	if ([SRDataManager sharedManager].stations.count == 0) {
 		[[SRDataManager sharedManager] loadStationsWithCompletionHandler:^(NSError *error) {
 			__strong SRCarPlaySceneDelegate *strongSelf = weakSelf;
 			if (strongSelf != nil) {
@@ -177,19 +207,35 @@ static CGFloat const SRCarPlayArtworkWidth = 256;
 	}
 }
 
+- (CPListTemplate *)templateForCurrentStationList {
+	return [SRDataManager sharedManager].selectedStationList == SRStationListFavorites ? self.favoritesTemplate : self.stationsTemplate;
+}
+
 - (void)selectCurrentStationList {
 	if (@available(iOS 17, *)) {
-		CPListTemplate *template = [SRDataManager sharedManager].selectedStationList == SRStationListFavorites ? self.favoritesTemplate : self.stationsTemplate;
-		if (self.tabBarTemplate.selectedTemplate != template) {
-			[self.tabBarTemplate selectTemplate:template];
-		}
+		// selected even when the tab bar already reports it, as its selection can be out of date with what CarPlay shows
+		[self.tabBarTemplate selectTemplate:[self templateForCurrentStationList]];
 	}
 }
 
 - (void)reloadStationTemplates {
 	SRDataManager *dataManager = [SRDataManager sharedManager];
+	// favorites can't be resolved until the stations are loaded
+	NSArray *emptyTitleVariants = dataManager.stations.count > 0 ? @[NSLocalizedString(@"NoFavorites", @"No favorites")] : @[NSLocalizedString(@"Loading", @"Loading")];
+	NSArray *emptySubtitleVariants = dataManager.stations.count > 0 ? @[NSLocalizedString(@"NoFavoritesCarPlayMessage", @"How to add favorites")] : @[];
+	// changing a tab's template makes CarPlay refresh the tab bar, so only change what is different
+	if (![self.favoritesTemplate.emptyViewTitleVariants isEqualToArray:emptyTitleVariants]) {
+		self.favoritesTemplate.emptyViewTitleVariants = emptyTitleVariants;
+	}
+	if (![self.favoritesTemplate.emptyViewSubtitleVariants isEqualToArray:emptySubtitleVariants]) {
+		self.favoritesTemplate.emptyViewSubtitleVariants = emptySubtitleVariants;
+	}
 	[self.stationsTemplate updateSections:@[[self sectionForStations:dataManager.stations list:SRStationListAll]]];
 	[self.favoritesTemplate updateSections:@[[self sectionForStations:dataManager.favoriteStations list:SRStationListFavorites]]];
+	if (self.restoredStationList) {
+		// a tab bar refresh can fall back to the first tab
+		[self selectCurrentStationList];
+	}
 }
 
 - (CPListSection *)sectionForStations:(NSArray *)stations list:(SRStationList)list {
