@@ -32,6 +32,7 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 @property (nonatomic, assign) BOOL ignoreFavoritesChange;
 // UITableView reports editing == YES while a swipe action is shown, so track the edit mode separately
 @property (nonatomic, assign) BOOL editingList;
+@property (nonatomic, assign) BOOL ignoreStationsChange;
 
 @end
 
@@ -216,6 +217,9 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 }
 
 - (void)stationsChanged:(NSNotification *)notification {
+	if (self.ignoreStationsChange) {
+		return;
+	}
 	[self reloadData];
 }
 
@@ -617,8 +621,12 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 		[self.tableView setEditing:NO animated:YES];
 	}
 	[self updateNavigationButtons];
-	// stations order or favorites may have changed while editing
+	// stations order or favorites may have changed while editing (the list already shows the changes, and
+	// reloading it would cut the end editing animation short)
+	self.ignoreStationsChange = YES;
 	[[NSNotificationCenter defaultCenter] postNotificationName:SRDataManagerDidChangeStations object:[SRDataManager sharedManager]];
+	self.ignoreStationsChange = NO;
+	[self updateEmptyState];
 }
 
 - (void)addButtonPressed:(id)sender {
