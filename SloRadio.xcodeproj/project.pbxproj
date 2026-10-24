@@ -10,6 +10,8 @@
 		19CFF82E26D6CB18009299DC /* MobileVLCKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1969137D26D6C2FB0065EDC3 /* MobileVLCKit.xcframework */; };
 		19CFF82F26D6CB18009299DC /* MobileVLCKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1969137D26D6C2FB0065EDC3 /* MobileVLCKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		19F7767C2B7111DA000C1147 /* AVAudioSession+Override.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F7767B2B7111DA000C1147 /* AVAudioSession+Override.m */; };
+		1C7077B7F79B6E8EB5868804 /* SRMetadataFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E1B5831DA6224BF92D5024D /* SRMetadataFormatter.m */; };
+		894A403B651E870CDDCB91F5 /* SRFavoritesPickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0AEB08A1AB52DBC0134F9B /* SRFavoritesPickerViewController.m */; };
 		C79A30A67CD51E560B1ADDDD /* SRPlaybackManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 143585357E3002A528AE872C /* SRPlaybackManager.m */; };
 		C81D33171AEF84900076BF01 /* SRRadioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C81D33161AEF84900076BF01 /* SRRadioViewController.m */; };
 		C824E3811FF5226D00EF1B03 /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C824E3801FF5226D00EF1B03 /* VideoToolbox.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -55,12 +57,10 @@
 		C8FCC29F1AF9347400DE77EC /* SRAcknowledgementsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FCC29E1AF9347400DE77EC /* SRAcknowledgementsViewController.m */; };
 		C8FCC2A11AF938B300DE77EC /* acknowledgements.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8FCC2A01AF938B300DE77EC /* acknowledgements.txt */; };
 		C8FE891724F2EE4900BBD72D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C8FE891624F2EE4900BBD72D /* GoogleService-Info.plist */; };
+		C997CA026BA78FF10671013B /* SRTrackLookup.m in Sources */ = {isa = PBXBuildFile; fileRef = 064644AA8F19519E6EF2547E /* SRTrackLookup.m */; };
 		DFFA8CD6F13ACA149D7F5EA1 /* SRPlatterView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D4659D9F7CC353361D2DCE4 /* SRPlatterView.m */; };
 		E028CD5F7ED7753B1D8CBA3B /* SRPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14708530F988E8FCB4420D57 /* SRPlayerViewController.m */; };
 		EBA78B09CF47C478BC03DA4F /* SRStationTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 2836258E924576AB39903DE7 /* SRStationTableViewCell.m */; };
-		894A403B651E870CDDCB91F5 /* SRFavoritesPickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0AEB08A1AB52DBC0134F9B /* SRFavoritesPickerViewController.m */; };
-		1C7077B7F79B6E8EB5868804 /* SRMetadataFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E1B5831DA6224BF92D5024D /* SRMetadataFormatter.m */; };
-		C997CA026BA78FF10671013B /* SRTrackLookup.m in Sources */ = {isa = PBXBuildFile; fileRef = 064644AA8F19519E6EF2547E /* SRTrackLookup.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,12 +89,18 @@
 
 /* Begin PBXFileReference section */
 		018658C9A54CE7A51E301E63 /* SRPlatterView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRPlatterView.h; path = Source/Views/SRPlatterView.h; sourceTree = "<group>"; };
+		064644AA8F19519E6EF2547E /* SRTrackLookup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRTrackLookup.m; path = Source/Player/SRTrackLookup.m; sourceTree = "<group>"; };
 		0D4659D9F7CC353361D2DCE4 /* SRPlatterView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRPlatterView.m; path = Source/Views/SRPlatterView.m; sourceTree = "<group>"; };
 		143585357E3002A528AE872C /* SRPlaybackManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRPlaybackManager.m; path = Source/Player/SRPlaybackManager.m; sourceTree = "<group>"; };
 		14708530F988E8FCB4420D57 /* SRPlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRPlayerViewController.m; path = Source/Controllers/SRPlayerViewController.m; sourceTree = "<group>"; };
+		1470C7345FAE16A1C7F5D232 /* SRFavoritesPickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRFavoritesPickerViewController.h; path = Source/Controllers/SRFavoritesPickerViewController.h; sourceTree = "<group>"; };
+		16D4AEDFF57D7D1E0215CC12 /* SRMetadataFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRMetadataFormatter.h; path = Source/Player/SRMetadataFormatter.h; sourceTree = "<group>"; };
 		1969137D26D6C2FB0065EDC3 /* MobileVLCKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MobileVLCKit.xcframework; path = Libraries/MobileVLCKit.xcframework; sourceTree = "<group>"; };
 		19F7767A2B7111DA000C1147 /* AVAudioSession+Override.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "AVAudioSession+Override.h"; path = "Source/Categories/AVAudioSession+Override.h"; sourceTree = "<group>"; };
 		19F7767B2B7111DA000C1147 /* AVAudioSession+Override.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "AVAudioSession+Override.m"; path = "Source/Categories/AVAudioSession+Override.m"; sourceTree = "<group>"; };
+		2836258E924576AB39903DE7 /* SRStationTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRStationTableViewCell.m; path = Source/Cells/SRStationTableViewCell.m; sourceTree = "<group>"; };
+		3E1B5831DA6224BF92D5024D /* SRMetadataFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRMetadataFormatter.m; path = Source/Player/SRMetadataFormatter.m; sourceTree = "<group>"; };
+		65943644198EADA5C4002E3E /* SRStationTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRStationTableViewCell.h; path = Source/Cells/SRStationTableViewCell.h; sourceTree = "<group>"; };
 		AC9D4610CB1FBE05C4D9CBB7 /* SRPlaybackManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRPlaybackManager.h; path = Source/Player/SRPlaybackManager.h; sourceTree = "<group>"; };
 		C81D33151AEF84900076BF01 /* SRRadioViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRRadioViewController.h; path = Source/Controllers/SRRadioViewController.h; sourceTree = "<group>"; };
 		C81D33161AEF84900076BF01 /* SRRadioViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRRadioViewController.m; path = Source/Controllers/SRRadioViewController.m; sourceTree = "<group>"; };
@@ -169,15 +175,9 @@
 		C8FCC2A01AF938B300DE77EC /* acknowledgements.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = acknowledgements.txt; path = Resources/acknowledgements.txt; sourceTree = "<group>"; };
 		C8FE88FC24F2D38600BBD72D /* SloRadio.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SloRadio.entitlements; sourceTree = "<group>"; };
 		C8FE891624F2EE4900BBD72D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		F0052D70F57953CA1870BA05 /* SRPlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRPlayerViewController.h; path = Source/Controllers/SRPlayerViewController.h; sourceTree = "<group>"; };
-		65943644198EADA5C4002E3E /* SRStationTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRStationTableViewCell.h; path = Source/Cells/SRStationTableViewCell.h; sourceTree = "<group>"; };
-		2836258E924576AB39903DE7 /* SRStationTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRStationTableViewCell.m; path = Source/Cells/SRStationTableViewCell.m; sourceTree = "<group>"; };
-		1470C7345FAE16A1C7F5D232 /* SRFavoritesPickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRFavoritesPickerViewController.h; path = Source/Controllers/SRFavoritesPickerViewController.h; sourceTree = "<group>"; };
-		DA0AEB08A1AB52DBC0134F9B /* SRFavoritesPickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRFavoritesPickerViewController.m; path = Source/Controllers/SRFavoritesPickerViewController.m; sourceTree = "<group>"; };
-		16D4AEDFF57D7D1E0215CC12 /* SRMetadataFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRMetadataFormatter.h; path = Source/Player/SRMetadataFormatter.h; sourceTree = "<group>"; };
-		3E1B5831DA6224BF92D5024D /* SRMetadataFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRMetadataFormatter.m; path = Source/Player/SRMetadataFormatter.m; sourceTree = "<group>"; };
 		CFC8D280AB6F7C805A4859F2 /* SRTrackLookup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRTrackLookup.h; path = Source/Player/SRTrackLookup.h; sourceTree = "<group>"; };
-		064644AA8F19519E6EF2547E /* SRTrackLookup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRTrackLookup.m; path = Source/Player/SRTrackLookup.m; sourceTree = "<group>"; };
+		DA0AEB08A1AB52DBC0134F9B /* SRFavoritesPickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRFavoritesPickerViewController.m; path = Source/Controllers/SRFavoritesPickerViewController.m; sourceTree = "<group>"; };
+		F0052D70F57953CA1870BA05 /* SRPlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRPlayerViewController.h; path = Source/Controllers/SRPlayerViewController.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -833,7 +833,7 @@
 				CODE_SIGN_ENTITLEMENTS = SloRadio/SloRadio.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				DEVELOPMENT_TEAM = 4PZ2UBJ583;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -859,7 +859,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "";
-				MARKETING_VERSION = 6.3;
+				MARKETING_VERSION = 7.0;
 				OTHER_LDFLAGS = (
 					"-Wl,-no_compact_unwind",
 					"-ObjC",
@@ -879,7 +879,7 @@
 				CODE_SIGN_ENTITLEMENTS = SloRadio/SloRadio.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				DEVELOPMENT_TEAM = 4PZ2UBJ583;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -905,7 +905,7 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "";
-				MARKETING_VERSION = 6.3;
+				MARKETING_VERSION = 7.0;
 				OTHER_LDFLAGS = (
 					"-Wl,-no_compact_unwind",
 					"-ObjC",
