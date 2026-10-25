@@ -71,6 +71,16 @@
 	return image;
 }
 
+- (void)removeImagesFromDiskWithKeysContaining:(NSString *)text {
+	NSURL *cacheUrl = [[self.fileManager URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] firstObject];
+	NSArray *fileUrls = [self.fileManager contentsOfDirectoryAtURL:cacheUrl includingPropertiesForKeys:nil options:0 error:nil];
+	for (NSURL *fileUrl in fileUrls) {
+		if ([fileUrl.lastPathComponent containsString:text]) {
+			[self.fileManager removeItemAtURL:fileUrl error:nil];
+		}
+	}
+}
+
 + (NSString *)keyForUrl:(NSURL *)url {
 	NSMutableCharacterSet *set = [[NSMutableCharacterSet URLPathAllowedCharacterSet] mutableCopy];
 	[set removeCharactersInString:@"/\\;:."];

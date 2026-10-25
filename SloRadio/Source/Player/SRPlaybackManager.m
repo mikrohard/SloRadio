@@ -50,6 +50,9 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 @property (nonatomic, copy) NSString *lookupResultText;
 // album art of the song found by the lookup (only valid while lookupRawText is the current metadata)
 @property (nonatomic, strong) UIImage *lookupArtworkImage;
+// album art is only kept in memory, as most songs don't come back often enough to be worth storing
+@property (nonatomic, strong) NSCache<NSURL *, UIImage *> *songArtworkCache;
+@property (nonatomic, strong) NSURLSession *songArtworkSession;
 
 @end
 
@@ -72,6 +75,11 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 	self = [super init];
 	if (self) {
 		_bgTask = UIBackgroundTaskInvalid;
+		_songArtworkCache = [[NSCache alloc] init];
+		_songArtworkCache.countLimit = 20;
+		// an ephemeral session doesn't store the downloaded album art on disk either
+		_songArtworkSession = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration ephemeralSessionConfiguration]];
+		[self removeSongArtworkFromDiskCache];
 		[self registerForNotifications];
 		[self setupAudioSession];
 		[[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:@{}];
@@ -395,7 +403,6 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 }
 
 - (void)loadSongArtworkFromURL:(NSURL *)artworkURL forNowPlayingText:(NSString *)nowPlaying {
-	NSString *cacheKey = [SRImageCache keyForUrl:artworkURL];
 	__weak SRPlaybackManager *weakSelf = self;
 	void (^applyImage)(UIImage *) = ^(UIImage *image) {
 		SRPlaybackManager *strongSelf = weakSelf;
@@ -404,23 +411,35 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 			[strongSelf nowPlayingTextDidUpdate];
 		}
 	};
-	dispatch_async(dispatch_get_global_queue(QOS_CLASS_UTILITY, 0), ^{
-		UIImage *image = [[SRImageCache sharedCache] imageForKey:cacheKey];
-		if (image) {
-			dispatch_async(dispatch_get_main_queue(), ^{
-				applyImage(image);
-			});
-			return;
-		}
-		[[[NSURLSession sharedSession] dataTaskWithURL:artworkURL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-			UIImage *downloadedImage = data ? [UIImage imageWithData:data] : nil;
+	UIImage *cachedImage = [self.songArtworkCache objectForKey:artworkURL];
+	if (cachedImage) {
+		applyImage(cachedImage);
+		return;
+	}
+	[[self.songArtworkSession dataTaskWithURL:artworkURL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+		UIImage *downloadedImage = data ? [UIImage imageWithData:data] : nil;
+		dispatch_async(dispatch_get_main_queue(), ^{
 			if (downloadedImage) {
-				[[SRImageCache sharedCache] cacheImage:downloadedImage forKey:cacheKey];
+				[weakSelf.songArtworkCache setObject:downloadedImage forKey:artworkURL];
 			}
-			dispatch_async(dispatch_get_main_queue(), ^{
-				applyImage(downloadedImage);
-			});
-		}] resume];
+			applyImage(downloadedImage);
+		});
+	}] resume];
+}
+
+- (void)removeSongArtworkFromDiskCache {
+	// album art used to be stored in the image disk cache (without a size limit)
+	NSString *cleanupKey = @"SRSongArtworkDiskCacheRemoved";
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	if ([defaults boolForKey:cleanupKey]) {
+		return;
+	}
+	dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), ^{
+		// catalog artwork is served from mzstatic.com (cache keys are percent encoded URLs, e.g. "is1-ssl%2Emzstatic%2Ecom")
+		[[SRImageCache sharedCache] removeImagesFromDiskWithKeysContaining:@"mzstatic"];
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[defaults setBool:YES forKey:cleanupKey];
+		});
 	});
 }
 

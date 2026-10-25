@@ -17,4 +17,7 @@
 - (void)cacheImage:(UIImage *)image forKey:(NSString *)key;
 - (UIImage *)imageForKey:(NSString *)key;
 
+// Removes the images whose key contains the given text from the disk cache.
+- (void)removeImagesFromDiskWithKeysContaining:(NSString *)text;
+
 @end
