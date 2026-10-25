@@ -303,15 +303,13 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 }
 
 - (void)reconfigureVisibleRows {
-	NSArray *indexPaths = [self.tableView indexPathsForVisibleRows];
-	NSInteger count = [self stations].count;
-	for (NSIndexPath *indexPath in indexPaths) {
-		if (indexPath.row >= count) {
-			// data is out of sync with the table view
-			[self reloadData];
-			return;
-		}
+	// the stations can change before the table view is reloaded (e.g. the selected station is set while the station
+	// list is being updated), and reconfiguring rows of an out of sync table view raises an exception
+	if ([self.tableView numberOfRowsInSection:0] != [self stations].count) {
+		[self reloadData];
+		return;
 	}
+	NSArray *indexPaths = [self.tableView indexPathsForVisibleRows];
 	if (indexPaths.count > 0) {
 		[self.tableView reconfigureRowsAtIndexPaths:indexPaths];
 	}
