@@ -20,6 +20,9 @@ static CGFloat const SRCompactArtworkSize = 48.f;
 static CGFloat const SRCompactArtworkWidth = 256;
 static CGFloat const SRExpandedArtworkWidth = 1024;
 static CGFloat const SRExpandedMaximumWidth = 440.f;
+// narrower players only show the transport buttons (e.g. a small Stage Manager window)
+static CGFloat const SRExpandedSecondaryButtonsMinimumWidth = 320.f;
+static CGFloat const SRExpandedHorizontalMargin = 32.f;
 static CGFloat const SRCompactAppleMusicIconSize = 13.f;
 static CGFloat const SRExpandedAppleMusicIconSize = 24.f;
 static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
@@ -89,7 +92,22 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 
 - (void)viewDidLayoutSubviews {
 	[super viewDidLayoutSubviews];
+	[self updateSecondaryButtonsVisibility];
 	[self observeRoutePickerHighlight];
+}
+
+- (void)updateSecondaryButtonsVisibility {
+	if (self.style != SRPlayerStyleExpanded) {
+		return;
+	}
+	// based on the available width (not the platter's), so showing the buttons can't change the decision
+	CGFloat width = MIN(SRExpandedMaximumWidth, self.view.safeAreaLayoutGuide.layoutFrame.size.width - SRExpandedHorizontalMargin);
+	BOOL hidden = width < SRExpandedSecondaryButtonsMinimumWidth;
+	for (UIView *view in @[self.favoriteButton, self.routeContainer]) {
+		if (view.hidden != hidden) {
+			view.hidden = hidden;
+		}
+	}
 }
 
 - (UIView *)platterView {
@@ -243,15 +261,30 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 	// [favorite]  ...  [previous] [play] [next]  ...  [route picker]
 	UIView *leadingSpacer = [[UIView alloc] init];
 	UIView *trailingSpacer = [[UIView alloc] init];
+	BOOL compact = self.style == SRPlayerStyleCompact;
 	UIStackView *row = [[UIStackView alloc] initWithArrangedSubviews:@[self.favoriteButton, leadingSpacer, self.previousButton, self.playButton, self.nextButton, trailingSpacer, self.routeContainer]];
 	row.axis = UILayoutConstraintAxisHorizontal;
 	row.alignment = UIStackViewAlignmentCenter;
-	row.spacing = self.style == SRPlayerStyleCompact ? 8.f : 16.f;
+	if (compact) {
+		row.spacing = 8.f;
+	} else {
+		// the gaps next to the spacers collapse in narrow windows (e.g. a small Stage Manager window)
+		row.spacing = 0.f;
+		[row setCustomSpacing:16.f afterView:self.previousButton];
+		[row setCustomSpacing:16.f afterView:self.playButton];
+	}
 	[leadingSpacer.widthAnchor constraintEqualToAnchor:trailingSpacer.widthAnchor].active = YES;
-	CGFloat size = self.style == SRPlayerStyleCompact ? 52.f : 56.f;
+	CGFloat size = compact ? 52.f : 56.f;
 	for (UIButton *button in @[self.previousButton, self.playButton, self.nextButton]) {
-		[button.widthAnchor constraintEqualToConstant:size].active = YES;
-		[button.heightAnchor constraintEqualToConstant:size].active = YES;
+		// the transport buttons shrink when the row doesn't fit
+		NSLayoutConstraint *preferredWidth = [button.widthAnchor constraintEqualToConstant:size];
+		preferredWidth.priority = UILayoutPriorityDefaultHigh;
+		[NSLayoutConstraint activateConstraints:@[
+			preferredWidth,
+			[button.widthAnchor constraintGreaterThanOrEqualToConstant:40.f],
+			[button.widthAnchor constraintLessThanOrEqualToConstant:size],
+			[button.heightAnchor constraintEqualToAnchor:button.widthAnchor],
+		]];
 	}
 	for (UIView *view in @[self.favoriteButton, self.routeContainer]) {
 		[view.widthAnchor constraintEqualToConstant:44.f].active = YES;
@@ -384,7 +417,7 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 
 		[stack.centerXAnchor constraintEqualToAnchor:safeArea.centerXAnchor],
 		[stack.centerYAnchor constraintEqualToAnchor:safeArea.centerYAnchor],
-		[stack.widthAnchor constraintLessThanOrEqualToAnchor:safeArea.widthAnchor constant:-64.f],
+		[stack.widthAnchor constraintLessThanOrEqualToAnchor:safeArea.widthAnchor constant:-SRExpandedHorizontalMargin],
 		[stack.heightAnchor constraintLessThanOrEqualToAnchor:safeArea.heightAnchor constant:-48.f],
 		preferredWidth,
 
