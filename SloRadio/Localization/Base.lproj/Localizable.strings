@@ -93,3 +93,6 @@
 "Volume" = "Volume";
 "Mute" = "Mute";
 "MaximumVolume" = "Maximum volume";
+
+"OpenInAppleMusic" = "Open in Apple Music";
+"CopySong" = "Copy Song";

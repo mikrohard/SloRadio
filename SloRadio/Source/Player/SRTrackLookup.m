@@ -18,7 +18,7 @@ static NSString * const SRTrackLookupArtworkSize = @"600x600bb";
 @interface SRTrackLookup ()
 
 @property (nonatomic, strong) NSURLSession *session;
-// lookup key -> @[first, second, artwork url] (NSNull for missing values)
+// lookup key -> @[first, second, artwork url, track url] (NSNull for missing values)
 @property (nonatomic, strong) NSCache *cache;
 // lookup key -> pending completion handlers
 @property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableArray<SRTrackLookupCompletion> *> *pendingCompletions;
@@ -58,7 +58,7 @@ static NSString * const SRTrackLookupArtworkSize = @"600x600bb";
 	NSString *key = [NSString stringWithFormat:@"%@|%@", [SRMetadataFormatter comparableText:firstPart], [SRMetadataFormatter comparableText:secondPart]];
 	NSArray *cached = [self.cache objectForKey:key];
 	if (cached) {
-		completion([self valueOrNil:cached[0]], [self valueOrNil:cached[1]], [self valueOrNil:cached[2]]);
+		completion([self valueOrNil:cached[0]], [self valueOrNil:cached[1]], [self valueOrNil:cached[2]], [self valueOrNil:cached[3]]);
 		return;
 	}
 	NSMutableArray *completions = self.pendingCompletions[key];
@@ -98,7 +98,7 @@ static NSString * const SRTrackLookupArtworkSize = @"600x600bb";
 }
 
 - (void)finishLookupWithKey:(NSString *)key match:(NSArray *)match cacheable:(BOOL)cacheable {
-	NSArray *result = match ?: @[[NSNull null], [NSNull null], [NSNull null]];
+	NSArray *result = match ?: @[[NSNull null], [NSNull null], [NSNull null], [NSNull null]];
 	// network errors and rate limiting are not cached, so the lookup is retried for the next metadata update
 	if (cacheable) {
 		[self.cache setObject:result forKey:key];
@@ -106,7 +106,7 @@ static NSString * const SRTrackLookupArtworkSize = @"600x600bb";
 	NSArray *completions = self.pendingCompletions[key];
 	[self.pendingCompletions removeObjectForKey:key];
 	for (SRTrackLookupCompletion completion in completions) {
-		completion([self valueOrNil:result[0]], [self valueOrNil:result[1]], [self valueOrNil:result[2]]);
+		completion([self valueOrNil:result[0]], [self valueOrNil:result[1]], [self valueOrNil:result[2]], [self valueOrNil:result[3]]);
 	}
 }
 
@@ -127,14 +127,15 @@ static NSString * const SRTrackLookupArtworkSize = @"600x600bb";
 			continue;
 		}
 		id artworkURL = [self artworkURLForResult:result] ?: [NSNull null];
+		id trackURL = [self trackURLForResult:result] ?: [NSNull null];
 		// stations use both "artist - title" and "title - artist"
 		NSArray *match = [self matchArtist:firstPart title:secondPart artistName:artistName trackName:trackName];
 		if (match) {
-			return @[match[0], match[1], artworkURL];
+			return @[match[0], match[1], artworkURL, trackURL];
 		}
 		match = [self matchArtist:secondPart title:firstPart artistName:artistName trackName:trackName];
 		if (match) {
-			return @[match[1], match[0], artworkURL];
+			return @[match[1], match[0], artworkURL, trackURL];
 		}
 	}
 	return nil;
@@ -186,6 +187,14 @@ static NSString * const SRTrackLookupArtworkSize = @"600x600bb";
 	NSRegularExpression *sizeExpression = [NSRegularExpression regularExpressionWithPattern:@"\\d+x\\d+bb" options:0 error:nil];
 	artworkUrl = [sizeExpression stringByReplacingMatchesInString:artworkUrl options:0 range:NSMakeRange(0, artworkUrl.length) withTemplate:SRTrackLookupArtworkSize];
 	return [NSURL URLWithString:artworkUrl];
+}
+
+- (NSURL *)trackURLForResult:(NSDictionary *)result {
+	NSString *trackUrl = result[@"trackViewUrl"];
+	if (![trackUrl isKindOfClass:[NSString class]] || trackUrl.length == 0) {
+		return nil;
+	}
+	return [NSURL URLWithString:trackUrl];
 }
 
 - (NSString *)baseOfTitle:(NSString *)title {

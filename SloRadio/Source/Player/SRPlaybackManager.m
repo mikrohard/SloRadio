@@ -50,6 +50,7 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 @property (nonatomic, copy) NSString *lookupResultText;
 // album art of the song found by the lookup (only valid while lookupRawText is the current metadata)
 @property (nonatomic, strong) UIImage *lookupArtworkImage;
+@property (nonatomic, strong) NSURL *lookupTrackURL;
 // album art is only kept in memory, as most songs don't come back often enough to be worth storing
 @property (nonatomic, strong) NSCache<NSURL *, UIImage *> *songArtworkCache;
 @property (nonatomic, strong) NSURLSession *songArtworkSession;
@@ -375,6 +376,10 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 	return nil;
 }
 
+- (NSURL *)songURL {
+	return [self songArtworkImage] ? self.lookupTrackURL : nil;
+}
+
 - (void)lookupNowPlayingText:(NSString *)nowPlaying firstPart:(NSString *)firstPart secondPart:(NSString *)secondPart {
 	if ([nowPlaying isEqualToString:self.lookupRawText]) {
 		// already looked up (or in progress)
@@ -383,8 +388,9 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 	self.lookupRawText = nowPlaying;
 	self.lookupResultText = nil;
 	self.lookupArtworkImage = nil;
+	self.lookupTrackURL = nil;
 	__weak SRPlaybackManager *weakSelf = self;
-	[[SRTrackLookup sharedLookup] lookupFirstPart:firstPart secondPart:secondPart completion:^(NSString *correctedFirst, NSString *correctedSecond, NSURL *artworkURL) {
+	[[SRTrackLookup sharedLookup] lookupFirstPart:firstPart secondPart:secondPart completion:^(NSString *correctedFirst, NSString *correctedSecond, NSURL *artworkURL, NSURL *trackURL) {
 		SRPlaybackManager *strongSelf = weakSelf;
 		if (!strongSelf || ![strongSelf.lookupRawText isEqualToString:nowPlaying]) {
 			// metadata changed in the meantime
@@ -397,17 +403,18 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 			[strongSelf nowPlayingTextDidUpdate];
 		}
 		if (artworkURL) {
-			[strongSelf loadSongArtworkFromURL:artworkURL forNowPlayingText:nowPlaying];
+			[strongSelf loadSongArtworkFromURL:artworkURL trackURL:trackURL forNowPlayingText:nowPlaying];
 		}
 	}];
 }
 
-- (void)loadSongArtworkFromURL:(NSURL *)artworkURL forNowPlayingText:(NSString *)nowPlaying {
+- (void)loadSongArtworkFromURL:(NSURL *)artworkURL trackURL:(NSURL *)trackURL forNowPlayingText:(NSString *)nowPlaying {
 	__weak SRPlaybackManager *weakSelf = self;
 	void (^applyImage)(UIImage *) = ^(UIImage *image) {
 		SRPlaybackManager *strongSelf = weakSelf;
 		if (image && [strongSelf.lookupRawText isEqualToString:nowPlaying]) {
 			strongSelf.lookupArtworkImage = image;
+			strongSelf.lookupTrackURL = trackURL;
 			[strongSelf nowPlayingTextDidUpdate];
 		}
 	};

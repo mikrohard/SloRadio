@@ -20,15 +20,18 @@ static CGFloat const SRCompactArtworkSize = 48.f;
 static CGFloat const SRCompactArtworkWidth = 256;
 static CGFloat const SRExpandedArtworkWidth = 1024;
 static CGFloat const SRExpandedMaximumWidth = 440.f;
+static CGFloat const SRCompactAppleMusicIconSize = 13.f;
+static CGFloat const SRExpandedAppleMusicIconSize = 24.f;
 static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 
-@interface SRPlayerViewController ()
+@interface SRPlayerViewController () <UIGestureRecognizerDelegate, UIContextMenuInteractionDelegate>
 
 @property (nonatomic, assign) SRPlayerStyle style;
 @property (nonatomic, assign) BOOL collapsed;
 @property (nonatomic, strong) SRPlatterView *platter;
 @property (nonatomic, strong) UIImageView *backdropView;
 @property (nonatomic, strong) UIImageView *artworkView;
+@property (nonatomic, strong) UIImageView *appleMusicIconView;
 @property (nonatomic, strong) CBAutoScrollLabel *titleLabel;
 @property (nonatomic, strong) CBAutoScrollLabel *subtitleLabel;
 @property (nonatomic, strong) UIButton *sleepTimerButton;
@@ -112,7 +115,29 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 		[artworkView setContentHuggingPriority:1 forAxis:axis.integerValue];
 		[artworkView setContentCompressionResistancePriority:1 forAxis:axis.integerValue];
 	}
+	// the album art links to the song in Apple Music
+	artworkView.userInteractionEnabled = YES;
+	[artworkView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(artworkTapped:)]];
 	self.artworkView = artworkView;
+
+	// Apple Music icon in the corner of the album art, marking it as a link
+	CGFloat iconSize = compact ? SRCompactAppleMusicIconSize : SRExpandedAppleMusicIconSize;
+	CGFloat iconInset = compact ? 3.f : 12.f;
+	UIImageView *appleMusicIconView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"AppleMusicIcon"]];
+	appleMusicIconView.alpha = 0.f;
+	appleMusicIconView.layer.shadowColor = [UIColor blackColor].CGColor;
+	appleMusicIconView.layer.shadowOpacity = 0.3f;
+	appleMusicIconView.layer.shadowRadius = compact ? 2.f : 4.f;
+	appleMusicIconView.layer.shadowOffset = CGSizeZero;
+	appleMusicIconView.translatesAutoresizingMaskIntoConstraints = NO;
+	[artworkView addSubview:appleMusicIconView];
+	[NSLayoutConstraint activateConstraints:@[
+		[appleMusicIconView.widthAnchor constraintEqualToConstant:iconSize],
+		[appleMusicIconView.heightAnchor constraintEqualToConstant:iconSize],
+		[appleMusicIconView.trailingAnchor constraintEqualToAnchor:artworkView.trailingAnchor constant:-iconInset],
+		[appleMusicIconView.bottomAnchor constraintEqualToAnchor:artworkView.bottomAnchor constant:-iconInset],
+	]];
+	self.appleMusicIconView = appleMusicIconView;
 
 	CBAutoScrollLabel *titleLabel = [[CBAutoScrollLabel alloc] init];
 	titleLabel.font = compact ? [UIFont systemFontOfSize:16.f weight:UIFontWeightSemibold] : [UIFont systemFontOfSize:24.f weight:UIFontWeightBold];
@@ -260,7 +285,10 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 	infoRow.spacing = 12.f;
 	[infoRow setCustomSpacing:8.f afterView:self.sleepTimerButton];
 	[infoRow setCustomSpacing:0.f afterView:self.inlinePlayButton];
-	[infoRow addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(nowPlayingTapped:)]];
+	UITapGestureRecognizer *nowPlayingRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(nowPlayingTapped:)];
+	nowPlayingRecognizer.delegate = self;
+	[infoRow addGestureRecognizer:nowPlayingRecognizer];
+	[infoRow addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
 
 	UIStackView *stack = [[UIStackView alloc] initWithArrangedSubviews:@[infoRow, self.transportRow]];
 	stack.axis = UILayoutConstraintAxisVertical;
@@ -305,6 +333,7 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 	artworkContainer.layer.shadowRadius = 24.f;
 	artworkContainer.layer.shadowOffset = CGSizeMake(0, 10.f);
 	[artworkContainer addSubview:self.artworkView];
+	[artworkContainer addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
 
 	UIStackView *labels = [[UIStackView alloc] initWithArrangedSubviews:@[self.titleLabel, self.subtitleLabel]];
 	labels.axis = UILayoutConstraintAxisVertical;
@@ -625,6 +654,21 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 
 	// artwork
 	[self updateArtworkForStation:station];
+	[self updateAppleMusicLink];
+}
+
+- (void)updateAppleMusicLink {
+	BOOL hasLink = [SRPlaybackManager sharedManager].songURL != nil;
+	CGFloat alpha = hasLink ? 1.f : 0.f;
+	if (self.appleMusicIconView.alpha != alpha) {
+		// fade along with the album art
+		[UIView animateWithDuration:0.25 animations:^{
+			self.appleMusicIconView.alpha = alpha;
+		}];
+	}
+	self.artworkView.isAccessibilityElement = hasLink;
+	self.artworkView.accessibilityLabel = hasLink ? NSLocalizedString(@"OpenInAppleMusic", @"Open in Apple Music") : nil;
+	self.artworkView.accessibilityTraits = hasLink ? UIAccessibilityTraitButton | UIAccessibilityTraitImage : UIAccessibilityTraitImage;
 }
 
 - (void)updateArtworkForStation:(SRRadioStation *)station {
@@ -764,12 +808,86 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 	}
 }
 
+- (void)artworkTapped:(UITapGestureRecognizer *)recognizer {
+	if ([SRPlaybackManager sharedManager].songURL) {
+		[self openSongInAppleMusic];
+	} else if (self.style == SRPlayerStyleCompact) {
+		[self nowPlayingTapped:recognizer];
+	}
+}
+
+- (void)openSongInAppleMusic {
+	NSURL *songURL = [SRPlaybackManager sharedManager].songURL;
+	if (songURL) {
+		[[UIApplication sharedApplication] openURL:songURL options:@{} completionHandler:nil];
+	}
+}
+
 - (void)nowPlayingTapped:(UITapGestureRecognizer *)recognizer {
 	if (self.collapsed) {
 		[self setCollapsed:NO animated:YES];
 	} else if (self.nowPlayingTapHandler) {
 		self.nowPlayingTapHandler();
 	}
+}
+
+#pragma mark - UIGestureRecognizerDelegate
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+	// taps on the album art are handled by the artwork itself
+	return ![touch.view isDescendantOfView:self.artworkView];
+}
+
+#pragma mark - UIContextMenuInteractionDelegate
+
+- (UIContextMenuConfiguration *)contextMenuInteraction:(UIContextMenuInteraction *)interaction configurationForMenuAtLocation:(CGPoint)location {
+	// buttons in the info row have their own actions
+	UIView *hitView = [interaction.view hitTest:location withEvent:nil];
+	if ([hitView isKindOfClass:[UIControl class]] || [hitView.superview isKindOfClass:[UIControl class]]) {
+		return nil;
+	}
+	SRPlaybackManager *playbackManager = [SRPlaybackManager sharedManager];
+	NSURL *songURL = playbackManager.songURL;
+	NSString *nowPlayingText = playbackManager.nowPlayingText;
+	if (!songURL && nowPlayingText.length == 0) {
+		return nil;
+	}
+	__weak SRPlayerViewController *weakSelf = self;
+	return [UIContextMenuConfiguration configurationWithIdentifier:nil previewProvider:nil actionProvider:^UIMenu *(NSArray<UIMenuElement *> *suggestedActions) {
+		NSMutableArray<UIMenuElement *> *actions = [NSMutableArray array];
+		if (songURL) {
+			[actions addObject:[UIAction actionWithTitle:NSLocalizedString(@"OpenInAppleMusic", @"Open in Apple Music")
+												   image:[UIImage systemImageNamed:@"arrow.up.forward.app"]
+											  identifier:nil
+												 handler:^(__kindof UIAction *action) {
+				[weakSelf openSongInAppleMusic];
+			}]];
+		}
+		if (nowPlayingText.length > 0) {
+			[actions addObject:[UIAction actionWithTitle:NSLocalizedString(@"CopySong", @"Copy song")
+												   image:[UIImage systemImageNamed:@"doc.on.doc"]
+											  identifier:nil
+												 handler:^(__kindof UIAction *action) {
+				[UIPasteboard generalPasteboard].string = nowPlayingText;
+			}]];
+		}
+		return [UIMenu menuWithTitle:nowPlayingText ?: @"" children:actions];
+	}];
+}
+
+- (UITargetedPreview *)contextMenuInteraction:(UIContextMenuInteraction *)interaction configuration:(UIContextMenuConfiguration *)configuration highlightPreviewForItemWithIdentifier:(id<NSCopying>)identifier {
+	return [self artworkPreview];
+}
+
+- (UITargetedPreview *)contextMenuInteraction:(UIContextMenuInteraction *)interaction configuration:(UIContextMenuConfiguration *)configuration dismissalPreviewForItemWithIdentifier:(id<NSCopying>)identifier {
+	return [self artworkPreview];
+}
+
+- (UITargetedPreview *)artworkPreview {
+	// the menu lifts the album art (the info row itself is transparent)
+	UIPreviewParameters *parameters = [[UIPreviewParameters alloc] init];
+	parameters.visiblePath = [UIBezierPath bezierPathWithRoundedRect:self.artworkView.bounds cornerRadius:self.artworkView.layer.cornerRadius];
+	return [[UITargetedPreview alloc] initWithView:self.artworkView parameters:parameters];
 }
 
 @end

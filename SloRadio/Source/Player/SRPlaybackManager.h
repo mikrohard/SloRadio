@@ -21,6 +21,8 @@ extern NSString * const SRPlaybackManagerDidUpdateNowPlayingText;
 @property (nonatomic, readonly) NSString *nowPlayingText;
 // album art of the currently playing song (nil when unknown, the station artwork should be used instead)
 @property (nonatomic, readonly) UIImage *songArtworkImage;
+// the currently playing song in Apple Music (only set together with the song's album art)
+@property (nonatomic, readonly) NSURL *songURL;
 
 + (SRPlaybackManager *)sharedManager;
 
