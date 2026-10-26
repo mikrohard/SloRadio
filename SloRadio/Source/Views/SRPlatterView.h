@@ -15,4 +15,8 @@
 
 - (instancetype)initWithCornerRadius:(CGFloat)cornerRadius;
 
+// Shows or hides the platter material and its content (animatable). Liquid Glass doesn't fade well with alpha,
+// so platters that appear or disappear should use this instead.
+- (void)setMaterialized:(BOOL)materialized;
+
 @end

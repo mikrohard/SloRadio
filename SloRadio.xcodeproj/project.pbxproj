@@ -63,6 +63,7 @@
 		EBA78B09CF47C478BC03DA4F /* SRStationTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 2836258E924576AB39903DE7 /* SRStationTableViewCell.m */; };
 		A54B626DDA5A16595377545D /* SRTrackLookupTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 60DA0FC631CC765393D0A79A /* SRTrackLookupTests.m */; };
 		8951DB17DC7DA67E7212409D /* SRMetadataFormatterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 64EAB6EEE88AD3BD1E469533 /* SRMetadataFormatterTests.m */; };
+		19C2CF04D230E57F82E455F1 /* SRToastView.m in Sources */ = {isa = PBXBuildFile; fileRef = 92DDA059A204E4C2FDA2DC90 /* SRToastView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -182,6 +183,8 @@
 		F0052D70F57953CA1870BA05 /* SRPlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRPlayerViewController.h; path = Source/Controllers/SRPlayerViewController.h; sourceTree = "<group>"; };
 		60DA0FC631CC765393D0A79A /* SRTrackLookupTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRTrackLookupTests.m; sourceTree = "<group>"; };
 		64EAB6EEE88AD3BD1E469533 /* SRMetadataFormatterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRMetadataFormatterTests.m; sourceTree = "<group>"; };
+		4422558767D13832AEF8CB72 /* SRToastView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRToastView.h; path = Source/Views/SRToastView.h; sourceTree = "<group>"; };
+		92DDA059A204E4C2FDA2DC90 /* SRToastView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRToastView.m; path = Source/Views/SRToastView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -332,6 +335,8 @@
 			children = (
 				0D4659D9F7CC353361D2DCE4 /* SRPlatterView.m */,
 				018658C9A54CE7A51E301E63 /* SRPlatterView.h */,
+				92DDA059A204E4C2FDA2DC90 /* SRToastView.m */,
+				4422558767D13832AEF8CB72 /* SRToastView.h */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -654,6 +659,7 @@
 				EBA78B09CF47C478BC03DA4F /* SRStationTableViewCell.m in Sources */,
 				E028CD5F7ED7753B1D8CBA3B /* SRPlayerViewController.m in Sources */,
 				DFFA8CD6F13ACA149D7F5EA1 /* SRPlatterView.m in Sources */,
+				19C2CF04D230E57F82E455F1 /* SRToastView.m in Sources */,
 				C79A30A67CD51E560B1ADDDD /* SRPlaybackManager.m in Sources */,
 				C83745821AF51D9B002EBB84 /* CBAutoScrollLabel.m in Sources */,
 				C837456C1AF28016002EBB84 /* MBProgressHUD.m in Sources */,

@@ -11,6 +11,8 @@
 @interface SRPlatterView ()
 
 @property (nonatomic, strong) UIVisualEffectView *effectView;
+@property (nonatomic, strong) UIVisualEffect *effect;
+@property (nonatomic, assign) float shadowOpacity;
 @property (nonatomic, strong) UIView *clippingView;
 
 @end
@@ -41,6 +43,8 @@
 		effectView.translatesAutoresizingMaskIntoConstraints = NO;
 		[self addSubview:effectView];
 		self.effectView = effectView;
+		self.effect = effectView.effect;
+		self.shadowOpacity = self.layer.shadowOpacity;
 		
 		// content is clipped to the platter shape (e.g. while the platter animates its size)
 		UIView *clippingView = [[UIView alloc] init];
@@ -63,6 +67,15 @@
 		]];
 	}
 	return self;
+}
+
+- (void)setMaterialized:(BOOL)materialized {
+	self.effectView.effect = materialized ? self.effect : nil;
+	self.clippingView.alpha = materialized ? 1.f : 0.f;
+	self.layer.shadowOpacity = materialized ? self.shadowOpacity : 0.f;
+	if (self.effectView.layer.borderWidth > 0) {
+		self.effectView.layer.borderColor = materialized ? [UIColor separatorColor].CGColor : [UIColor clearColor].CGColor;
+	}
 }
 
 - (UIView *)contentView {

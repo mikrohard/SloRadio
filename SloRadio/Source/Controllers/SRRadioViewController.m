@@ -17,6 +17,7 @@
 #import "SRFavoritesPickerViewController.h"
 #import "SRStationTableViewCell.h"
 #import "MBProgressHUD.h"
+#import "SRToastView.h"
 #import "Reachability.h"
 
 static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
@@ -229,6 +230,8 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 
 - (void)selectedStationChanged:(NSNotification *)notification {
 	[self reconfigureVisibleRows];
+	// a playback error of the previous station no longer applies
+	[SRToastView hideCurrentToast];
 }
 
 - (void)favoritesChanged:(NSNotification *)notification {
@@ -686,20 +689,9 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 	if ([[UIApplication sharedApplication] applicationState] != UIApplicationStateActive) {
 		return;
 	}
-	NSString *message = nil;
-	if ([self isInternetReachable]) {
-		message = [NSString stringWithFormat:NSLocalizedString(@"PlaybackErrorStation", @""), station.name];
-	}
-	else {
-		message = [NSString stringWithFormat:NSLocalizedString(@"PlaybackErrorInternet", @""), station.name];
-	}
-	UIAlertController *controller = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Oops", @"Oops!")
-																		message:message
-																 preferredStyle:UIAlertControllerStyleAlert];
-	[controller addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"Ok", @"Ok")
-												   style:UIAlertActionStyleCancel
-												 handler:nil]];
-	[self presentOnTop:controller];
+	// a toast instead of an alert, so the error doesn't interrupt choosing another station
+	NSString *format = [self isInternetReachable] ? NSLocalizedString(@"PlaybackErrorStation", @"") : NSLocalizedString(@"PlaybackErrorInternet", @"");
+	[SRToastView showMessage:[NSString stringWithFormat:format, station.name] inView:self.view];
 }
 
 - (void)presentOnTop:(UIViewController *)controller {
