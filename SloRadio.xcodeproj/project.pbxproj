@@ -61,6 +61,8 @@
 		DFFA8CD6F13ACA149D7F5EA1 /* SRPlatterView.m in Sources */ = {isa = PBXBuildFile; fileRef = 0D4659D9F7CC353361D2DCE4 /* SRPlatterView.m */; };
 		E028CD5F7ED7753B1D8CBA3B /* SRPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 14708530F988E8FCB4420D57 /* SRPlayerViewController.m */; };
 		EBA78B09CF47C478BC03DA4F /* SRStationTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 2836258E924576AB39903DE7 /* SRStationTableViewCell.m */; };
+		A54B626DDA5A16595377545D /* SRTrackLookupTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 60DA0FC631CC765393D0A79A /* SRTrackLookupTests.m */; };
+		8951DB17DC7DA67E7212409D /* SRMetadataFormatterTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 64EAB6EEE88AD3BD1E469533 /* SRMetadataFormatterTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -178,6 +180,8 @@
 		CFC8D280AB6F7C805A4859F2 /* SRTrackLookup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRTrackLookup.h; path = Source/Player/SRTrackLookup.h; sourceTree = "<group>"; };
 		DA0AEB08A1AB52DBC0134F9B /* SRFavoritesPickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRFavoritesPickerViewController.m; path = Source/Controllers/SRFavoritesPickerViewController.m; sourceTree = "<group>"; };
 		F0052D70F57953CA1870BA05 /* SRPlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRPlayerViewController.h; path = Source/Controllers/SRPlayerViewController.h; sourceTree = "<group>"; };
+		60DA0FC631CC765393D0A79A /* SRTrackLookupTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRTrackLookupTests.m; sourceTree = "<group>"; };
+		64EAB6EEE88AD3BD1E469533 /* SRMetadataFormatterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRMetadataFormatterTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -425,6 +429,8 @@
 			isa = PBXGroup;
 			children = (
 				C8C8FA511AEEADAD00E5E46C /* SloRadioTests.m */,
+				64EAB6EEE88AD3BD1E469533 /* SRMetadataFormatterTests.m */,
+				60DA0FC631CC765393D0A79A /* SRTrackLookupTests.m */,
 				C8C8FA4F1AEEADAD00E5E46C /* Supporting Files */,
 			);
 			path = SloRadioTests;
@@ -681,6 +687,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8951DB17DC7DA67E7212409D /* SRMetadataFormatterTests.m in Sources */,
+				A54B626DDA5A16595377545D /* SRTrackLookupTests.m in Sources */,
 				C8C8FA521AEEADAD00E5E46C /* SloRadioTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -941,6 +949,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.jernej.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SloRadio.app/SloRadio";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/SloRadio/Source/Player";
 			};
 			name = Debug;
 		};
@@ -961,6 +970,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.jernej.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SloRadio.app/SloRadio";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/SloRadio/Source/Player";
 			};
 			name = Release;
 		};

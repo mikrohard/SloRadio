@@ -324,11 +324,7 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 	
 	// stations mostly send a single "now playing" text
 	if (nowPlaying.length) {
-		NSRange separator = [nowPlaying rangeOfString:@" - "];
-		if (separator.location != NSNotFound) {
-			*firstPart = [[nowPlaying substringToIndex:separator.location] stringByTrimmingCharactersInSet:whitespace];
-			*secondPart = [[nowPlaying substringFromIndex:NSMaxRange(separator)] stringByTrimmingCharactersInSet:whitespace];
-		}
+		[SRMetadataFormatter splitText:nowPlaying firstPart:firstPart secondPart:secondPart];
 	} else if (title.length && artist.length) {
 		*firstPart = artist;
 		*secondPart = title;

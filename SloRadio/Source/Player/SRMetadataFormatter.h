@@ -14,6 +14,9 @@
 // Returns a title cased version of all caps or all lowercase text. Mixed case text is returned unchanged.
 + (NSString *)formattedText:(NSString *)text;
 
+// Splits "artist - title" (or "title - artist") text into its two parts. Returns NO when the text has no separator.
++ (BOOL)splitText:(NSString *)text firstPart:(NSString **)firstPart secondPart:(NSString **)secondPart;
+
 // Whether the text carries no real information (e.g. "(null)" or a truncated "(n" sent by some streaming servers).
 + (BOOL)isPlaceholderText:(NSString *)text;
 

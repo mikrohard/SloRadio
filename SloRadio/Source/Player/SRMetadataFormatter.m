@@ -128,6 +128,28 @@
 	return capitalized;
 }
 
+#pragma mark - Parts
+
++ (BOOL)splitText:(NSString *)text firstPart:(NSString **)firstPart secondPart:(NSString **)secondPart {
+	// most stations use "artist - title", a few "artist / title"
+	NSCharacterSet *whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+	for (NSString *separator in @[@" - ", @" / "]) {
+		NSRange range = [text rangeOfString:separator];
+		if (range.location == NSNotFound) {
+			continue;
+		}
+		NSString *first = [[text substringToIndex:range.location] stringByTrimmingCharactersInSet:whitespace];
+		NSString *second = [[text substringFromIndex:NSMaxRange(range)] stringByTrimmingCharactersInSet:whitespace];
+		if (first.length == 0 || second.length == 0) {
+			continue;
+		}
+		*firstPart = first;
+		*secondPart = second;
+		return YES;
+	}
+	return NO;
+}
+
 #pragma mark - Placeholders
 
 + (BOOL)isPlaceholderText:(NSString *)text {
@@ -151,6 +173,19 @@
 #pragma mark - Comparing
 
 + (NSString *)comparableText:(NSString *)text {
+	if (text.length == 0) {
+		return @"";
+	}
+	static NSRegularExpression *exclamationExpression;
+	static NSRegularExpression *dollarExpression;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		exclamationExpression = [NSRegularExpression regularExpressionWithPattern:@"(?<=\\p{L})!(?=\\p{L})" options:0 error:nil];
+		dollarExpression = [NSRegularExpression regularExpressionWithPattern:@"(?<=\\p{L})\\$(?=\\p{L})" options:0 error:nil];
+	});
+	// stylized letters inside names ("P!nk", "Ke$ha")
+	text = [exclamationExpression stringByReplacingMatchesInString:text options:0 range:NSMakeRange(0, text.length) withTemplate:@"i"];
+	text = [dollarExpression stringByReplacingMatchesInString:text options:0 range:NSMakeRange(0, text.length) withTemplate:@"s"];
 	NSString *folded = [text stringByFoldingWithOptions:NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch | NSWidthInsensitiveSearch
 												 locale:[NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"]];
 	folded = [folded stringByReplacingOccurrencesOfString:@"&" withString:@" and "];

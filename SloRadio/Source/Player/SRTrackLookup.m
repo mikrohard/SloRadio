@@ -15,6 +15,16 @@ static NSTimeInterval const SRTrackLookupTimeout = 6.0;
 static NSUInteger const SRTrackLookupResultLimit = 10;
 static NSString * const SRTrackLookupArtworkSize = @"600x600bb";
 
+// how closely the artists of a catalog song have to match the station's artists
+typedef NS_ENUM(NSInteger, SRArtistMatching) {
+	// the same artists ("A & B" vs. "B, A")
+	SRArtistMatchingExact,
+	// the catalog song may have additional artists ("A" vs. "A & B")
+	SRArtistMatchingMoreArtists,
+	// either side may have additional artists, or a longer artist name ("A & B" vs. "A", "Band" vs. "Band Name")
+	SRArtistMatchingLoose,
+};
+
 @interface SRTrackLookup ()
 
 @property (nonatomic, strong) NSURLSession *session;
@@ -69,31 +79,49 @@ static NSString * const SRTrackLookupArtworkSize = @"600x600bb";
 	}
 	self.pendingCompletions[key] = [NSMutableArray arrayWithObject:[completion copy]];
 
+	__weak SRTrackLookup *weakSelf = self;
+	void (^finish)(NSArray *, BOOL) = ^(NSArray *match, BOOL cacheable) {
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[weakSelf finishLookupWithKey:key match:match cacheable:cacheable];
+		});
+	};
+	NSString *term = [self searchTermForFirstPart:firstPart secondPart:secondPart];
+	[self searchWithTerm:term completion:^(NSArray *results) {
+		NSArray *match = results ? [weakSelf matchForFirstPart:firstPart secondPart:secondPart inResults:results] : nil;
+		NSString *fallbackTerm = [weakSelf fallbackSearchTermForFirstPart:firstPart secondPart:secondPart];
+		if (!results || match || !fallbackTerm || [fallbackTerm isEqualToString:term]) {
+			finish(match, results != nil);
+			return;
+		}
+		// the artist may be spelled differently in the catalog ("deAndre" vs. "De André"), so search for the title again
+		[weakSelf searchWithTerm:fallbackTerm completion:^(NSArray *fallbackResults) {
+			NSArray *fallbackMatch = fallbackResults ? [weakSelf matchForFirstPart:firstPart secondPart:secondPart inResults:fallbackResults] : nil;
+			finish(fallbackMatch, fallbackResults != nil);
+		}];
+	}];
+}
+
+// calls the completion handler with the search results (nil when the search failed, e.g. because of rate limiting)
+- (void)searchWithTerm:(NSString *)term completion:(void (^)(NSArray *results))completion {
 	NSURLComponents *components = [NSURLComponents componentsWithString:SRTrackLookupUrl];
 	NSString *country = [[NSLocale currentLocale] objectForKey:NSLocaleCountryCode] ?: SRTrackLookupDefaultCountry;
 	components.queryItems = @[
-		[NSURLQueryItem queryItemWithName:@"term" value:[NSString stringWithFormat:@"%@ %@", firstPart, secondPart]],
+		[NSURLQueryItem queryItemWithName:@"term" value:term],
 		[NSURLQueryItem queryItemWithName:@"media" value:@"music"],
 		[NSURLQueryItem queryItemWithName:@"entity" value:@"song"],
 		[NSURLQueryItem queryItemWithName:@"limit" value:[NSString stringWithFormat:@"%lu", (unsigned long)SRTrackLookupResultLimit]],
 		[NSURLQueryItem queryItemWithName:@"country" value:country],
 	];
-	__weak SRTrackLookup *weakSelf = self;
 	[[self.session dataTaskWithURL:components.URL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-		NSArray *match = nil;
-		BOOL cacheable = NO;
+		NSArray *results = nil;
 		NSInteger statusCode = [response isKindOfClass:[NSHTTPURLResponse class]] ? ((NSHTTPURLResponse *)response).statusCode : 0;
 		if (!error && statusCode == 200 && data) {
 			NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
 			if ([json isKindOfClass:[NSDictionary class]]) {
-				NSArray *results = json[@"results"];
-				match = [weakSelf matchForFirstPart:firstPart secondPart:secondPart inResults:[results isKindOfClass:[NSArray class]] ? results : @[]];
-				cacheable = YES;
+				results = [json[@"results"] isKindOfClass:[NSArray class]] ? json[@"results"] : @[];
 			}
 		}
-		dispatch_async(dispatch_get_main_queue(), ^{
-			[weakSelf finishLookupWithKey:key match:match cacheable:cacheable];
-		});
+		completion(results);
 	}] resume];
 }
 
@@ -119,10 +147,10 @@ static NSString * const SRTrackLookupArtworkSize = @"600x600bb";
 - (NSArray *)matchForFirstPart:(NSString *)firstPart secondPart:(NSString *)secondPart inResults:(NSArray *)results {
 	// prefer songs by exactly the same artists and then songs with exactly the same title,
 	// so a different version (e.g. a remix or a collaboration) doesn't take over the original song
-	for (NSNumber *allowMoreArtists in @[@NO, @YES]) {
+	for (NSNumber *artistMatching in @[@(SRArtistMatchingExact), @(SRArtistMatchingMoreArtists), @(SRArtistMatchingLoose)]) {
 		for (NSNumber *allowVersionSuffix in @[@NO, @YES]) {
 			NSArray *match = [self matchForFirstPart:firstPart secondPart:secondPart inResults:results
-									allowMoreArtists:allowMoreArtists.boolValue allowVersionSuffix:allowVersionSuffix.boolValue];
+									  artistMatching:artistMatching.integerValue allowVersionSuffix:allowVersionSuffix.boolValue];
 			if (match) {
 				return match;
 			}
@@ -132,7 +160,7 @@ static NSString * const SRTrackLookupArtworkSize = @"600x600bb";
 }
 
 - (NSArray *)matchForFirstPart:(NSString *)firstPart secondPart:(NSString *)secondPart inResults:(NSArray *)results
-			  allowMoreArtists:(BOOL)allowMoreArtists allowVersionSuffix:(BOOL)allowVersionSuffix {
+				artistMatching:(SRArtistMatching)artistMatching allowVersionSuffix:(BOOL)allowVersionSuffix {
 	for (NSDictionary *result in results) {
 		if (![result isKindOfClass:[NSDictionary class]]) {
 			continue;
@@ -146,12 +174,12 @@ static NSString * const SRTrackLookupArtworkSize = @"600x600bb";
 		id trackURL = [self trackURLForResult:result] ?: [NSNull null];
 		// stations use both "artist - title" and "title - artist"
 		NSArray *match = [self matchArtist:firstPart title:secondPart artistName:artistName trackName:trackName
-						  allowMoreArtists:allowMoreArtists allowVersionSuffix:allowVersionSuffix];
+							artistMatching:artistMatching allowVersionSuffix:allowVersionSuffix];
 		if (match) {
 			return @[match[0], match[1], artworkURL, trackURL];
 		}
 		match = [self matchArtist:secondPart title:firstPart artistName:artistName trackName:trackName
-				 allowMoreArtists:allowMoreArtists allowVersionSuffix:allowVersionSuffix];
+				   artistMatching:artistMatching allowVersionSuffix:allowVersionSuffix];
 		if (match) {
 			return @[match[1], match[0], artworkURL, trackURL];
 		}
@@ -160,12 +188,12 @@ static NSString * const SRTrackLookupArtworkSize = @"600x600bb";
 }
 
 // returns @[artist, title] with the corrected spelling (NSNull for parts that can't be corrected), nil if not a match;
-// allowMoreArtists also matches catalog songs with additional artists ("A" vs. "A & B"),
+// artistMatching defines how closely the artists have to match,
 // allowVersionSuffix also matches titles that differ only in a version suffix ("Title" vs. "Title (Remix)")
 - (NSArray *)matchArtist:(NSString *)artist title:(NSString *)title artistName:(NSString *)artistName trackName:(NSString *)trackName
-		allowMoreArtists:(BOOL)allowMoreArtists allowVersionSuffix:(BOOL)allowVersionSuffix {
-	NSString *comparableArtist = [SRMetadataFormatter comparableText:artist];
-	NSString *comparableArtistName = [SRMetadataFormatter comparableText:artistName];
+		  artistMatching:(SRArtistMatching)artistMatching allowVersionSuffix:(BOOL)allowVersionSuffix {
+	NSString *comparableArtist = [self comparableName:artist];
+	NSString *comparableArtistName = [self comparableName:artistName];
 	if (comparableArtist.length == 0 || comparableArtistName.length == 0) {
 		return nil;
 	}
@@ -195,7 +223,23 @@ static NSString * const SRTrackLookupArtworkSize = @"600x600bb";
 	}
 	// the catalog lists collaborations as one artist, so the station may leave out featured artists ("A" vs. "A & B"),
 	// but a station listing artists the catalog song doesn't have ("A & B" vs. "A") is a different song (e.g. a remix)
-	BOOL artistMatches = [artists isEqualToSet:catalogArtists] || (allowMoreArtists && [artists isSubsetOfSet:catalogArtists]);
+	BOOL artistMatches = [artists isEqualToSet:catalogArtists] ||
+		(artistMatching >= SRArtistMatchingMoreArtists && [artists isSubsetOfSet:catalogArtists]);
+	if (!artistMatches && artistMatching == SRArtistMatchingLoose) {
+		// only used when no better match was found: stations add artists the catalog doesn't list ("Queen/Freddie Mercury"
+		// vs. "Queen") or extend an artist's name ("Charlie Daniels Band" vs. "Charlie Daniels")
+		artistMatches = [catalogArtists isSubsetOfSet:artists];
+		if (!artistMatches && MIN(comparableArtist.length, comparableArtistName.length) >= 3) {
+			artistMatches = [comparableArtistName hasPrefix:comparableArtist] || [comparableArtist hasPrefix:comparableArtistName];
+		}
+	}
+	// a band named differently ("Spike Jones & His City Slickers" vs. "Spike Jones & The City Slickers") only matches
+	// by one of its artists, so the title has to be exactly the same
+	BOOL requireSameTitle = NO;
+	if (!artistMatches && artistMatching == SRArtistMatchingLoose && !allowVersionSuffix && [artists intersectsSet:catalogArtists]) {
+		artistMatches = YES;
+		requireSameTitle = YES;
+	}
 	if (!artistMatches) {
 		return nil;
 	}
@@ -204,14 +248,26 @@ static NSString * const SRTrackLookupArtworkSize = @"600x600bb";
 	BOOL showCatalogFeaturing = catalogFeaturingSegment != nil && ![catalogFeaturedArtists isSubsetOfSet:fieldArtists];
 
 	id correctedTitle = nil;
-	if ([[SRMetadataFormatter comparableText:songTitle] isEqualToString:[SRMetadataFormatter comparableText:catalogTitle]]) {
+	// titles that differ in a leading "The" ("Sound of Silence" vs. "The Sound of Silence") are only used when no title
+	// is spelled the same ("The Locomotion" prefers "The Loco-Motion" over "Locomotion")
+	NSString *comparableSongTitle = [SRMetadataFormatter comparableText:songTitle];
+	NSString *comparableCatalogTitle = [SRMetadataFormatter comparableText:catalogTitle];
+	BOOL titleMatches = [comparableSongTitle isEqualToString:comparableCatalogTitle] ||
+		(allowVersionSuffix && [[self comparableName:songTitle] isEqualToString:[self comparableName:catalogTitle]]);
+	NSString *trackBase = [self baseOfTitle:catalogTitle];
+	if (titleMatches) {
 		correctedTitle = showCatalogFeaturing ? trackName : catalogTitle;
+	} else if (requireSameTitle) {
+		return nil;
+	} else if (allowVersionSuffix && [[self comparableName:songTitle] isEqualToString:[self comparableName:trackBase]]) {
+		// the station's whole title is the catalog's title without its version suffix, e.g. "Hip Teens (Don't Wear
+		// Blue Jeans)" vs. "Hip Teens Don't Wear Blue Jeans (Original Version)"
+		correctedTitle = showCatalogFeaturing ? [NSString stringWithFormat:@"%@ %@", trackBase, catalogFeaturingSegment] : trackBase;
 	} else if (allowVersionSuffix) {
 		// compare without version suffixes, e.g. "Title (Radio Edit)" or "Title - Remastered 2011"
 		NSString *titleBase = [self baseOfTitle:songTitle];
-		NSString *trackBase = [self baseOfTitle:catalogTitle];
-		NSString *comparableTitleBase = [SRMetadataFormatter comparableText:titleBase];
-		if (comparableTitleBase.length == 0 || ![comparableTitleBase isEqualToString:[SRMetadataFormatter comparableText:trackBase]]) {
+		NSString *comparableTitleBase = [self comparableName:titleBase];
+		if (comparableTitleBase.length == 0 || ![comparableTitleBase isEqualToString:[self comparableName:trackBase]]) {
 			return nil;
 		}
 		// keep our version suffix (with its leading separator), only fix its letter case
@@ -250,7 +306,7 @@ static NSString * const SRTrackLookupArtworkSize = @"600x600bb";
 	static NSRegularExpression *separatorExpression;
 	static dispatch_once_t onceToken;
 	dispatch_once(&onceToken, ^{
-		separatorExpression = [NSRegularExpression regularExpressionWithPattern:@"\\s*[,&+;/]\\s*|\\s+(?:and|x|with|featuring|feat\\.?|ft\\.?|vs\\.?)\\s+"
+		separatorExpression = [NSRegularExpression regularExpressionWithPattern:@"\\s*[,&+;/]\\s*|\\s+(?:and|in|i|y|x|with|featuring|feat\\.?|ft\\.?|vs\\.?)\\s+|\\s+(?:feat|ft)\\.(?=\\S)"
 																		options:NSRegularExpressionCaseInsensitive
 																		  error:nil];
 	});
@@ -259,7 +315,7 @@ static NSString * const SRTrackLookupArtworkSize = @"600x600bb";
 	NSArray<NSTextCheckingResult *> *separators = [separatorExpression matchesInString:text options:0 range:NSMakeRange(0, text.length)];
 	for (NSUInteger index = 0; index <= separators.count; index++) {
 		NSUInteger end = index < separators.count ? separators[index].range.location : text.length;
-		NSString *comparableArtist = [SRMetadataFormatter comparableText:[text substringWithRange:NSMakeRange(start, end - start)]];
+		NSString *comparableArtist = [self comparableName:[text substringWithRange:NSMakeRange(start, end - start)]];
 		if (comparableArtist.length > 0) {
 			[artists addObject:comparableArtist];
 		}
@@ -300,9 +356,45 @@ static NSString * const SRTrackLookupArtworkSize = @"600x600bb";
 	return [title stringByReplacingCharactersInRange:result.range withString:@""];
 }
 
+// comparable form of an artist or a title, without a leading "The" ("The Beatles" vs. "Beatles")
+- (NSString *)comparableName:(NSString *)text {
+	NSString *trimmed = [text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+	if (trimmed.length > 4 && [trimmed rangeOfString:@"the " options:NSCaseInsensitiveSearch | NSAnchoredSearch].location != NSNotFound) {
+		trimmed = [trimmed substringFromIndex:4];
+	}
+	return [SRMetadataFormatter comparableText:trimmed];
+}
+
+// The catalog search only finds songs containing every word, so words the catalog never uses in names are left out
+// ("Samstone x Aktive" is listed as "Samstone & Aktive").
+- (NSString *)searchTermForFirstPart:(NSString *)firstPart secondPart:(NSString *)secondPart {
+	static NSRegularExpression *joinerExpression;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		joinerExpression = [NSRegularExpression regularExpressionWithPattern:@"(?<=^|\\s)(?:x|vs\\.?)(?=\\s|$)"
+																	 options:NSRegularExpressionCaseInsensitive
+																	   error:nil];
+	});
+	NSString *term = [NSString stringWithFormat:@"%@ %@", firstPart, secondPart];
+	term = [joinerExpression stringByReplacingMatchesInString:term options:0 range:NSMakeRange(0, term.length) withTemplate:@""];
+	NSArray *words = [term componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+	return [[words filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"length > 0"]] componentsJoinedByString:@" "];
+}
+
+// The second search uses the title and only the first word of the artist ("Fabrizio Franziska" for
+// "Fabrizio deAndre - Franziska"), for stations that spell the artist differently than the catalog.
+- (NSString *)fallbackSearchTermForFirstPart:(NSString *)firstPart secondPart:(NSString *)secondPart {
+	NSArray *words = [firstPart componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+	NSString *firstWord = [[words filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"length > 0"]] firstObject];
+	if (firstWord.length == 0 || secondPart.length == 0) {
+		return nil;
+	}
+	return [self searchTermForFirstPart:firstWord secondPart:secondPart];
+}
+
 - (NSString *)baseOfTitle:(NSString *)title {
 	NSUInteger end = title.length;
-	for (NSString *separator in @[@" (", @" [", @" - "]) {
+	for (NSString *separator in @[@" (", @" [", @" - ", @"...", @"…"]) {
 		NSRange range = [title rangeOfString:separator];
 		if (range.location != NSNotFound && range.location > 0) {
 			end = MIN(end, range.location);
