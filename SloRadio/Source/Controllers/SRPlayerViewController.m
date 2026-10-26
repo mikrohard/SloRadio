@@ -276,12 +276,15 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 	[leadingSpacer.widthAnchor constraintEqualToAnchor:trailingSpacer.widthAnchor].active = YES;
 	CGFloat size = compact ? 52.f : 56.f;
 	for (UIButton *button in @[self.previousButton, self.playButton, self.nextButton]) {
-		// the transport buttons shrink when the row doesn't fit
+		// the transport buttons shrink when the row doesn't fit (but never below their symbol, which the button's
+		// background clips); they mustn't hug their symbol, or they would always shrink
+		[button setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
+		[button setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisVertical];
 		NSLayoutConstraint *preferredWidth = [button.widthAnchor constraintEqualToConstant:size];
 		preferredWidth.priority = UILayoutPriorityDefaultHigh;
 		[NSLayoutConstraint activateConstraints:@[
 			preferredWidth,
-			[button.widthAnchor constraintGreaterThanOrEqualToConstant:40.f],
+			[button.widthAnchor constraintGreaterThanOrEqualToConstant:44.f],
 			[button.widthAnchor constraintLessThanOrEqualToConstant:size],
 			[button.heightAnchor constraintEqualToAnchor:button.widthAnchor],
 		]];
