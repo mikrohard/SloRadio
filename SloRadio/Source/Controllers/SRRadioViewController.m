@@ -34,6 +34,7 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 // UITableView reports editing == YES while a swipe action is shown, so track the edit mode separately
 @property (nonatomic, assign) BOOL editingList;
 @property (nonatomic, assign) BOOL ignoreStationsChange;
+@property (nonatomic, assign) BOOL ignoreSelectionChange;
 
 @end
 
@@ -229,6 +230,9 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 }
 
 - (void)selectedStationChanged:(NSNotification *)notification {
+	if (self.ignoreSelectionChange) {
+		return;
+	}
 	[self reconfigureVisibleRows];
 	// a playback error of the previous station no longer applies
 	[SRToastView hideCurrentToast];
@@ -464,10 +468,18 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 				[self toggleFavoriteForStation:station];
 				return;
 			}
+			// deleting the selected station scommccocococococcelects another one, and reloading the table view in response
+			// would put it out of sync with the row deletion below
+			NSInteger selectedStationId = [SRDataManager sharedManager].selectedRadioStation.stationId;
 			self.ignoreFavoritesChange = YES;
+			self.ignoreSelectionChange = YES;
 			[[SRDataManager sharedManager] deleteRadioStation:station];
+			self.ignoreSelectionChange = NO;
 			self.ignoreFavoritesChange = NO;
 			[tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+			if ([SRDataManager sharedManager].selectedRadioStation.stationId != selectedStationId) {
+				[self selectedStationChanged:nil];
+			}
 			if (station.stationId == [[SRRadioPlayer sharedPlayer] currentRadioStation].stationId) {
 				// deleted station currently playing... stop it
 				[[SRPlaybackManager sharedManager] stop];
