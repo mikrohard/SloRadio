@@ -7,6 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F0F555C4AF868B8E3344EFEC /* SRFFmpegEngineTests.m in Sources */ = {isa = PBXBuildFile; fileRef = EF05A5BFC01C180F8B06011E /* SRFFmpegEngineTests.m */; };
+		5A602CD6514FDCE4D61A189A /* SRICYParserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9E96CFB9552B0A1355D205AF /* SRICYParserTests.m */; };
+		2C70AB31EBC6D99B618761FD /* SRMetadataDecoderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 062FEE3C624C1137825A9878 /* SRMetadataDecoderTests.m */; };
+		C2B15AA2C8DF8FB1583E2327 /* SRAudioBufferTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C2F72A74FA99989D41316D5F /* SRAudioBufferTests.m */; };
+		AA1CEFFE35E9B1EB959ADAAD /* SRFFmpegDecoderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = F01394ACFA433DAFF93B8875 /* SRFFmpegDecoderTests.m */; };
+		9C3C2E179C9E4B2827E3E380 /* Fixtures in Resources */ = {isa = PBXBuildFile; fileRef = 93E89F4B6A7FEFE6EE149F95 /* Fixtures */; };
+		F4B14965E7FE095FAAC44EF7 /* SRICYParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A6AAA15AA1D7DBE980A978B /* SRICYParser.m */; };
+		146C969F984A9A34C7FA2670 /* SRMetadataDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 29870024797C345A0717B6E7 /* SRMetadataDecoder.m */; };
+		6B217A865B275CD72729344F /* SRByteQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = FE3D96638ADBC68B566E2651 /* SRByteQueue.m */; };
+		C44C5D57D848AEA318B844A3 /* SRAudioRingBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 75C8FB065BC3730F7A48F831 /* SRAudioRingBuffer.m */; };
+		5E43E9DD445746AB381A6822 /* SRStreamInput.m in Sources */ = {isa = PBXBuildFile; fileRef = 839258AB4F25388D3398990A /* SRStreamInput.m */; };
+		610D101568F2E5A4E986A1BA /* SRFFmpegDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 0F50A233DDA4CEDA42F033AB /* SRFFmpegDecoder.m */; };
+		3BE8158994CE0B249E14B8F3 /* SRAudioOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = F3C9604517840E0199C9067A /* SRAudioOutput.m */; };
+		75B14FE12A94302E54516918 /* SRFFmpegEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = BBBBDF31EB5568BB2D319561 /* SRFFmpegEngine.m */; };
 		BE28F6F8CFFF74C02AABBE8D /* SRRadioPlayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1EADDF9D590EA5CD22DFA57F /* SRRadioPlayerTests.m */; };
 		44E328E13E8612E5D126CD92 /* SRStreamResolver.m in Sources */ = {isa = PBXBuildFile; fileRef = F4FE88ABF7F1490DC1CBEC0E /* SRStreamResolver.m */; };
 		F2DAF75506ECFDCC3B18E369 /* SRAVPlayerEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = BDC3C631F654FD44A3CDC629 /* SRAVPlayerEngine.m */; };
@@ -16,6 +30,8 @@
 		19C2CF04D230E57F82E455F1 /* SRToastView.m in Sources */ = {isa = PBXBuildFile; fileRef = 92DDA059A204E4C2FDA2DC90 /* SRToastView.m */; };
 		19CFF82E26D6CB18009299DC /* MobileVLCKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1969137D26D6C2FB0065EDC3 /* MobileVLCKit.xcframework */; };
 		19CFF82F26D6CB18009299DC /* MobileVLCKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1969137D26D6C2FB0065EDC3 /* MobileVLCKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		39C786EC87BABCE613016CE4 /* FFmpeg.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF17751E428E81781C3C1FB6 /* FFmpeg.xcframework */; };
+		68D6167F43FEE3177608625E /* FFmpeg.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FF17751E428E81781C3C1FB6 /* FFmpeg.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		19F7767C2B7111DA000C1147 /* AVAudioSession+Override.m in Sources */ = {isa = PBXBuildFile; fileRef = 19F7767B2B7111DA000C1147 /* AVAudioSession+Override.m */; };
 		1C7077B7F79B6E8EB5868804 /* SRMetadataFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E1B5831DA6224BF92D5024D /* SRMetadataFormatter.m */; };
 		894A403B651E870CDDCB91F5 /* SRFavoritesPickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DA0AEB08A1AB52DBC0134F9B /* SRFavoritesPickerViewController.m */; };
@@ -90,6 +106,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				19CFF82F26D6CB18009299DC /* MobileVLCKit.xcframework in Embed Frameworks */,
+				68D6167F43FEE3177608625E /* FFmpeg.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -97,6 +114,28 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		EF05A5BFC01C180F8B06011E /* SRFFmpegEngineTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRFFmpegEngineTests.m; sourceTree = "<group>"; };
+		9E96CFB9552B0A1355D205AF /* SRICYParserTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRICYParserTests.m; sourceTree = "<group>"; };
+		062FEE3C624C1137825A9878 /* SRMetadataDecoderTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRMetadataDecoderTests.m; sourceTree = "<group>"; };
+		C2F72A74FA99989D41316D5F /* SRAudioBufferTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRAudioBufferTests.m; sourceTree = "<group>"; };
+		F01394ACFA433DAFF93B8875 /* SRFFmpegDecoderTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRFFmpegDecoderTests.m; sourceTree = "<group>"; };
+		93E89F4B6A7FEFE6EE149F95 /* Fixtures */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Fixtures; sourceTree = "<group>"; };
+		1A6AAA15AA1D7DBE980A978B /* SRICYParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRICYParser.m; path = Source/Player/SRICYParser.m; sourceTree = "<group>"; };
+		8642202DDC42E7E05591A4C0 /* SRICYParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRICYParser.h; path = Source/Player/SRICYParser.h; sourceTree = "<group>"; };
+		29870024797C345A0717B6E7 /* SRMetadataDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRMetadataDecoder.m; path = Source/Player/SRMetadataDecoder.m; sourceTree = "<group>"; };
+		BB2BFDE02BC27FCD764EA36F /* SRMetadataDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRMetadataDecoder.h; path = Source/Player/SRMetadataDecoder.h; sourceTree = "<group>"; };
+		FE3D96638ADBC68B566E2651 /* SRByteQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRByteQueue.m; path = Source/Player/SRByteQueue.m; sourceTree = "<group>"; };
+		46222285F17F7AF15E94C93E /* SRByteQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRByteQueue.h; path = Source/Player/SRByteQueue.h; sourceTree = "<group>"; };
+		75C8FB065BC3730F7A48F831 /* SRAudioRingBuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRAudioRingBuffer.m; path = Source/Player/SRAudioRingBuffer.m; sourceTree = "<group>"; };
+		11DC9EBF54B72FF1E391891E /* SRAudioRingBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRAudioRingBuffer.h; path = Source/Player/SRAudioRingBuffer.h; sourceTree = "<group>"; };
+		839258AB4F25388D3398990A /* SRStreamInput.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRStreamInput.m; path = Source/Player/SRStreamInput.m; sourceTree = "<group>"; };
+		BEC5640C1C63F89CFB376CDB /* SRStreamInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRStreamInput.h; path = Source/Player/SRStreamInput.h; sourceTree = "<group>"; };
+		0F50A233DDA4CEDA42F033AB /* SRFFmpegDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRFFmpegDecoder.m; path = Source/Player/SRFFmpegDecoder.m; sourceTree = "<group>"; };
+		1D50683DDCEEBB6391E12A6E /* SRFFmpegDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRFFmpegDecoder.h; path = Source/Player/SRFFmpegDecoder.h; sourceTree = "<group>"; };
+		F3C9604517840E0199C9067A /* SRAudioOutput.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRAudioOutput.m; path = Source/Player/SRAudioOutput.m; sourceTree = "<group>"; };
+		CBBAE85D934CEEDAB4680491 /* SRAudioOutput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRAudioOutput.h; path = Source/Player/SRAudioOutput.h; sourceTree = "<group>"; };
+		BBBBDF31EB5568BB2D319561 /* SRFFmpegEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRFFmpegEngine.m; path = Source/Player/SRFFmpegEngine.m; sourceTree = "<group>"; };
+		E21C62DD87DDBB5154244615 /* SRFFmpegEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRFFmpegEngine.h; path = Source/Player/SRFFmpegEngine.h; sourceTree = "<group>"; };
 		1EADDF9D590EA5CD22DFA57F /* SRRadioPlayerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRRadioPlayerTests.m; sourceTree = "<group>"; };
 		F4FE88ABF7F1490DC1CBEC0E /* SRStreamResolver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRStreamResolver.m; path = Source/Player/SRStreamResolver.m; sourceTree = "<group>"; };
 		BDC3C631F654FD44A3CDC629 /* SRAVPlayerEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRAVPlayerEngine.m; path = Source/Player/SRAVPlayerEngine.m; sourceTree = "<group>"; };
@@ -115,6 +154,7 @@
 		1470C7345FAE16A1C7F5D232 /* SRFavoritesPickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRFavoritesPickerViewController.h; path = Source/Controllers/SRFavoritesPickerViewController.h; sourceTree = "<group>"; };
 		16D4AEDFF57D7D1E0215CC12 /* SRMetadataFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SRMetadataFormatter.h; path = Source/Player/SRMetadataFormatter.h; sourceTree = "<group>"; };
 		1969137D26D6C2FB0065EDC3 /* MobileVLCKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = MobileVLCKit.xcframework; path = Libraries/MobileVLCKit.xcframework; sourceTree = "<group>"; };
+		FF17751E428E81781C3C1FB6 /* FFmpeg.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = FFmpeg.xcframework; path = Libraries/FFmpeg/FFmpeg.xcframework; sourceTree = "<group>"; };
 		19F7767A2B7111DA000C1147 /* AVAudioSession+Override.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "AVAudioSession+Override.h"; path = "Source/Categories/AVAudioSession+Override.h"; sourceTree = "<group>"; };
 		19F7767B2B7111DA000C1147 /* AVAudioSession+Override.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "AVAudioSession+Override.m"; path = "Source/Categories/AVAudioSession+Override.m"; sourceTree = "<group>"; };
 		2836258E924576AB39903DE7 /* SRStationTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SRStationTableViewCell.m; path = Source/Cells/SRStationTableViewCell.m; sourceTree = "<group>"; };
@@ -214,6 +254,7 @@
 				C8C8FA641AEEB66500E5E46C /* AudioToolbox.framework in Frameworks */,
 				C8C8FA621AEEB65F00E5E46C /* AVFoundation.framework in Frameworks */,
 				C8C8FA601AEEB65A00E5E46C /* CFNetwork.framework in Frameworks */,
+				39C786EC87BABCE613016CE4 /* FFmpeg.xcframework in Frameworks */,
 				19CFF82E26D6CB18009299DC /* MobileVLCKit.xcframework in Frameworks */,
 				C8C8FA791AEEB8B000E5E46C /* Security.framework in Frameworks */,
 				C8B4F36C2C1611E00076FFC3 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
@@ -452,6 +493,12 @@
 				C8C8FA511AEEADAD00E5E46C /* SloRadioTests.m */,
 				64EAB6EEE88AD3BD1E469533 /* SRMetadataFormatterTests.m */,
 				60DA0FC631CC765393D0A79A /* SRTrackLookupTests.m */,
+				EF05A5BFC01C180F8B06011E /* SRFFmpegEngineTests.m */,
+				9E96CFB9552B0A1355D205AF /* SRICYParserTests.m */,
+				062FEE3C624C1137825A9878 /* SRMetadataDecoderTests.m */,
+				C2F72A74FA99989D41316D5F /* SRAudioBufferTests.m */,
+				F01394ACFA433DAFF93B8875 /* SRFFmpegDecoderTests.m */,
+				93E89F4B6A7FEFE6EE149F95 /* Fixtures */,
 				1EADDF9D590EA5CD22DFA57F /* SRRadioPlayerTests.m */,
 				2B7640577675ADFB73B9246B /* SRStreamResolverTests.m */,
 				23FE0EAF739232F8573BD58A /* SRRadioPlayerNetworkTests.m */,
@@ -473,6 +520,22 @@
 			children = (
 				C8C8FA5C1AEEAF5A00E5E46C /* SRRadioPlayer.h */,
 				C8C8FA5D1AEEAF5A00E5E46C /* SRRadioPlayer.m */,
+				1A6AAA15AA1D7DBE980A978B /* SRICYParser.m */,
+				8642202DDC42E7E05591A4C0 /* SRICYParser.h */,
+				29870024797C345A0717B6E7 /* SRMetadataDecoder.m */,
+				BB2BFDE02BC27FCD764EA36F /* SRMetadataDecoder.h */,
+				FE3D96638ADBC68B566E2651 /* SRByteQueue.m */,
+				46222285F17F7AF15E94C93E /* SRByteQueue.h */,
+				75C8FB065BC3730F7A48F831 /* SRAudioRingBuffer.m */,
+				11DC9EBF54B72FF1E391891E /* SRAudioRingBuffer.h */,
+				839258AB4F25388D3398990A /* SRStreamInput.m */,
+				BEC5640C1C63F89CFB376CDB /* SRStreamInput.h */,
+				0F50A233DDA4CEDA42F033AB /* SRFFmpegDecoder.m */,
+				1D50683DDCEEBB6391E12A6E /* SRFFmpegDecoder.h */,
+				F3C9604517840E0199C9067A /* SRAudioOutput.m */,
+				CBBAE85D934CEEDAB4680491 /* SRAudioOutput.h */,
+				BBBBDF31EB5568BB2D319561 /* SRFFmpegEngine.m */,
+				E21C62DD87DDBB5154244615 /* SRFFmpegEngine.h */,
 				F4FE88ABF7F1490DC1CBEC0E /* SRStreamResolver.m */,
 				BDC3C631F654FD44A3CDC629 /* SRAVPlayerEngine.m */,
 				7ED90B3C973F02221D469DD8 /* SRVLCEngine.m */,
@@ -497,6 +560,7 @@
 			children = (
 				C856C5DE2CA8710C003B35C2 /* CarPlay.framework */,
 				1969137D26D6C2FB0065EDC3 /* MobileVLCKit.xcframework */,
+				FF17751E428E81781C3C1FB6 /* FFmpeg.xcframework */,
 				C88849F920416B1C008B0276 /* CoreTelephony.framework */,
 				C824E3801FF5226D00EF1B03 /* VideoToolbox.framework */,
 				C8C8FA781AEEB8B000E5E46C /* Security.framework */,
@@ -647,6 +711,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9C3C2E179C9E4B2827E3E380 /* Fixtures in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -712,6 +777,14 @@
 				C856C5D82CA86FD3003B35C2 /* SRAppSceneDelegate.m in Sources */,
 				C84DCC721AFD28570062C8F7 /* SRSliderTableViewCell.m in Sources */,
 				C8C8FA5E1AEEAF5A00E5E46C /* SRRadioPlayer.m in Sources */,
+				F4B14965E7FE095FAAC44EF7 /* SRICYParser.m in Sources */,
+				146C969F984A9A34C7FA2670 /* SRMetadataDecoder.m in Sources */,
+				6B217A865B275CD72729344F /* SRByteQueue.m in Sources */,
+				C44C5D57D848AEA318B844A3 /* SRAudioRingBuffer.m in Sources */,
+				5E43E9DD445746AB381A6822 /* SRStreamInput.m in Sources */,
+				610D101568F2E5A4E986A1BA /* SRFFmpegDecoder.m in Sources */,
+				3BE8158994CE0B249E14B8F3 /* SRAudioOutput.m in Sources */,
+				75B14FE12A94302E54516918 /* SRFFmpegEngine.m in Sources */,
 				44E328E13E8612E5D126CD92 /* SRStreamResolver.m in Sources */,
 				F2DAF75506ECFDCC3B18E369 /* SRAVPlayerEngine.m in Sources */,
 				AD229F06AF6C2490CEFF1D4B /* SRVLCEngine.m in Sources */,
@@ -724,6 +797,11 @@
 			files = (
 				8951DB17DC7DA67E7212409D /* SRMetadataFormatterTests.m in Sources */,
 				A54B626DDA5A16595377545D /* SRTrackLookupTests.m in Sources */,
+				F0F555C4AF868B8E3344EFEC /* SRFFmpegEngineTests.m in Sources */,
+				5A602CD6514FDCE4D61A189A /* SRICYParserTests.m in Sources */,
+				2C70AB31EBC6D99B618761FD /* SRMetadataDecoderTests.m in Sources */,
+				C2B15AA2C8DF8FB1583E2327 /* SRAudioBufferTests.m in Sources */,
+				AA1CEFFE35E9B1EB959ADAAD /* SRFFmpegDecoderTests.m in Sources */,
 				BE28F6F8CFFF74C02AABBE8D /* SRRadioPlayerTests.m in Sources */,
 				FE6F81CC197B83069CA0A17E /* SRStreamResolverTests.m in Sources */,
 				6C02636D238520EA8961B343 /* SRRadioPlayerNetworkTests.m in Sources */,
@@ -896,6 +974,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					"$(PROJECT_DIR)/Libraries/FFmpeg/include",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
 				INFOPLIST_FILE = SloRadio/Info.plist;
@@ -944,6 +1023,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					"$(PROJECT_DIR)/Libraries/FFmpeg/include",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 				);
 				INFOPLIST_FILE = SloRadio/Info.plist;

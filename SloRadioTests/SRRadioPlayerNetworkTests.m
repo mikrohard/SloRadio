@@ -12,6 +12,8 @@
 #import <XCTest/XCTest.h>
 #import "SRRadioPlayer.h"
 #import "SRStreamResolver.h"
+#import "SRStreamInput.h"
+#import "SRByteQueue.h"
 
 static NSTimeInterval const SRNetworkTestTimeout = 30.0;
 
@@ -21,6 +23,7 @@ static NSTimeInterval const SRNetworkTestTimeout = 30.0;
 @property (nonatomic, strong) NSMutableArray<NSNumber *> *states;
 @property (nonatomic, strong) XCTestExpectation *playingExpectation;
 @property (nonatomic, strong) XCTestExpectation *metaDataExpectation;
+@property (nonatomic, strong) XCTestExpectation *titleExpectation;
 
 @end
 
@@ -84,6 +87,10 @@ static NSTimeInterval const SRNetworkTestTimeout = 30.0;
 		[self.metaDataExpectation fulfill];
 		self.metaDataExpectation = nil;
 	}
+	if ([metadata[SRRadioPlayerMetaDataTitleKey] length] > 0 && [metadata[SRRadioPlayerMetaDataArtistKey] length] > 0) {
+		[self.titleExpectation fulfill];
+		self.titleExpectation = nil;
+	}
 }
 
 #pragma mark - Tests
@@ -100,7 +107,7 @@ static NSTimeInterval const SRNetworkTestTimeout = 30.0;
 	XCTestExpectation *metaDataExpectation = [self expectationWithDescription:@"now playing"];
 	self.metaDataExpectation = metaDataExpectation;
 	[self playAndWaitForPlaying:@"http://mp3.rtvslo.si/ars"];
-	XCTAssertEqualObjects([self engineClassName], @"SRVLCEngine");
+	XCTAssertEqualObjects([self engineClassName], @"SRFFmpegEngine");
 	[self assertTimeAdvances];
 	[self waitForExpectations:@[metaDataExpectation] timeout:SRNetworkTestTimeout];
 	XCTAssertGreaterThan([self.player.metaData[SRRadioPlayerMetaDataNowPlayingKey] length], 0u);
@@ -108,9 +115,151 @@ static NSTimeInterval const SRNetworkTestTimeout = 30.0;
 
 - (void)testShoutcastV1Plays {
 	// STUDIO-S answers "ICY 200 OK"
+	XCTestExpectation *metaDataExpectation = [self expectationWithDescription:@"now playing"];
+	self.metaDataExpectation = metaDataExpectation;
 	[self playAndWaitForPlaying:@"http://31.15.234.118:8000"];
+	XCTAssertEqualObjects([self engineClassName], @"SRFFmpegEngine");
+	[self assertTimeAdvances];
+	// its in-body ICY headers were parsed, so the metadata is separated from the audio
+	[self waitForExpectations:@[metaDataExpectation] timeout:SRNetworkTestTimeout];
+}
+
+- (void)testOggVorbisCommentsAreMetaData {
+	// Radio Net: Ogg Vorbis, titles in Vorbis comments instead of ICY metadata
+	XCTestExpectation *metaDataExpectation = [self expectationWithDescription:@"title and artist"];
+	self.titleExpectation = metaDataExpectation;
+	[self playAndWaitForPlaying:@"https://stream.radionet.si/stream.ogg"];
+	XCTAssertEqualObjects([self engineClassName], @"SRFFmpegEngine");
+	[self assertTimeAdvances];
+	[self waitForExpectations:@[metaDataExpectation] timeout:SRNetworkTestTimeout];
+}
+
+- (void)testHEAACPlays {
+	// Center 80-a: HE-AAC (the AudioToolbox decoder failed on it)
+	[self playAndWaitForPlaying:@"http://stream3.radiocenter.si:8064/;stream/1"];
+	XCTAssertEqualObjects([self engineClassName], @"SRFFmpegEngine");
+	[self assertTimeAdvances];
+}
+
+- (void)testWindows1250TitlesAreDecoded {
+	// these stations send Windows-1250 titles, mostly with č, š and ž
+	for (NSString *url in @[@"http://zvok.ragla.si/rrprk", @"http://93.103.130.12/tomi.mp3"]) {
+		XCTestExpectation *metaDataExpectation = [self expectationWithDescription:url];
+		self.metaDataExpectation = metaDataExpectation;
+		[self playAndWaitForPlaying:url];
+		[self waitForExpectations:@[metaDataExpectation] timeout:SRNetworkTestTimeout];
+		NSString *title = self.player.metaData[SRRadioPlayerMetaDataNowPlayingKey];
+		NSLog(@"%@ title: %@", url, title);
+		NSCharacterSet *mojibake = [NSCharacterSet characterSetWithCharactersInString:@"\uFFFD\u00C3\u00C4\u00C5\u00E8\u00B9\u00BE"];
+		XCTAssertEqual([title rangeOfCharacterFromSet:mojibake].location, NSNotFound, @"%@", title);
+		[self.player stop];
+		[self.states removeAllObjects];
+	}
+}
+
+- (void)testShoutcastV2WithoutMetaDataPlays {
+	// Radio Rogla: Shoutcast v2 that sends no icy-metaint
+	[self playAndWaitForPlaying:@"http://193.105.67.24:8010/;?type=http&nocache=3804"];
+	XCTAssertEqualObjects([self engineClassName], @"SRFFmpegEngine");
+	[self assertTimeAdvances];
+}
+
+- (void)testVLCEngineCanStillBeSelected {
+	[[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"SRPlayerUseVLCEngine"];
+	[self addTeardownBlock:^{
+		[[NSUserDefaults standardUserDefaults] removeObjectForKey:@"SRPlayerUseVLCEngine"];
+	}];
+	[self playAndWaitForPlaying:@"http://mp3.rtvslo.si/ars"];
 	XCTAssertEqualObjects([self engineClassName], @"SRVLCEngine");
 	[self assertTimeAdvances];
+}
+
+// Plays every station of the stations API for a few seconds. Slow (several minutes), so it only runs with
+// SR_ALL_STATIONS=1 on top of SR_NETWORK_TESTS=1.
+- (void)testAllStationsPlay {
+	if (![[NSProcessInfo processInfo].environment[@"SR_ALL_STATIONS"] isEqualToString:@"1"]) {
+		XCTSkip(@"set SR_ALL_STATIONS=1 to play every station");
+	}
+	NSData *json = [NSData dataWithContentsOfURL:[NSURL URLWithString:@"https://iphone.jernej.org/sloradio/stations.php"]];
+	NSArray *stations = [NSJSONSerialization JSONObjectWithData:json options:0 error:nil][@"stations"];
+	XCTAssertGreaterThan(stations.count, 100u);
+	NSMutableArray *failed = [NSMutableArray array];
+	NSCountedSet *engines = [NSCountedSet set];
+	for (NSDictionary *station in stations) {
+		@autoreleasepool {
+			[self.states removeAllObjects];
+			self.playingExpectation = [self expectationWithDescription:station[@"name"]];
+			[self.player playStreamAtUrl:[NSURL URLWithString:station[@"url"]]];
+			XCTWaiterResult result = [XCTWaiter waitForExpectations:@[self.playingExpectation] timeout:20.0];
+			self.playingExpectation = nil;
+			NSTimeInterval start = self.player.timePlaying;
+			[[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:2.0]];
+			BOOL playing = result == XCTWaiterResultCompleted && self.player.state == SRRadioPlayerStatePlaying && self.player.timePlaying - start > 1.0;
+			NSString *engine = [self engineClassName];
+			[engines addObject:engine ?: @"none"];
+			NSLog(@"STATION %@ %@ via %@, title: %@", playing ? @"OK  " : @"FAIL", station[@"name"], engine,
+				  self.player.metaData[SRRadioPlayerMetaDataNowPlayingKey] ?: self.player.metaData[SRRadioPlayerMetaDataTitleKey]);
+			if (!playing) {
+				if ([self isReachable:[NSURL URLWithString:station[@"url"]]]) {
+					[failed addObject:[NSString stringWithFormat:@"%@ (%@, states %@)", station[@"name"], station[@"url"], self.states]];
+				} else {
+					NSLog(@"STATION OFFLINE %@: the server can't be reached at all", station[@"name"]);
+				}
+			}
+			[self.player stop];
+		}
+	}
+	NSLog(@"STATIONS played with %@", engines);
+	XCTAssertEqual(failed.count, 0u, @"%lu of %lu stations failed: %@", (unsigned long)failed.count, (unsigned long)stations.count, failed);
+}
+
+- (void)testDownloadPausesAndResumesWhenTheQueueIsFull {
+	// ARS sends 192 kbit/s, read only 128 kbit/s from a tiny queue: the download is paused and resumed over and over
+	SRByteQueue *queue = [[SRByteQueue alloc] initWithCapacity:32 * 1024];
+	SRStreamInput *input = [[SRStreamInput alloc] initWithURL:[NSURL URLWithString:@"http://mp3.rtvslo.si/ars"] queue:queue];
+	[input start];
+	__block NSInteger total = 0;
+	__block BOOL failed = NO;
+	dispatch_semaphore_t done = dispatch_semaphore_create(0);
+	dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
+		uint8_t bytes[4000];
+		NSDate *end = [NSDate dateWithTimeIntervalSinceNow:20];
+		while ([end timeIntervalSinceNow] > 0) {
+			NSInteger count = [queue readBytes:bytes maxLength:sizeof(bytes)];
+			if (count <= 0) {
+				failed = YES;
+				break;
+			}
+			total += count;
+			usleep(250000);	// 4000 bytes every 0.25 s = 128 kbit/s
+		}
+		dispatch_semaphore_signal(done);
+	});
+	while (dispatch_semaphore_wait(done, DISPATCH_TIME_NOW) != 0) {
+		[[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+	}
+	[input cancel];
+	XCTAssertFalse(failed, @"the download failed: %@", queue.error);
+	XCTAssertGreaterThan(total, 280000);
+	// it was paused: far less than 20 s of 192 kbit/s was downloaded
+	XCTAssertLessThan(queue.totalBytesAppended, 20 * 24000 * 9 / 10);
+}
+
+// Whether the server responds at all (a station whose server is down isn't a player failure).
+- (BOOL)isReachable:(NSURL *)url {
+	NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+	configuration.timeoutIntervalForRequest = 8.0;
+	NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration];
+	NSURLSessionDataTask *task = [session dataTaskWithURL:url];
+	[task resume];
+	// the response headers are enough, a stream never completes
+	NSDate *timeout = [NSDate dateWithTimeIntervalSinceNow:10];
+	while ([timeout timeIntervalSinceNow] > 0 && task.state == NSURLSessionTaskStateRunning && task.response == nil) {
+		[[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+	}
+	BOOL reachable = task.response != nil;
+	[session invalidateAndCancel];
+	return reachable;
 }
 
 - (void)testPLSIsUnwrapped {
