@@ -9,8 +9,11 @@
 #import "SRRadioPlayer.h"
 #import "SRRadioStation.h"
 #import "SRDataManager.h"
+#import "SRPlaybackEngine.h"
+#import "SRStreamResolver.h"
+#import "SRAVPlayerEngine.h"
+#import "SRVLCEngine.h"
 #import "NSString+Additions.h"
-#import <MobileVLCKit/MobileVLCKit.h>
 
 NSString * const SRRadioPlayerStateDidChangeNotification = @"SRRadioPlayerStateDidChangeNotification";
 NSString * const SRRadioPlayerMetaDataDidChangeNotification = @"SRRadioPlayerMetaDataDidChangeNotification";
@@ -18,22 +21,18 @@ NSString * const SRRadioPlayerMetaDataArtistKey = @"SRRadioPlayerMetaDataArtistK
 NSString * const SRRadioPlayerMetaDataTitleKey = @"SRRadioPlayerMetaDataTitleKey";
 NSString * const SRRadioPlayerMetaDataGenreKey = @"SRRadioPlayerMetaDataGenreKey";
 NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNowPlayingKey";
-NSString * const SRRadioPlayerTimeoutStatsInputBytes = @"SRRadioPlayerTimeoutStatsInputBytes";
-NSString * const SRRadioPlayerTimeoutStatsDemuxBytes = @"SRRadioPlayerTimeoutStatsDemuxBytes";
-NSString * const SRRadioPlayerTimeoutStatsDecodedAudio = @"SRRadioPlayerTimeoutStatsDecodedAudio";
-NSString * const SRRadioPlayerTimeoutStatsInputBytesTimestamp = @"SRRadioPlayerTimeoutStatsInputBytesTimestamp";
-NSString * const SRRadioPlayerTimeoutStatsDemuxBytesTimestamp = @"SRRadioPlayerTimeoutStatsDemuxBytesTimestamp";
-NSString * const SRRadioPlayerTimeoutStatsDecodedAudioTimestamp = @"SRRadioPlayerTimeoutStatsDecodedAudioTimestamp";
 
-static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
+// reconnect delays after consecutive stalls: immediately, then 1, 2, 4, 8, 10, 10, ... seconds
+static NSTimeInterval const SRRadioPlayerMaxReconnectDelay = 10.0;
 
-@interface SRRadioPlayer () <VLCMediaDelegate, VLCMediaPlayerDelegate>
+@interface SRRadioPlayer () <SRPlaybackEngineDelegate>
 
-@property (nonatomic, strong) VLCMediaListPlayer *listPlayer;
-@property (nonatomic, strong) VLCMediaPlayer *player;
-@property (nonatomic, strong) VLCMedia *media;
-@property (nonatomic, strong) NSTimer *timeoutObserver;
-@property (nonatomic, strong) NSMutableDictionary *timeoutStats;
+@property (nonatomic, strong) id<SRPlaybackEngine> engine;
+@property (nonatomic, strong) SRStreamResolver *resolver;
+@property (nonatomic, strong) NSURL *streamURL;
+@property (nonatomic, assign) SRStreamFormat streamFormat;
+@property (nonatomic, strong) NSTimer *reconnectTimer;
+@property (nonatomic, assign) NSUInteger reconnectCount;
 @property (nonatomic, assign) int fadeVolume;
 
 @end
@@ -43,7 +42,6 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 @synthesize state = _state;
 @synthesize currentRadioStation = _currentRadioStation;
 @synthesize metaData = _metaData;
-@synthesize timePlaying = _timePlaying;
 @synthesize delegate = _delegate;
 
 #pragma mark - Singleton
@@ -61,56 +59,117 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 	self = [super init];
 	if (self) {
 		_fadeVolume = 100;
+		_state = SRRadioPlayerStateStopped;
+		_metaData = @{};
 	}
 	return self;
+}
+
+- (void)dealloc {
+	[self tearDownPlayback];
 }
 
 #pragma mark - Playback control
 
 - (void)playRadioStation:(SRRadioStation *)station {
 	_currentRadioStation = station;
-	[self stopIfPlayingAndClearStation:NO];
-	[self playStreamAtUrl:station.url];
+	[self startStreamAtUrl:station.url];
 }
 
 - (void)playStreamAtUrl:(NSURL *)url {
-	[self stopIfPlayingAndClearStation:YES];
-	self.listPlayer = [[VLCMediaListPlayer alloc] initWithOptions:[self playbackOptions]];
-	self.player = self.listPlayer.mediaPlayer;
-	self.player.delegate = self;
-	VLCMedia *media = [VLCMedia mediaWithURL:url];
-	[self registerMedia:media];
-	[self.listPlayer setRootMedia:media];
-	[self.listPlayer playMedia:media];
-	[self updatePlayerState];
-	[self updateMetaData];
+	_currentRadioStation = nil;
+	[self startStreamAtUrl:url];
 }
 
-- (void)stopIfPlayingAndClearStation:(BOOL)clearStation {
-	if (self.player) {
-		[self.player stop];
-		self.player = nil;
-		self.listPlayer = nil;
-		[self registerMedia:nil];
-		[self updatePlayerState];
-		if (clearStation) {
-			_currentRadioStation = nil;
-		}
-		_timePlaying = 0.0;
-        [self resetMetaData];
+- (void)startStreamAtUrl:(NSURL *)url {
+	[self tearDownPlayback];
+	self.streamURL = url;
+	self.reconnectCount = 0;
+	[self setMetaDataAndNotify:@{}];
+	if (!url) {
+		[self setStateAndNotify:SRRadioPlayerStateError];
+		return;
 	}
+	[self setStateAndNotify:SRRadioPlayerStateOpening];
+
+	SRStreamResolver *resolver = [[SRStreamResolver alloc] initWithURL:url];
+	self.resolver = resolver;
+	__weak SRRadioPlayer *weakSelf = self;
+	[resolver resolveWithCompletion:^(NSURL *resolvedURL, SRStreamFormat format) {
+		SRRadioPlayer *player = weakSelf;
+		if (player.resolver != resolver) {
+			return;
+		}
+		player.resolver = nil;
+		// reconnects reuse the resolved stream
+		player.streamURL = resolvedURL;
+		player.streamFormat = format;
+		[player startEngine];
+	}];
+}
+
+- (void)startEngine {
+	SRDataManager *dataManager = [SRDataManager sharedManager];
+	NSTimeInterval bufferDuration = dataManager.playerCachingEnabled ? dataManager.playerCacheSize : 0.0;
+	Class engineClass = [self engineClassForFormat:self.streamFormat];
+	id<SRPlaybackEngine> engine = [[engineClass alloc] initWithURL:self.streamURL bufferDuration:bufferDuration];
+	engine.delegate = self;
+	self.engine = engine;
+	[self updateVolume];
+	[engine start];
+}
+
+// Overridden by tests to inject a fake engine.
+- (Class)engineClassForFormat:(SRStreamFormat)format {
+	return format == SRStreamFormatHLS ? [SRAVPlayerEngine class] : [SRVLCEngine class];
 }
 
 - (void)stop {
-	[self.player stop];
-	self.player = nil;
-	self.listPlayer = nil;
-	[self registerMedia:nil];
-	[self updatePlayerState];
+	[self tearDownPlayback];
+	[self setStateAndNotify:SRRadioPlayerStateStopped];
 	_currentRadioStation = nil;
-	_timePlaying = 0.0;
-	[self updateMetaData];
+	[self setMetaDataAndNotify:@{}];
 }
+
+// Stops everything that is going on without notifying anybody.
+- (void)tearDownPlayback {
+	[self.resolver cancel];
+	self.resolver = nil;
+	[self.reconnectTimer invalidate];
+	self.reconnectTimer = nil;
+	self.engine.delegate = nil;
+	[self.engine stop];
+	self.engine = nil;
+}
+
+- (NSTimeInterval)timePlaying {
+	return self.engine.playbackTime;
+}
+
+#pragma mark - Reconnecting
+
+- (void)reconnect {
+	self.engine.delegate = nil;
+	[self.engine stop];
+	self.engine = nil;
+	[self.reconnectTimer invalidate];
+
+	NSTimeInterval delay = 0.0;
+	if (self.reconnectCount > 0) {
+		delay = MIN(pow(2.0, self.reconnectCount - 1), SRRadioPlayerMaxReconnectDelay);
+	}
+	self.reconnectCount++;
+	[self setStateAndNotify:SRRadioPlayerStateBuffering];
+	self.reconnectTimer = [NSTimer timerWithTimeInterval:delay target:self selector:@selector(reconnectTimerFired:) userInfo:nil repeats:NO];
+	[[NSRunLoop mainRunLoop] addTimer:self.reconnectTimer forMode:NSRunLoopCommonModes];
+}
+
+- (void)reconnectTimerFired:(NSTimer *)timer {
+	self.reconnectTimer = nil;
+	[self startEngine];
+}
+
+#pragma mark - Volume
 
 - (void)setVolume:(int)volume {
 	self.fadeVolume = volume;
@@ -118,60 +177,69 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 }
 
 - (void)updateVolume {
-	if (self.player) {
-		self.player.audio.volume = (int)roundf(self.fadeVolume * [SRDataManager sharedManager].playerVolume);
+	float volume = self.fadeVolume / 100.f * [SRDataManager sharedManager].playerVolume;
+	[self.engine setVolume:MIN(MAX(volume, 0.f), 1.f)];
+}
+
+#pragma mark - SRPlaybackEngineDelegate
+
+- (void)playbackEngine:(id<SRPlaybackEngine>)engine didChangeState:(SRRadioPlayerState)state {
+	if (engine != self.engine) {
+		return;
 	}
-}
-
-#pragma mark - Playback options
-
-- (NSArray *)playbackOptions {
-	SRDataManager *dataManager = [SRDataManager sharedManager];
-	if (dataManager.playerCachingEnabled) {
-		NSString *cachingOption = [NSString stringWithFormat:@"--network-caching=%.0f", dataManager.playerCacheSize * 1000];
-		return @[cachingOption];
+	if (state == SRRadioPlayerStatePlaying) {
+		self.reconnectCount = 0;
 	}
-	return nil;
+	if (state == SRRadioPlayerStateError) {
+		[self tearDownPlayback];
+	}
+	if (state == SRRadioPlayerStateOpening && self.state == SRRadioPlayerStateBuffering) {
+		// a reconnecting engine opens the stream again, keep showing that we are buffering
+		return;
+	}
+	[self setStateAndNotify:state];
 }
 
-#pragma mark - Meta data
-
-- (void)resetMetaData {
-    _metaData = @{};
-    if ([self.delegate respondsToSelector:@selector(radioPlayer:didChangeMetaData:)]) {
-        [self.delegate radioPlayer:self didChangeMetaData:self.metaData];
-    }
-	[[NSNotificationCenter defaultCenter] postNotificationName:SRRadioPlayerMetaDataDidChangeNotification
-														object:self
-													  userInfo:_metaData];
-}
-
-- (void)updateMetaData {
-	[self updateMetaDataPreserveNowPlaying:NO];
-}
-
-- (void)updateMetaDataPreserveNowPlaying:(BOOL)preserve {
-    VLCMediaMetaData *mediaMetaData = self.media.metaData;
-	NSString *genre = [self decodedMetadataString:[mediaMetaData genre]];
-	NSString *title = [self decodedMetadataString:[mediaMetaData title]];
-	NSString *artist = [self decodedMetadataString:[mediaMetaData artist]];
-	NSString *nowPlaying = [self decodedMetadataString:[mediaMetaData nowPlaying]];
-	if (preserve && !nowPlaying) {
-		nowPlaying = [_metaData objectForKey:SRRadioPlayerMetaDataNowPlayingKey];
+- (void)playbackEngine:(id<SRPlaybackEngine>)engine didChangeMetaData:(NSDictionary<NSString *, NSString *> *)rawMetaData {
+	if (engine != self.engine) {
+		return;
 	}
 	NSMutableDictionary *metaData = [NSMutableDictionary dictionary];
-	if (genre) {
-		[metaData setObject:genre forKey:SRRadioPlayerMetaDataGenreKey];
+	for (NSString *key in rawMetaData) {
+		NSString *value = [self decodedMetadataString:rawMetaData[key]];
+		if (value) {
+			metaData[key] = value;
+		}
 	}
-	if (title) {
-		[metaData setObject:title forKey:SRRadioPlayerMetaDataTitleKey];
+	if (!metaData[SRRadioPlayerMetaDataNowPlayingKey] && self.metaData[SRRadioPlayerMetaDataNowPlayingKey]) {
+		// some updates only carry the static stream info, keep the current song
+		metaData[SRRadioPlayerMetaDataNowPlayingKey] = self.metaData[SRRadioPlayerMetaDataNowPlayingKey];
 	}
-	if (artist) {
-		[metaData setObject:artist forKey:SRRadioPlayerMetaDataArtistKey];
+	[self setMetaDataAndNotify:metaData];
+}
+
+- (void)playbackEngineDidStall:(id<SRPlaybackEngine>)engine {
+	if (engine != self.engine) {
+		return;
 	}
-	if (nowPlaying) {
-		[metaData setObject:nowPlaying forKey:SRRadioPlayerMetaDataNowPlayingKey];
+	NSLog(@"Stream %@ stalled, reconnecting (attempt %lu)", self.streamURL, (unsigned long)self.reconnectCount + 1);
+	[self reconnect];
+}
+
+#pragma mark - State and meta data
+
+- (void)setStateAndNotify:(SRRadioPlayerState)state {
+	if (state != _state) {
+		_state = state;
+		[[NSNotificationCenter defaultCenter] postNotificationName:SRRadioPlayerStateDidChangeNotification
+															object:self];
+		if ([self.delegate respondsToSelector:@selector(radioPlayer:didChangeState:)]) {
+			[self.delegate radioPlayer:self didChangeState:_state];
+		}
 	}
+}
+
+- (void)setMetaDataAndNotify:(NSDictionary *)metaData {
 	_metaData = [NSDictionary dictionaryWithDictionary:metaData];
 	if ([self.delegate respondsToSelector:@selector(radioPlayer:didChangeMetaData:)]) {
 		[self.delegate radioPlayer:self didChangeMetaData:self.metaData];
@@ -182,246 +250,42 @@ static NSTimeInterval const SRRadioTimeoutInterval = 5.0;
 }
 
 - (NSString *)decodedMetadataString:(NSString *)input {
+	if (![input isKindOfClass:[NSString class]]) {
+		return nil;
+	}
 	NSString *output = [input stringByStrippingHTML];
-	if (input != nil) {
-		NSRegularExpression *expr = [NSRegularExpression regularExpressionWithPattern:@"&[#a-zA-Z0-9]+;"
-																			  options:NSRegularExpressionCaseInsensitive
-																				error:nil];
-		if ([expr numberOfMatchesInString:input options:0 range:NSMakeRange(0, input.length)]) {
-			NSData *data = [input dataUsingEncoding:NSUTF8StringEncoding];
-			if (data != nil) {
-				NSAttributedString *attrStr = [[NSAttributedString alloc] initWithData:data
-																			   options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType}
-																	documentAttributes:nil
-																				 error:nil];
-				if (attrStr.string != nil) {
-					output = attrStr.string;
-				}
+	NSRegularExpression *expr = [NSRegularExpression regularExpressionWithPattern:@"&[#a-zA-Z0-9]+;"
+																		  options:NSRegularExpressionCaseInsensitive
+																			error:nil];
+	if ([expr numberOfMatchesInString:input options:0 range:NSMakeRange(0, input.length)]) {
+		NSData *data = [input dataUsingEncoding:NSUTF8StringEncoding];
+		if (data != nil) {
+			NSAttributedString *attrStr = [[NSAttributedString alloc] initWithData:data
+																		   options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType,
+																					 NSCharacterEncodingDocumentAttribute: @(NSUTF8StringEncoding)}
+																documentAttributes:nil
+																			 error:nil];
+			if (attrStr.string != nil) {
+				output = attrStr.string;
 			}
 		}
 	}
-	
+
 	// trim output string
 	if (output != nil) {
 		NSMutableCharacterSet *set = [NSMutableCharacterSet characterSetWithCharactersInString:@"-"];
 		[set formUnionWithCharacterSet:[NSCharacterSet whitespaceCharacterSet]];
 		output = [output stringByTrimmingCharactersInSet:set];
 	}
-	
+
 	// cleanup multiple spaces
 	if (output != nil) {
-		NSString *pattern = @"\\s+";
-		NSString *replacement = @" ";
-		NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:0 error:nil];
-		output = [regex stringByReplacingMatchesInString:output options:0 range:NSMakeRange(0, output.length) withTemplate:replacement];
+		NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"\\s+" options:0 error:nil];
+		output = [regex stringByReplacingMatchesInString:output options:0 range:NSMakeRange(0, output.length) withTemplate:@" "];
 	}
-	
+
+	// an empty string is kept: it clears the current song (e.g. during ads)
 	return output;
-}
-
-#pragma mark - Register media
-
-- (void)registerMedia:(VLCMedia *)media {
-	if (self.media != media) {
-		[self stopMediaTimeoutObserver];
-		[self unregisterMediaKVO];
-		self.media.delegate = nil;
-		self.media = nil;
-		self.media = media;
-		self.media.delegate = self;
-		[self registerMediaKVO];
-		[self startMediaTimeoutObserver];
-	}
-}
-
-- (void)registerMediaKVO {
-	if (self.media) {
-		[self.media addObserver:self forKeyPath:@"state" options:NSKeyValueObservingOptionOld|NSKeyValueObservingOptionNew context:nil];
-	}
-}
-
-- (void)unregisterMediaKVO {
-	if (self.media) {
-		[self.media removeObserver:self forKeyPath:@"state"];
-	}
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
-	if (object == self.media && [keyPath isEqualToString:@"state"]) {
-		VLCMediaState oldMediaState = [[change objectForKey:NSKeyValueChangeOldKey] integerValue];
-		VLCMediaState newMediaState = [[change objectForKey:NSKeyValueChangeNewKey] integerValue];
-		if (oldMediaState != newMediaState) {
-			[self updatePlayerState];
-		}
-	}
-}
-
-- (void)startMediaTimeoutObserver {
-	[self stopMediaTimeoutObserver];
-	if (self.media) {
-		VLCMediaStats mediaStats = self.media.statistics;
-		self.timeoutStats = [NSMutableDictionary dictionary];
-		NSTimeInterval timestamp = [[NSDate date] timeIntervalSince1970];
-		[self.timeoutStats setObject:@(mediaStats.readBytes) forKey:SRRadioPlayerTimeoutStatsInputBytes];
-		[self.timeoutStats setObject:@(timestamp) forKey:SRRadioPlayerTimeoutStatsInputBytesTimestamp];
-		[self.timeoutStats setObject:@(mediaStats.demuxReadBytes) forKey:SRRadioPlayerTimeoutStatsDemuxBytes];
-		[self.timeoutStats setObject:@(timestamp) forKey:SRRadioPlayerTimeoutStatsDemuxBytesTimestamp];
-		[self.timeoutStats setObject:@(mediaStats.decodedAudio) forKey:SRRadioPlayerTimeoutStatsDecodedAudio];
-		[self.timeoutStats setObject:@(timestamp) forKey:SRRadioPlayerTimeoutStatsDecodedAudioTimestamp];
-
-		self.timeoutObserver = [NSTimer timerWithTimeInterval:1.0 target:self selector:@selector(timeoutObserverFired:) userInfo:nil repeats:YES];
-		[[NSRunLoop currentRunLoop] addTimer:self.timeoutObserver forMode:NSRunLoopCommonModes];
-	}
-}
-
-- (void)stopMediaTimeoutObserver {
-	[self.timeoutObserver invalidate];
-	self.timeoutObserver = nil;
-	self.timeoutStats = nil;
-}
-
-- (void)timeoutObserverFired:(NSTimer *)timer {
-	if ([self isHlsStream]) {
-		// skip timeout logic for HLS streams
-		return;
-	}
-	BOOL triggerTimeout = NO;
-	NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
-	
-	VLCMediaStats mediaStats = self.media.statistics;
-	NSInteger previousInputBytes = [[self.timeoutStats objectForKey:SRRadioPlayerTimeoutStatsInputBytes] integerValue];
-	if (previousInputBytes != mediaStats.readBytes) {
-		[self.timeoutStats setObject:@(mediaStats.readBytes) forKey:SRRadioPlayerTimeoutStatsInputBytes];
-		[self.timeoutStats setObject:@(now) forKey:SRRadioPlayerTimeoutStatsInputBytesTimestamp];
-	} else {
-		NSTimeInterval inputBytesTimestamp = [[self.timeoutStats objectForKey:SRRadioPlayerTimeoutStatsInputBytesTimestamp] doubleValue];
-		if (now - inputBytesTimestamp >= SRRadioTimeoutInterval) {
-			triggerTimeout = YES;
-		}
-	}
-	
-	NSInteger previousDemuxBytes = [[self.timeoutStats objectForKey:SRRadioPlayerTimeoutStatsDemuxBytes] integerValue];
-	if (previousDemuxBytes != mediaStats.demuxReadBytes) {
-		[self.timeoutStats setObject:@(mediaStats.demuxReadBytes) forKey:SRRadioPlayerTimeoutStatsDemuxBytes];
-		[self.timeoutStats setObject:@(now) forKey:SRRadioPlayerTimeoutStatsDemuxBytesTimestamp];
-	} else {
-		NSTimeInterval demuxBytesTimestamp = [[self.timeoutStats objectForKey:SRRadioPlayerTimeoutStatsDemuxBytesTimestamp] doubleValue];
-		if (now - demuxBytesTimestamp >= SRRadioTimeoutInterval) {
-			triggerTimeout = YES;
-		}
-	}
-	
-	NSInteger previousDecodedAudio = [[self.timeoutStats objectForKey:SRRadioPlayerTimeoutStatsDecodedAudio] integerValue];
-	if (previousDecodedAudio != mediaStats.decodedAudio) {
-		[self.timeoutStats setObject:@(mediaStats.decodedAudio) forKey:SRRadioPlayerTimeoutStatsDecodedAudio];
-		[self.timeoutStats setObject:@(now) forKey:SRRadioPlayerTimeoutStatsDecodedAudioTimestamp];
-	} else {
-		NSTimeInterval decodedAudioTimestamp = [[self.timeoutStats objectForKey:SRRadioPlayerTimeoutStatsDecodedAudioTimestamp] doubleValue];
-		if (now - decodedAudioTimestamp >= SRRadioTimeoutInterval) {
-			triggerTimeout = YES;
-		}
-	}
-	
-	if (triggerTimeout && (self.state == SRRadioPlayerStateBuffering || self.state == SRRadioPlayerStatePlaying)) {
-		if (self.currentRadioStation) {
-			[self playRadioStation:self.currentRadioStation];
-		} else {
-			NSURL *url = [self.media url];
-			[self playStreamAtUrl:url];
-		}
-	}
-}
-
-- (BOOL)isHlsStream {
-	NSString *url = [[self.media url] absoluteString];
-	if (url != nil) {
-		return [url rangeOfString:@"m3u8" options:NSCaseInsensitiveSearch].location != NSNotFound;
-	}
-	return NO;
-}
-
-#pragma mark - VLCMediaPlayerDelegate
-
-- (void)mediaPlayerTimeChanged:(NSNotification *)aNotification {
-	_timePlaying = self.player.time.value.doubleValue / 1000.0;
-	if (self.state != SRRadioPlayerStatePlaying && self.timePlaying > 0) {
-		[self updatePlayerState];
-	}
-}
-
-- (void)mediaPlayerStateChanged:(NSNotification *)aNotification {
-	[self registerMedia:self.player.media];
-	if (self.player.state == VLCMediaPlayerStateESAdded || self.player.state == VLCMediaPlayerStatePlaying) {
-		// the volume only sticks once the audio output exists, each new player starts at full volume
-		[self updateVolume];
-	}
-	[self updatePlayerState];
-}
-
-#pragma mark - VLCMediaDelegate
-
-- (void)mediaMetaDataDidChange:(VLCMedia *)aMedia {
-	[self updateMetaDataPreserveNowPlaying:YES];
-}
-
-- (void)mediaDidFinishParsing:(VLCMedia *)aMedia {
-	[self updateMetaDataPreserveNowPlaying:YES];
-}
-
-#pragma mark - Player state handling
-
-- (void)updatePlayerState {
-	SRRadioPlayerState state = SRRadioPlayerStateStopped;
-	if (self.player) {
-		switch (self.player.state) {
-			case VLCMediaPlayerStateBuffering:
-				state = SRRadioPlayerStateBuffering;
-				break;
-			case VLCMediaPlayerStatePlaying:
-				state = self.timePlaying > 0 ? SRRadioPlayerStatePlaying : SRRadioPlayerStateBuffering;
-				break;
-			case VLCMediaPlayerStatePaused:
-				state = SRRadioPlayerStatePaused;
-				break;
-			case VLCMediaPlayerStateError:
-				state = SRRadioPlayerStateError;
-				break;
-			case VLCMediaPlayerStateESAdded:
-				state = _state;
-				break;
-			case VLCMediaPlayerStateStopped:
-			case VLCMediaPlayerStateEnded:
-			default:
-				break;
-		}
-	}
-	if (self.media && self.media.state != VLCMediaStateNothingSpecial) {
-		switch (self.media.state) {
-			case VLCMediaStateBuffering:
-				state = SRRadioPlayerStateBuffering;
-				break;
-			case VLCMediaStatePlaying:
-				state = self.timePlaying > 0 ? SRRadioPlayerStatePlaying : SRRadioPlayerStateBuffering;
-				break;
-			case VLCMediaStateError:
-				state = SRRadioPlayerStateError;
-				break;
-			default:
-				break;
-		}
-	}
-	if (state != _state) {
-		_state = state;
-		if (_state == SRRadioPlayerStatePlaying) {
-			[self updateVolume];
-			[self.media parseWithOptions:VLCMediaParseNetwork];
-		}
-		[[NSNotificationCenter defaultCenter] postNotificationName:SRRadioPlayerStateDidChangeNotification
-															object:self];
-		if ([self.delegate respondsToSelector:@selector(radioPlayer:didChangeState:)]) {
-			[self.delegate radioPlayer:self didChangeState:_state];
-		}
-	}
 }
 
 @end
