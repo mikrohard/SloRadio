@@ -18,3 +18,6 @@ if [ ! -d "$VLCKIT_FRAMEWORK" ]; then
 	popd
 	rm -r "$TEMP_PATH"
 fi
+
+# FFmpeg (built from source on first build, takes about a minute; no-op when up to date)
+"${SOURCE_ROOT}/Scripts/build-ffmpeg.sh"
