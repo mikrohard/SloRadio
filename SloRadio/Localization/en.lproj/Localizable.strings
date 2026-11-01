@@ -96,3 +96,12 @@
 
 "OpenInAppleMusic" = "Open in Apple Music";
 "CopySong" = "Copy Song";
+
+/* Menu bar */
+"MenuAbout" = "About SloRadio";
+"MenuSettings" = "Settings…";
+"MenuAddStation" = "Add Station…";
+"MenuControls" = "Controls";
+"NextStation" = "Next Station";
+"PreviousStation" = "Previous Station";
+"MenuSendFeedback" = "Send Feedback…";

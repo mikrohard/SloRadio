@@ -19,7 +19,7 @@ static void *SRTableViewContentOffsetContext = &SRTableViewContentOffsetContext;
 @interface SRMainViewController () <UISplitViewControllerDelegate>
 
 @property (nonatomic, strong) UISplitViewController *splitController;
-@property (nonatomic, strong) SRRadioViewController *radioController;
+@property (nonatomic, strong, readwrite) SRRadioViewController *radioController;
 @property (nonatomic, strong) UINavigationController *radioNavigationController;
 @property (nonatomic, strong) SRPlayerViewController *playerPanelController;
 @property (nonatomic, strong) SRPlayerViewController *playerCardController;
@@ -57,6 +57,10 @@ static void *SRTableViewContentOffsetContext = &SRTableViewContentOffsetContext;
 - (void)setupSplitController {
 	self.radioController = [[SRRadioViewController alloc] init];
 	self.radioNavigationController = [[UINavigationController alloc] initWithRootViewController:self.radioController];
+	if (@available(iOS 16.0, *)) {
+		// on the Mac the bar would move into the window's toolbar, which has no room for the list switch
+		self.radioNavigationController.navigationBar.preferredBehavioralStyle = UIBehavioralStylePad;
+	}
 	self.playerPanelController = [[SRPlayerViewController alloc] initWithStyle:SRPlayerStyleExpanded];
 
 	UISplitViewController *splitController = [[UISplitViewController alloc] initWithStyle:UISplitViewControllerStyleDoubleColumn];

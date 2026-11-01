@@ -184,13 +184,13 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 												   image:[UIImage systemImageNamed:@"gearshape"]
 											  identifier:nil
 												 handler:^(__kindof UIAction *action) {
-		[weakSelf presentSheetWithController:[[SRSettingsViewController alloc] init]];
+		[weakSelf presentSettings];
 	}];
 	UIAction *aboutAction = [UIAction actionWithTitle:NSLocalizedString(@"About", @"About")
 												image:[UIImage systemImageNamed:@"info.circle"]
 										   identifier:nil
 											  handler:^(__kindof UIAction *action) {
-		[weakSelf presentSheetWithController:[[SRAboutViewController alloc] init]];
+		[weakSelf presentAbout];
 	}];
 	UIMenu *appMenu = [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[settingsAction, aboutAction]];
 	return [UIMenu menuWithChildren:@[listMenu, appMenu]];
@@ -397,6 +397,7 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 	buttonConfiguration.baseForegroundColor = [UIColor whiteColor];
 	buttonConfiguration.contentInsets = NSDirectionalEdgeInsetsMake(10.f, 18.f, 10.f, 18.f);
 	UIButton *addButton = [UIButton buttonWithConfiguration:buttonConfiguration primaryAction:nil];
+	[SRAppearance usePadStyleForControl:addButton];
 	[addButton addTarget:self action:@selector(addFavoritesButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
 	
 	UIStackView *stack = [[UIStackView alloc] initWithArrangedSubviews:@[imageView, titleLabel, messageLabel, addButton]];
@@ -654,6 +655,20 @@ static NSTimeInterval const SRRadioStationsUpdateInterval = 60*60; // 1 hour
 }
 
 #pragma mark - Presentation
+
+- (void)presentSettings {
+	[self presentSheetWithController:[[SRSettingsViewController alloc] init]];
+}
+
+- (void)presentAbout {
+	[self presentSheetWithController:[[SRAboutViewController alloc] init]];
+}
+
+- (BOOL)isPresentingSheet {
+	// sheets are presented by the window's root controller, also when presented from here
+	UIViewController *root = self.view.window.rootViewController ?: self;
+	return root.presentedViewController != nil;
+}
 
 - (void)presentAddRadioController {
 	SRAddRadioViewController *controller = [[SRAddRadioViewController alloc] initEmpty];

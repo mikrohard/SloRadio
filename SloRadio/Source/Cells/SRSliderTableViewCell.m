@@ -43,6 +43,7 @@
 		self.valueLabel = valueLabel;
 		
 		UISlider *slider = [[UISlider alloc] init];
+		[SRAppearance usePadStyleForControl:slider];
 		slider.minimumTrackTintColor = [SRAppearance mainColor];
 		[slider addTarget:self action:@selector(sliderValueChanged:) forControlEvents:UIControlEventValueChanged];
 		self.slider = slider;

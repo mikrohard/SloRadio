@@ -15,6 +15,10 @@
 	if ([scene isKindOfClass:[UIWindowScene class]]) {
 		SRAppDelegate *appDelegate = (SRAppDelegate *)[[UIApplication sharedApplication] delegate];
 		UIWindowScene *windowScene = (UIWindowScene *)scene;
+		if ([NSProcessInfo processInfo].isMacCatalystApp) {
+			// narrower windows would collapse the station list into the iPhone layout
+			windowScene.sizeRestrictions.minimumSize = CGSizeMake(720.f, 500.f);
+		}
 		self.window = [[UIWindow alloc] initWithWindowScene:windowScene];
 		self.window.tintColor = [SRAppearance mainColor];
 		self.window.rootViewController = appDelegate.mainController;

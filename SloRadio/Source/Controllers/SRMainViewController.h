@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
+@class SRRadioViewController;
+
 @interface SRMainViewController : UIViewController
+
+@property (nonatomic, readonly) SRRadioViewController *radioController;
 
 @end

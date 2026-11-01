@@ -96,3 +96,12 @@
 
 "OpenInAppleMusic" = "Odpri v Apple Music";
 "CopySong" = "Kopiraj skladbo";
+
+/* Menu bar */
+"MenuAbout" = "O aplikaciji SloRadio";
+"MenuSettings" = "Nastavitve …";
+"MenuAddStation" = "Dodaj postajo …";
+"MenuControls" = "Predvajanje";
+"NextStation" = "Naslednja postaja";
+"PreviousStation" = "Prejšnja postaja";
+"MenuSendFeedback" = "Pošlji povratne informacije …";

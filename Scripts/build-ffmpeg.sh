@@ -5,7 +5,8 @@
 #   Scripts/build-ffmpeg.sh [--force]
 #
 # Output (git-ignored):
-#   Libraries/FFmpeg/FFmpeg.xcframework   dynamic framework (ios-arm64, ios-arm64_x86_64-simulator) + dSYMs
+#   Libraries/FFmpeg/FFmpeg.xcframework   dynamic framework (ios-arm64, ios-arm64_x86_64-simulator,
+#                                         ios-arm64_x86_64-maccatalyst) + dSYMs
 #   Libraries/FFmpeg/include/             public headers (add to HEADER_SEARCH_PATHS)
 #   Libraries/FFmpeg/COPYING.LGPLv2.1     license, FFmpeg is used under the LGPL
 #   Libraries/FFmpeg/BUILD_INFO.txt       version + configure flags (also the stamp checked by PrepareForBuild.sh)
@@ -52,7 +53,8 @@ CONFIGURE_FLAGS="--disable-everything --disable-autodetect --disable-programs --
 --enable-static --disable-shared --enable-pic --disable-debug --enable-optimizations \
 $(join_components demuxer $DEMUXERS)$(join_components decoder $DECODERS)$(join_components parser $PARSERS)$(join_components protocol $PROTOCOLS)"
 
-STAMP="ffmpeg=${FFMPEG_VERSION} ios=${IOS_MIN_VERSION} flags=$(printf '%s' "$CONFIGURE_FLAGS" | shasum -a 256 | cut -c1-16)"
+SLICES="ios-arm64 ios-simulator ios-maccatalyst"
+STAMP="ffmpeg=${FFMPEG_VERSION} ios=${IOS_MIN_VERSION} slices=${SLICES} flags=$(printf '%s' "$CONFIGURE_FLAGS" | shasum -a 256 | cut -c1-16)"
 
 # --- up to date? ---------------------------------------------------------------------------------
 
@@ -82,15 +84,22 @@ tar -xJf "$TARBALL" -C "$WORK_DIR"
 
 # --- per architecture builds ---------------------------------------------------------------------
 
-build_arch() { # $1 = sdk (iphoneos|iphonesimulator), $2 = arch (arm64|x86_64)
-	sdk="$1"; arch="$2"
-	case "$sdk" in
-		iphoneos) target="${arch}-apple-ios${IOS_MIN_VERSION}" ;;
-		*)        target="${arch}-apple-ios${IOS_MIN_VERSION}-simulator" ;;
+# clang target triple for an sdk (iphoneos|iphonesimulator|macosx, macosx meaning Mac Catalyst) and an arch
+target_for() { # $1 = sdk, $2 = arch
+	case "$1" in
+		iphoneos) echo "$2-apple-ios${IOS_MIN_VERSION}" ;;
+		macosx)   echo "$2-apple-ios${IOS_MIN_VERSION}-macabi" ;;
+		*)        echo "$2-apple-ios${IOS_MIN_VERSION}-simulator" ;;
 	esac
+}
+
+build_arch() { # $1 = sdk (iphoneos|iphonesimulator|macosx), $2 = arch (arm64|x86_64)
+	sdk="$1"; arch="$2"
+	target="$(target_for "$sdk" "$arch")"
 	case "$arch" in
 		arm64) ffarch="aarch64"; asm_flags="" ;;
-		*)     ffarch="x86_64";  asm_flags="--disable-x86asm" ;;   # no nasm needed, x86_64 is simulator only
+		# no nasm needed: x86_64 is the simulator and Intel Macs, where the C code is fast enough for audio
+		*)     ffarch="x86_64";  asm_flags="--disable-x86asm" ;;
 	esac
 	sysroot="$(xcrun --sdk "$sdk" --show-sdk-path)"
 	build_dir="${WORK_DIR}/build-${sdk}-${arch}"
@@ -114,10 +123,7 @@ build_arch() { # $1 = sdk (iphoneos|iphonesimulator), $2 = arch (arm64|x86_64)
 # Links the static libraries of one architecture into the framework's dynamic library.
 link_dylib() { # $1 = sdk, $2 = arch, $3 = output
 	sdk="$1"; arch="$2"; out="$3"
-	case "$sdk" in
-		iphoneos) target="${arch}-apple-ios${IOS_MIN_VERSION}" ;;
-		*)        target="${arch}-apple-ios${IOS_MIN_VERSION}-simulator" ;;
-	esac
+	target="$(target_for "$sdk" "$arch")"
 	prefix="${WORK_DIR}/install-${sdk}-${arch}"
 	xcrun --sdk "$sdk" clang -dynamiclib -target "$target" -isysroot "$(xcrun --sdk "$sdk" --show-sdk-path)" \
 		-install_name "@rpath/${FRAMEWORK_NAME}.framework/${FRAMEWORK_NAME}" \
@@ -129,7 +135,13 @@ link_dylib() { # $1 = sdk, $2 = arch, $3 = output
 		-lz -g -o "$out"
 }
 
-write_info_plist() { # $1 = framework dir, $2 = platform
+write_info_plist() { # $1 = directory, $2 = platform
+	if [ "$2" = "MacOSX" ]; then
+		# Mac Catalyst for iOS 15 runs on macOS 12 and later
+		min_version_key="LSMinimumSystemVersion"; min_version="12.0"
+	else
+		min_version_key="MinimumOSVersion"; min_version="${IOS_MIN_VERSION}"
+	fi
 	cat > "$1/Info.plist" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -144,7 +156,7 @@ write_info_plist() { # $1 = framework dir, $2 = platform
 	<key>CFBundleShortVersionString</key><string>${FFMPEG_VERSION}</string>
 	<key>CFBundleVersion</key><string>${FFMPEG_VERSION}</string>
 	<key>CFBundleSupportedPlatforms</key><array><string>$2</string></array>
-	<key>MinimumOSVersion</key><string>${IOS_MIN_VERSION}</string>
+	<key>${min_version_key}</key><string>${min_version}</string>
 </dict>
 </plist>
 EOF
@@ -154,16 +166,27 @@ make_framework() { # $1 = slice name, $2 = platform, $3 = sdk, rest = archs
 	slice="$1"; platform="$2"; sdk="$3"; shift 3
 	fw="${WORK_DIR}/frameworks/${slice}/${FRAMEWORK_NAME}.framework"
 	rm -rf "$fw"; mkdir -p "$fw"
+	binary="${fw}/${FRAMEWORK_NAME}"
+	plist_dir="$fw"
+	if [ "$sdk" = "macosx" ]; then
+		# Mac frameworks are versioned bundles: Versions/A with the binary and Resources/Info.plist, plus symlinks
+		mkdir -p "${fw}/Versions/A/Resources"
+		ln -s A "${fw}/Versions/Current"
+		ln -s "Versions/Current/${FRAMEWORK_NAME}" "${fw}/${FRAMEWORK_NAME}"
+		ln -s Versions/Current/Resources "${fw}/Resources"
+		binary="${fw}/Versions/A/${FRAMEWORK_NAME}"
+		plist_dir="${fw}/Versions/A/Resources"
+	fi
 	dylibs=""
 	for arch in "$@"; do
 		link_dylib "$sdk" "$arch" "${WORK_DIR}/frameworks/${slice}/${FRAMEWORK_NAME}-${arch}"
 		dylibs="$dylibs ${WORK_DIR}/frameworks/${slice}/${FRAMEWORK_NAME}-${arch}"
 	done
 	# shellcheck disable=SC2086
-	lipo -create $dylibs -output "${fw}/${FRAMEWORK_NAME}"
-	write_info_plist "$fw" "$platform"
-	dsymutil "${fw}/${FRAMEWORK_NAME}" -o "${WORK_DIR}/frameworks/${slice}/${FRAMEWORK_NAME}.framework.dSYM"
-	strip -x "${fw}/${FRAMEWORK_NAME}"
+	lipo -create $dylibs -output "$binary"
+	write_info_plist "$plist_dir" "$platform"
+	dsymutil "$binary" -o "${WORK_DIR}/frameworks/${slice}/${FRAMEWORK_NAME}.framework.dSYM"
+	strip -x "$binary"
 	# shellcheck disable=SC2086
 	rm -f $dylibs
 }
@@ -171,9 +194,11 @@ make_framework() { # $1 = slice name, $2 = platform, $3 = sdk, rest = archs
 build_arch iphoneos arm64
 build_arch iphonesimulator arm64
 build_arch iphonesimulator x86_64
+build_arch macosx arm64
+build_arch macosx x86_64
 
 # Headers are architecture independent for these targets (all little endian, 64-bit), verify that.
-for other in install-iphonesimulator-arm64 install-iphonesimulator-x86_64; do
+for other in install-iphonesimulator-arm64 install-iphonesimulator-x86_64 install-macosx-arm64 install-macosx-x86_64; do
 	if ! diff -r "${WORK_DIR}/install-iphoneos-arm64/include" "${WORK_DIR}/${other}/include" > /dev/null; then
 		echo "error: public headers differ between iphoneos-arm64 and ${other}" >&2
 		exit 1
@@ -183,6 +208,7 @@ done
 echo "Creating ${FRAMEWORK_NAME}.xcframework..."
 make_framework ios-arm64 iPhoneOS iphoneos arm64
 make_framework ios-arm64_x86_64-simulator iPhoneSimulator iphonesimulator arm64 x86_64
+make_framework ios-arm64_x86_64-maccatalyst MacOSX macosx arm64 x86_64
 
 rm -rf "$OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
@@ -191,6 +217,8 @@ xcodebuild -create-xcframework \
 	-debug-symbols "${WORK_DIR}/frameworks/ios-arm64/${FRAMEWORK_NAME}.framework.dSYM" \
 	-framework "${WORK_DIR}/frameworks/ios-arm64_x86_64-simulator/${FRAMEWORK_NAME}.framework" \
 	-debug-symbols "${WORK_DIR}/frameworks/ios-arm64_x86_64-simulator/${FRAMEWORK_NAME}.framework.dSYM" \
+	-framework "${WORK_DIR}/frameworks/ios-arm64_x86_64-maccatalyst/${FRAMEWORK_NAME}.framework" \
+	-debug-symbols "${WORK_DIR}/frameworks/ios-arm64_x86_64-maccatalyst/${FRAMEWORK_NAME}.framework.dSYM" \
 	-output "${OUTPUT_DIR}/${FRAMEWORK_NAME}.xcframework" > /dev/null
 cp -R "${WORK_DIR}/install-iphoneos-arm64/include" "${OUTPUT_DIR}/include"
 cp "${SRC_DIR}/COPYING.LGPLv2.1" "${OUTPUT_DIR}/"

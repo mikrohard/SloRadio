@@ -15,4 +15,7 @@
 // Settings style icon: a white symbol on a rounded, colored square
 + (UIImage *)iconWithSymbolName:(NSString *)symbolName backgroundColor:(UIColor *)backgroundColor;
 
+// Keeps the iPad look and feel of a button or slider in the Mac app (which otherwise shows native Mac controls).
++ (void)usePadStyleForControl:(UIControl *)control;
+
 @end

@@ -215,6 +215,7 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 		return result;
 	};
 	UIButton *sleepTimerButton = [UIButton buttonWithConfiguration:sleepConfiguration primaryAction:nil];
+	[SRAppearance usePadStyleForControl:sleepTimerButton];
 	sleepTimerButton.showsMenuAsPrimaryAction = YES;
 	sleepTimerButton.menu = [UIMenu menuWithTitle:NSLocalizedString(@"SleepTimer", @"Sleep timer") children:@[
 		[UIAction actionWithTitle:NSLocalizedString(@"CancelSleepTimer", @"Cancel sleep timer")
@@ -383,7 +384,8 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 	UIStackView *platterStack = [[UIStackView alloc] initWithArrangedSubviews:@[self.transportRow]];
 	platterStack.axis = UILayoutConstraintAxisVertical;
 	platterStack.spacing = 4.f;
-	if ([NSProcessInfo processInfo].isiOSAppOnMac) {
+	// isMacCatalystApp is also true for the iPad app running on a Mac (isiOSAppOnMac only for that one)
+	if ([NSProcessInfo processInfo].isMacCatalystApp) {
 		// desktop apps have their own volume, independent of the system volume
 		[platterStack addArrangedSubview:[self createVolumeRow]];
 	}
@@ -455,6 +457,7 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 	}
 
 	UISlider *volumeSlider = [[UISlider alloc] init];
+	[SRAppearance usePadStyleForControl:volumeSlider];
 	volumeSlider.minimumValue = 0.f;
 	volumeSlider.maximumValue = 1.f;
 	volumeSlider.value = [SRDataManager sharedManager].playerVolume;
@@ -478,6 +481,7 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 	configuration.cornerStyle = UIButtonConfigurationCornerStyleCapsule;
 	configuration.baseForegroundColor = [UIColor labelColor];
 	UIButton *button = [UIButton buttonWithConfiguration:configuration primaryAction:nil];
+	[SRAppearance usePadStyleForControl:button];
 	button.pointerInteractionEnabled = YES;
 	// round highlight while the button is pressed
 	button.configurationUpdateHandler = ^(__kindof UIButton *button) {

@@ -36,4 +36,12 @@ static CGFloat const SRIconSymbolPointSize = 15.f;
 	return [icon imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
 }
 
++ (void)usePadStyleForControl:(UIControl *)control {
+	if ([control isKindOfClass:[UIButton class]]) {
+		((UIButton *)control).preferredBehavioralStyle = UIBehavioralStylePad;
+	} else if ([control isKindOfClass:[UISlider class]]) {
+		((UISlider *)control).preferredBehavioralStyle = UIBehavioralStylePad;
+	}
+}
+
 @end
