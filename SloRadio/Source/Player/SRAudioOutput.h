@@ -13,6 +13,11 @@
 // Plays the audio of a ring buffer with AVAudioEngine.
 @interface SRAudioOutput : NSObject
 
+// The output for this platform: AVAudioEngine on iOS, AVSampleBufferAudioRenderer on the Mac, where AVAudioEngine
+// always plays on a Core Audio device and doesn't follow the AirPlay route picked in the app.
++ (instancetype)outputWithBuffer:(SRAudioBuffer *)buffer sampleRate:(double)sampleRate;
++ (instancetype)sampleBufferOutputWithBuffer:(SRAudioBuffer *)buffer sampleRate:(double)sampleRate;
+
 - (instancetype)initWithBuffer:(SRAudioBuffer *)buffer sampleRate:(double)sampleRate;
 
 - (BOOL)start:(NSError **)error;

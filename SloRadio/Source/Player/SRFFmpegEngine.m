@@ -305,7 +305,7 @@ static NSTimeInterval const SRFFmpegEngineTickInterval = 0.05;
 	[self onMainThread:^(SRFFmpegEngine *engine) {
 		NSLog(@"Playing %@ (%@)", engine.url, description);
 		engine.opened = YES;
-		engine.output = [[SRAudioOutput alloc] initWithBuffer:engine.buffer sampleRate:SRFFmpegDecoderOutputSampleRate];
+		engine.output = [SRAudioOutput outputWithBuffer:engine.buffer sampleRate:SRFFmpegDecoderOutputSampleRate];
 		engine.output.volume = engine.volume;
 		NSError *error = nil;
 		if (![engine.output start:&error]) {

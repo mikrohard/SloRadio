@@ -29,7 +29,21 @@ typedef struct {
 
 @end
 
+@interface SRSampleBufferAudioOutput : SRAudioOutput
+@end
+
 @implementation SRAudioOutput
+
++ (instancetype)outputWithBuffer:(SRAudioBuffer *)buffer sampleRate:(double)sampleRate {
+	if ([NSProcessInfo processInfo].isMacCatalystApp) {
+		return [self sampleBufferOutputWithBuffer:buffer sampleRate:sampleRate];
+	}
+	return [[SRAudioOutput alloc] initWithBuffer:buffer sampleRate:sampleRate];
+}
+
++ (instancetype)sampleBufferOutputWithBuffer:(SRAudioBuffer *)buffer sampleRate:(double)sampleRate {
+	return [[SRSampleBufferAudioOutput alloc] initWithBuffer:buffer sampleRate:sampleRate];
+}
 
 - (instancetype)initWithBuffer:(SRAudioBuffer *)buffer sampleRate:(double)sampleRate {
 	self = [super init];
@@ -146,6 +160,248 @@ typedef struct {
 	AVAudioSession *session = [AVAudioSession sharedInstance];
 	NSTimeInterval latency = session.outputLatency + session.IOBufferDuration;
 	return (uint64_t)(MAX(latency, 0.0) * self.sampleRate);
+}
+
+@end
+
+#pragma mark - Sample buffer output
+
+// Plays through AVSampleBufferAudioRenderer, which follows the app's AirPlay route on the Mac.
+// The renderer pulls ahead of the playback on its own (more for AirPlay), so instead of playing silence while
+// rebuffering the synchronizer is paused, and `renderedFrames` is the synchronizer's time: the audio that was heard.
+@interface SRSampleBufferAudioOutput ()
+
+@property (nonatomic, strong) SRAudioBuffer *ringBuffer;
+@property (nonatomic, assign) double rate;
+@property (nonatomic, strong) dispatch_queue_t queue;
+@property (nonatomic, strong) dispatch_source_t timer;
+@property (nonatomic, strong) AVSampleBufferAudioRenderer *renderer;
+@property (nonatomic, strong) AVSampleBufferRenderSynchronizer *synchronizer;
+@property (nonatomic, assign) CMAudioFormatDescriptionRef format;
+// queue only
+@property (nonatomic, assign) BOOL clockRunning;
+@property (nonatomic, assign) BOOL wantsPlaying;
+
+@end
+
+@implementation SRSampleBufferAudioOutput {
+	int32_t _playingFlag;
+	int32_t _underrunFlag;
+	// frames enqueued into the renderer, the time of the next sample
+	uint64_t _enqueuedFrames;
+	BOOL _running;
+	float _volumeValue;
+	// 8 channels x 4096 frames, used on the queue
+	float *_planar;
+}
+
+- (instancetype)initWithBuffer:(SRAudioBuffer *)buffer sampleRate:(double)sampleRate {
+	self = [super initWithBuffer:buffer sampleRate:sampleRate];
+	if (self) {
+		_ringBuffer = buffer;
+		_rate = sampleRate;
+		_volumeValue = 1.f;
+		_planar = calloc(8 * 4096, sizeof(float));
+		_queue = dispatch_queue_create("org.jernej.SloRadio.SampleBufferOutput", DISPATCH_QUEUE_SERIAL);
+	}
+	return self;
+}
+
+- (void)dealloc {
+	[self stop];
+	if (_format) {
+		CFRelease(_format);
+	}
+	free(_planar);
+}
+
+- (BOOL)start:(NSError **)error {
+	if (_running) {
+		return YES;
+	}
+	AudioStreamBasicDescription asbd = {0};
+	asbd.mSampleRate = self.rate;
+	asbd.mFormatID = kAudioFormatLinearPCM;
+	asbd.mFormatFlags = kAudioFormatFlagIsFloat | kAudioFormatFlagIsPacked;
+	asbd.mChannelsPerFrame = self.ringBuffer.channels;
+	asbd.mBitsPerChannel = 32;
+	asbd.mBytesPerFrame = 4 * asbd.mChannelsPerFrame;
+	asbd.mFramesPerPacket = 1;
+	asbd.mBytesPerPacket = asbd.mBytesPerFrame;
+	CMAudioFormatDescriptionRef format = NULL;
+	OSStatus status = CMAudioFormatDescriptionCreate(kCFAllocatorDefault, &asbd, 0, NULL, 0, NULL, NULL, &format);
+	if (status != noErr) {
+		if (error) {
+			*error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+		}
+		return NO;
+	}
+	self.format = format;
+
+	self.renderer = [[AVSampleBufferAudioRenderer alloc] init];
+	self.renderer.volume = _volumeValue;
+	self.synchronizer = [[AVSampleBufferRenderSynchronizer alloc] init];
+	[self.synchronizer addRenderer:self.renderer];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(rendererWasFlushed:) name:AVSampleBufferAudioRendererWasFlushedAutomaticallyNotification object:self.renderer];
+
+	__weak SRSampleBufferAudioOutput *weakSelf = self;
+	self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue);
+	dispatch_source_set_timer(self.timer, DISPATCH_TIME_NOW, 10 * NSEC_PER_MSEC, 2 * NSEC_PER_MSEC);
+	dispatch_source_set_event_handler(self.timer, ^{
+		[weakSelf feed];
+	});
+	dispatch_resume(self.timer);
+	_running = YES;
+	return YES;
+}
+
+- (void)stop {
+	if (!_running) {
+		return;
+	}
+	_running = NO;
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:AVSampleBufferAudioRendererWasFlushedAutomaticallyNotification object:self.renderer];
+	dispatch_source_cancel(self.timer);
+	dispatch_sync(self.queue, ^{
+		[self.synchronizer setRate:0];
+		[self.renderer flush];
+		[self.synchronizer removeRenderer:self.renderer atTime:kCMTimeInvalid completionHandler:nil];
+	});
+	self.timer = nil;
+}
+
+#pragma mark - Queue
+
+- (CMTime)endTime {
+	return CMTimeMake((int64_t)__atomic_load_n(&_enqueuedFrames, __ATOMIC_ACQUIRE), (int32_t)self.rate);
+}
+
+- (void)feed {
+	if (!_running) {
+		return;
+	}
+	BOOL playing = __atomic_load_n(&_playingFlag, __ATOMIC_ACQUIRE) != 0;
+	if (playing != self.wantsPlaying) {
+		self.wantsPlaying = playing;
+		if (!playing && self.clockRunning) {
+			// rebuffering: pause, whatever is still queued plays when resumed
+			[self.synchronizer setRate:0];
+			self.clockRunning = NO;
+		}
+	}
+	if (!playing) {
+		return;
+	}
+	CMTime resumeTime = CMTimeMinimum(self.synchronizer.currentTime, [self endTime]);
+	BOOL enqueued = NO;
+	while (self.renderer.isReadyForMoreMediaData) {
+		CMSampleBufferRef sample = [self copyNextSampleBuffer];
+		if (!sample) {
+			break;
+		}
+		[self.renderer enqueueSampleBuffer:sample];
+		CFRelease(sample);
+		enqueued = YES;
+	}
+	if (!self.clockRunning) {
+		if (enqueued) {
+			[self.synchronizer setRate:1 time:resumeTime];
+			self.clockRunning = YES;
+		}
+	} else if (CMTimeCompare(self.synchronizer.currentTime, [self endTime]) >= 0) {
+		// everything that was enqueued was played
+		__atomic_store_n(&_underrunFlag, 1, __ATOMIC_RELEASE);
+	}
+}
+
+// Up to 4096 frames from the ring buffer, interleaved, or NULL if it's empty.
+- (CMSampleBufferRef)copyNextSampleBuffer {
+	SRAudioRingBuffer *ring = self.ringBuffer.ring;
+	uint32_t frames = MIN(SRAudioRingBufferAvailableFrames(ring), 4096u);
+	if (frames == 0) {
+		return NULL;
+	}
+	uint32_t channels = MIN(self.ringBuffer.channels, 8u);
+	float *planes[8];
+	for (uint32_t c = 0; c < channels; c++) {
+		planes[c] = _planar + c * 4096;
+	}
+	frames = SRAudioRingBufferRead(ring, planes, frames);
+	size_t bytes = (size_t)frames * channels * sizeof(float);
+	CMBlockBufferRef block = NULL;
+	if (CMBlockBufferCreateWithMemoryBlock(kCFAllocatorDefault, NULL, bytes, kCFAllocatorDefault, NULL, 0, bytes, kCMBlockBufferAssureMemoryNowFlag, &block) != noErr) {
+		return NULL;
+	}
+	float *interleaved = NULL;
+	CMBlockBufferGetDataPointer(block, 0, NULL, NULL, (char **)&interleaved);
+	for (uint32_t f = 0; f < frames; f++) {
+		for (uint32_t c = 0; c < channels; c++) {
+			interleaved[f * channels + c] = planes[c][f];
+		}
+	}
+	CMSampleBufferRef sample = NULL;
+	OSStatus status = CMAudioSampleBufferCreateReadyWithPacketDescriptions(kCFAllocatorDefault, block, self.format, frames, [self endTime], NULL, &sample);
+	CFRelease(block);
+	if (status != noErr) {
+		return NULL;
+	}
+	__atomic_add_fetch(&_enqueuedFrames, frames, __ATOMIC_RELEASE);
+	return sample;
+}
+
+- (void)rendererWasFlushed:(NSNotification *)notification {
+	// the output route changed (e.g. to AirPlay) and the renderer dropped what was queued: continue from where it stopped
+	dispatch_async(self.queue, ^{
+		if (!self->_running) {
+			return;
+		}
+		NSValue *value = notification.userInfo[AVSampleBufferAudioRendererFlushTimeKey];
+		CMTime flushTime = value ? value.CMTimeValue : self.synchronizer.currentTime;
+		[self.synchronizer setRate:0];
+		self.clockRunning = NO;
+		uint64_t frames = (uint64_t)MAX(CMTimeGetSeconds(flushTime) * self.rate, 0.0);
+		if (frames < __atomic_load_n(&self->_enqueuedFrames, __ATOMIC_ACQUIRE)) {
+			__atomic_store_n(&self->_enqueuedFrames, frames, __ATOMIC_RELEASE);
+		}
+	});
+}
+
+#pragma mark - Properties
+
+- (void)setPlaying:(BOOL)playing {
+	__atomic_store_n(&_underrunFlag, 0, __ATOMIC_RELEASE);
+	__atomic_store_n(&_playingFlag, playing ? 1 : 0, __ATOMIC_RELEASE);
+}
+
+- (BOOL)playing {
+	return __atomic_load_n(&_playingFlag, __ATOMIC_ACQUIRE) != 0;
+}
+
+- (BOOL)underrun {
+	return __atomic_load_n(&_underrunFlag, __ATOMIC_ACQUIRE) != 0;
+}
+
+- (uint64_t)renderedFrames {
+	if (!self.synchronizer) {
+		return 0;
+	}
+	CMTime heard = CMTimeMinimum(self.synchronizer.currentTime, [self endTime]);
+	double seconds = CMTimeGetSeconds(heard);
+	return seconds > 0 ? (uint64_t)(seconds * self.rate) : 0;
+}
+
+- (uint64_t)latencyFrames {
+	// renderedFrames is already what was heard
+	return 0;
+}
+
+- (void)setVolume:(float)volume {
+	_volumeValue = volume;
+	self.renderer.volume = volume;
+}
+
+- (float)volume {
+	return _volumeValue;
 }
 
 @end
