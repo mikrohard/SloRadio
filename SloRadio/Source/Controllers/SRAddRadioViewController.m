@@ -39,6 +39,11 @@
 	return self;
 }
 
+- (void)viewDidLayoutSubviews {
+	[super viewDidLayoutSubviews];
+	[SRAppearance fitSheetToTableViewController:self];
+}
+
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	[self setupNavigationButtons];
