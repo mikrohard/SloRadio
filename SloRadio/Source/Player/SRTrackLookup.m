@@ -28,10 +28,10 @@ typedef NS_ENUM(NSInteger, SRArtistMatching) {
 @interface SRTrackLookup ()
 
 @property (nonatomic, strong) NSURLSession *session;
-// lookup key -> @[first, second, artwork url, track url] (NSNull for missing values)
+// lookup key -> @[first, second, artwork url, track url, split index] (NSNull for missing values)
 @property (nonatomic, strong) NSCache *cache;
 // lookup key -> pending completion handlers
-@property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableArray<SRTrackLookupCompletion> *> *pendingCompletions;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, NSMutableArray<SRTrackLookupSplitsCompletion> *> *pendingCompletions;
 
 @end
 
@@ -65,10 +65,24 @@ typedef NS_ENUM(NSInteger, SRArtistMatching) {
 #pragma mark - Lookup
 
 - (void)lookupFirstPart:(NSString *)firstPart secondPart:(NSString *)secondPart completion:(SRTrackLookupCompletion)completion {
-	NSString *key = [NSString stringWithFormat:@"%@|%@", [SRMetadataFormatter comparableText:firstPart], [SRMetadataFormatter comparableText:secondPart]];
+	[self lookupSplits:@[@[firstPart, secondPart]] completion:^(NSUInteger splitIndex, NSString *first, NSString *second, NSURL *artworkURL, NSURL *trackURL) {
+		completion(first, second, artworkURL, trackURL);
+	}];
+}
+
+- (void)lookupSplits:(NSArray<NSArray<NSString *> *> *)splits completion:(SRTrackLookupSplitsCompletion)completion {
+	if (splits.count == 0) {
+		completion(NSNotFound, nil, nil, nil, nil);
+		return;
+	}
+	NSMutableArray *keyParts = [NSMutableArray arrayWithCapacity:splits.count];
+	for (NSArray<NSString *> *split in splits) {
+		[keyParts addObject:[NSString stringWithFormat:@"%@|%@", [SRMetadataFormatter comparableText:split[0]], [SRMetadataFormatter comparableText:split[1]]]];
+	}
+	NSString *key = [keyParts componentsJoinedByString:@"||"];
 	NSArray *cached = [self.cache objectForKey:key];
 	if (cached) {
-		completion([self valueOrNil:cached[0]], [self valueOrNil:cached[1]], [self valueOrNil:cached[2]], [self valueOrNil:cached[3]]);
+		[self callCompletion:completion withResult:cached];
 		return;
 	}
 	NSMutableArray *completions = self.pendingCompletions[key];
@@ -85,20 +99,35 @@ typedef NS_ENUM(NSInteger, SRArtistMatching) {
 			[weakSelf finishLookupWithKey:key match:match cacheable:cacheable];
 		});
 	};
+	// every split has the same words, so one search covers all of them
+	NSString *firstPart = splits[0][0];
+	NSString *secondPart = splits[0][1];
 	NSString *term = [self searchTermForFirstPart:firstPart secondPart:secondPart];
 	[self searchWithTerm:term completion:^(NSArray *results) {
-		NSArray *match = results ? [weakSelf matchForFirstPart:firstPart secondPart:secondPart inResults:results] : nil;
-		NSString *fallbackTerm = [weakSelf fallbackSearchTermForFirstPart:firstPart secondPart:secondPart];
+		NSArray *match = results ? [weakSelf matchForSplits:splits inResults:results] : nil;
+		// the fallback search uses the first word of the artist, which is only known for a single split
+		NSString *fallbackTerm = splits.count == 1 ? [weakSelf fallbackSearchTermForFirstPart:firstPart secondPart:secondPart] : nil;
 		if (!results || match || !fallbackTerm || [fallbackTerm isEqualToString:term]) {
 			finish(match, results != nil);
 			return;
 		}
 		// the artist may be spelled differently in the catalog ("deAndre" vs. "De André"), so search for the title again
 		[weakSelf searchWithTerm:fallbackTerm completion:^(NSArray *fallbackResults) {
-			NSArray *fallbackMatch = fallbackResults ? [weakSelf matchForFirstPart:firstPart secondPart:secondPart inResults:fallbackResults] : nil;
+			NSArray *fallbackMatch = fallbackResults ? [weakSelf matchForSplits:splits inResults:fallbackResults] : nil;
 			finish(fallbackMatch, fallbackResults != nil);
 		}];
 	}];
+}
+
+// returns @[first, second, artwork url, track url, split index] (NSNull for missing values), nil if no split matches
+- (NSArray *)matchForSplits:(NSArray<NSArray<NSString *> *> *)splits inResults:(NSArray *)results {
+	for (NSUInteger index = 0; index < splits.count; index++) {
+		NSArray *match = [self matchForFirstPart:splits[index][0] secondPart:splits[index][1] inResults:results];
+		if (match) {
+			return [match arrayByAddingObject:@(index)];
+		}
+	}
+	return nil;
 }
 
 // calls the completion handler with the search results (nil when the search failed, e.g. because of rate limiting)
@@ -126,16 +155,21 @@ typedef NS_ENUM(NSInteger, SRArtistMatching) {
 }
 
 - (void)finishLookupWithKey:(NSString *)key match:(NSArray *)match cacheable:(BOOL)cacheable {
-	NSArray *result = match ?: @[[NSNull null], [NSNull null], [NSNull null], [NSNull null]];
+	NSArray *result = match ?: @[[NSNull null], [NSNull null], [NSNull null], [NSNull null], @(NSNotFound)];
 	// network errors and rate limiting are not cached, so the lookup is retried for the next metadata update
 	if (cacheable) {
 		[self.cache setObject:result forKey:key];
 	}
 	NSArray *completions = self.pendingCompletions[key];
 	[self.pendingCompletions removeObjectForKey:key];
-	for (SRTrackLookupCompletion completion in completions) {
-		completion([self valueOrNil:result[0]], [self valueOrNil:result[1]], [self valueOrNil:result[2]], [self valueOrNil:result[3]]);
+	for (SRTrackLookupSplitsCompletion completion in completions) {
+		[self callCompletion:completion withResult:result];
 	}
+}
+
+- (void)callCompletion:(SRTrackLookupSplitsCompletion)completion withResult:(NSArray *)result {
+	completion([result[4] unsignedIntegerValue], [self valueOrNil:result[0]], [self valueOrNil:result[1]],
+			   [self valueOrNil:result[2]], [self valueOrNil:result[3]]);
 }
 
 - (id)valueOrNil:(id)value {

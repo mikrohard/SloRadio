@@ -318,9 +318,9 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 		return nil;
 	}
 	NSCharacterSet *whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-	NSString *nowPlaying = [[player.metaData objectForKey:SRRadioPlayerMetaDataNowPlayingKey] stringByTrimmingCharactersInSet:whitespace];
-	NSString *title = [[player.metaData objectForKey:SRRadioPlayerMetaDataTitleKey] stringByTrimmingCharactersInSet:whitespace];
-	NSString *artist = [[player.metaData objectForKey:SRRadioPlayerMetaDataArtistKey] stringByTrimmingCharactersInSet:whitespace];
+	NSString *nowPlaying = [[SRMetadataFormatter cleanedText:[player.metaData objectForKey:SRRadioPlayerMetaDataNowPlayingKey]] stringByTrimmingCharactersInSet:whitespace];
+	NSString *title = [[SRMetadataFormatter cleanedText:[player.metaData objectForKey:SRRadioPlayerMetaDataTitleKey]] stringByTrimmingCharactersInSet:whitespace];
+	NSString *artist = [[SRMetadataFormatter cleanedText:[player.metaData objectForKey:SRRadioPlayerMetaDataArtistKey]] stringByTrimmingCharactersInSet:whitespace];
 	
 	// stations mostly send a single "now playing" text
 	if (nowPlaying.length) {
@@ -354,9 +354,14 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 	NSString *formattedText = nil;
 	if (firstPart.length && secondPart.length) {
 		formattedText = [NSString stringWithFormat:@"%@ - %@", [SRMetadataFormatter formattedText:firstPart], [SRMetadataFormatter formattedText:secondPart]];
-		[self lookupNowPlayingText:nowPlaying firstPart:firstPart secondPart:secondPart];
+		[self lookupNowPlayingText:nowPlaying splits:@[@[firstPart, secondPart]]];
 	} else {
 		formattedText = [SRMetadataFormatter formattedText:nowPlaying];
+		// "TITLE-ARTIST" with a hyphenated word or a one word part: shown as is unless the catalog confirms a split
+		NSArray *hyphenSplits = [SRMetadataFormatter hyphenSplitsOfText:nowPlaying];
+		if (hyphenSplits.count > 0 && hyphenSplits.count <= 3) {
+			[self lookupNowPlayingText:nowPlaying splits:hyphenSplits];
+		}
 	}
 	return formattedText;
 }
@@ -376,7 +381,8 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 	return [self songArtworkImage] ? self.lookupTrackURL : nil;
 }
 
-- (void)lookupNowPlayingText:(NSString *)nowPlaying firstPart:(NSString *)firstPart secondPart:(NSString *)secondPart {
+// splits are the possible @[first, second] parts of the text, the first one matching a catalog song is used
+- (void)lookupNowPlayingText:(NSString *)nowPlaying splits:(NSArray<NSArray<NSString *> *> *)splits {
 	if ([nowPlaying isEqualToString:self.lookupRawText]) {
 		// already looked up (or in progress)
 		return;
@@ -386,12 +392,14 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 	self.lookupArtworkImage = nil;
 	self.lookupTrackURL = nil;
 	__weak SRPlaybackManager *weakSelf = self;
-	[[SRTrackLookup sharedLookup] lookupFirstPart:firstPart secondPart:secondPart completion:^(NSString *correctedFirst, NSString *correctedSecond, NSURL *artworkURL, NSURL *trackURL) {
+	[[SRTrackLookup sharedLookup] lookupSplits:splits completion:^(NSUInteger splitIndex, NSString *correctedFirst, NSString *correctedSecond, NSURL *artworkURL, NSURL *trackURL) {
 		SRPlaybackManager *strongSelf = weakSelf;
-		if (!strongSelf || ![strongSelf.lookupRawText isEqualToString:nowPlaying]) {
-			// metadata changed in the meantime
+		if (!strongSelf || ![strongSelf.lookupRawText isEqualToString:nowPlaying] || splitIndex == NSNotFound) {
+			// metadata changed in the meantime, or the song wasn't found
 			return;
 		}
+		NSString *firstPart = splits[splitIndex][0];
+		NSString *secondPart = splits[splitIndex][1];
 		if (correctedFirst || correctedSecond) {
 			strongSelf.lookupResultText = [NSString stringWithFormat:@"%@ - %@",
 										   correctedFirst ?: [SRMetadataFormatter formattedText:firstPart],

@@ -15,6 +15,7 @@
 - (NSArray *)matchForFirstPart:(NSString *)firstPart secondPart:(NSString *)secondPart inResults:(NSArray *)results;
 - (NSString *)searchTermForFirstPart:(NSString *)firstPart secondPart:(NSString *)secondPart;
 - (NSString *)fallbackSearchTermForFirstPart:(NSString *)firstPart secondPart:(NSString *)secondPart;
+- (NSArray *)matchForSplits:(NSArray<NSArray<NSString *> *> *)splits inResults:(NSArray *)results;
 
 @end
 
@@ -76,6 +77,27 @@
 		@"Queen | A Kind Of Magic",
 	]];
 	[self assertMatch:match index:0 first:@"A Kind Of Magic" second:@"Queen"];
+}
+
+- (void)testSplitConfirmedByTheCatalog {
+	// Radio Rogla: "SENZA UNA DONNA (WITHOUT A WOMAN)-ZUCCHERO" can't be split safely without the catalog
+	NSArray *results = [self resultsWithSongs:@[
+		@"Zucchero & Jack Savoretti | Senza Una Donna (Without A Woman)",
+		@"Zucchero | Senza una donna (Without a Woman) [feat. Paul Young]",
+		@"Zucchero & Paul Young | Senza una Donna (Without a Woman)",
+	]];
+	NSArray *match = [[SRTrackLookup sharedLookup] matchForSplits:@[@[@"SENZA UNA DONNA (WITHOUT A WOMAN)", @"ZUCCHERO"]] inResults:results];
+	XCTAssertEqualObjects(match[4], @0);
+	XCTAssertEqualObjects(match[0], @"Senza Una Donna (Without A Woman)");
+	XCTAssertEqualObjects(match[1], [NSNull null]);
+	// the hyphenated artist: only the right split matches
+	results = [self resultsWithSongs:@[@"a-ha | Take On Me"]];
+	match = [[SRTrackLookup sharedLookup] matchForSplits:@[@[@"TAKE ON ME", @"A-HA"], @[@"TAKE ON ME-A", @"HA"]] inResults:results];
+	XCTAssertEqualObjects(match[4], @0);
+	XCTAssertEqualObjects(match[0], @"Take On Me");
+	XCTAssertEqualObjects(match[1], @"a-ha");
+	match = [[SRTrackLookup sharedLookup] matchForSplits:@[@[@"TAKE ON ME-A", @"HA"]] inResults:results];
+	XCTAssertNil(match);
 }
 
 - (void)testDifferentSongDoesNotMatch {

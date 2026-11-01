@@ -13,6 +13,9 @@
 // track URL to the song in Apple Music (both nil when the song wasn't found).
 typedef void (^SRTrackLookupCompletion)(NSString *firstPart, NSString *secondPart, NSURL *artworkURL, NSURL *trackURL);
 
+// Like SRTrackLookupCompletion, splitIndex is the index of the matched split (NSNotFound when the song wasn't found).
+typedef void (^SRTrackLookupSplitsCompletion)(NSUInteger splitIndex, NSString *firstPart, NSString *secondPart, NSURL *artworkURL, NSURL *trackURL);
+
 // Looks up the canonical spelling of a song in the iTunes catalog (iTunes Search API).
 @interface SRTrackLookup : NSObject
 
@@ -21,5 +24,9 @@ typedef void (^SRTrackLookupCompletion)(NSString *firstPart, NSString *secondPar
 // The completion handler is always called on the main queue. Only exact matches (ignoring case, accents and
 // punctuation) are used, so a lookup never replaces a song with a different one.
 - (void)lookupFirstPart:(NSString *)firstPart secondPart:(NSString *)secondPart completion:(SRTrackLookupCompletion)completion;
+
+// Looks up text whose separator isn't certain ("TITLE-ARTIST"), trying every split (@[first, second] pairs) of it
+// with one catalog search. The first split that matches a song exactly is used.
+- (void)lookupSplits:(NSArray<NSArray<NSString *> *> *)splits completion:(SRTrackLookupSplitsCompletion)completion;
 
 @end

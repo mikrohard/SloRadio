@@ -130,6 +130,19 @@
 
 #pragma mark - Parts
 
++ (NSString *)cleanedText:(NSString *)text {
+	// e.g. Radio Rogla sends "TITLE-\uFEFFARTIST" (the artist read from a file with a byte order mark)
+	static NSCharacterSet *invisibleCharacters;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		invisibleCharacters = [NSCharacterSet characterSetWithCharactersInString:@"\uFEFF\u200B\u200C\u200D\u2060"];
+	});
+	if (!text || [text rangeOfCharacterFromSet:invisibleCharacters].location == NSNotFound) {
+		return text;
+	}
+	return [[text componentsSeparatedByCharactersInSet:invisibleCharacters] componentsJoinedByString:@""];
+}
+
 + (BOOL)splitText:(NSString *)text firstPart:(NSString **)firstPart secondPart:(NSString **)secondPart {
 	// most stations use "artist - title", a few "artist / title"
 	NSCharacterSet *whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
@@ -147,7 +160,40 @@
 		*secondPart = second;
 		return YES;
 	}
+	// a few use "TITLE-ARTIST": only trusted for a single hyphen between phrases of several words
+	NSArray<NSArray<NSString *> *> *hyphenSplits = [self hyphenSplitsOfText:text];
+	if (hyphenSplits.count == 1 && [text componentsSeparatedByString:@"-"].count == 2) {
+		NSString *first = hyphenSplits[0][0];
+		NSString *second = hyphenSplits[0][1];
+		if ([first rangeOfCharacterFromSet:whitespace].location != NSNotFound &&
+			[second rangeOfCharacterFromSet:whitespace].location != NSNotFound) {
+			*firstPart = first;
+			*secondPart = second;
+			return YES;
+		}
+	}
 	return NO;
+}
+
++ (NSArray<NSArray<NSString *> *> *)hyphenSplitsOfText:(NSString *)text {
+	NSCharacterSet *whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+	NSMutableArray *splits = [NSMutableArray array];
+	NSRange searchRange = NSMakeRange(0, text.length);
+	NSRange range;
+	while ((range = [text rangeOfString:@"-" options:0 range:searchRange]).location != NSNotFound) {
+		searchRange = NSMakeRange(NSMaxRange(range), text.length - NSMaxRange(range));
+		if (range.location == 0 || NSMaxRange(range) >= text.length ||
+			[whitespace characterIsMember:[text characterAtIndex:range.location - 1]] ||
+			[whitespace characterIsMember:[text characterAtIndex:NSMaxRange(range)]]) {
+			continue;
+		}
+		NSString *first = [[text substringToIndex:range.location] stringByTrimmingCharactersInSet:whitespace];
+		NSString *second = [[text substringFromIndex:NSMaxRange(range)] stringByTrimmingCharactersInSet:whitespace];
+		if ([self comparableText:first].length > 0 && [self comparableText:second].length > 0) {
+			[splits addObject:@[first, second]];
+		}
+	}
+	return splits;
 }
 
 #pragma mark - Placeholders

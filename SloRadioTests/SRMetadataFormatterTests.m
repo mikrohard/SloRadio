@@ -36,6 +36,37 @@
 	[self assertText:@"zz" first:nil second:nil];
 }
 
+- (void)testSplitTextAtHyphenWithoutSpaces {
+	// Radio Rogla sends "TITLE-ARTIST"
+	[self assertText:@"UPAM, DA SI SREČNA-POSKOČNI MUZIKANTI & TILEN LOTRIČ" first:@"UPAM, DA SI SREČNA" second:@"POSKOČNI MUZIKANTI & TILEN LOTRIČ"];
+	[self assertText:@"SHE S NOT CRYING ANYMORE-BILLY RAY CYRUS" first:@"SHE S NOT CRYING ANYMORE" second:@"BILLY RAY CYRUS"];
+	// a spaced separator wins over hyphenated words
+	[self assertText:@"A-HA - TAKE ON ME" first:@"A-HA" second:@"TAKE ON ME"];
+	// hyphenated words aren't separators
+	[self assertText:@"Spider-Man Theme" first:nil second:nil];
+	[self assertText:@"Jay-Z" first:nil second:nil];
+	[self assertText:@"Non-stop glasba" first:nil second:nil];
+	[self assertText:@"Ob-La-Di, Ob-La-Da the Beatles" first:nil second:nil];
+	// a one word part is left to the catalog lookup
+	[self assertText:@"SENZA UNA DONNA (WITHOUT A WOMAN)-ZUCCHERO" first:nil second:nil];
+}
+
+- (void)testHyphenSplits {
+	NSArray *splits = [SRMetadataFormatter hyphenSplitsOfText:@"SENZA UNA DONNA (WITHOUT A WOMAN)-ZUCCHERO"];
+	XCTAssertEqualObjects(splits, (@[@[@"SENZA UNA DONNA (WITHOUT A WOMAN)", @"ZUCCHERO"]]));
+	splits = [SRMetadataFormatter hyphenSplitsOfText:@"TAKE ON ME-A-HA"];
+	XCTAssertEqualObjects(splits, (@[@[@"TAKE ON ME", @"A-HA"], @[@"TAKE ON ME-A", @"HA"]]));
+	XCTAssertEqualObjects([SRMetadataFormatter hyphenSplitsOfText:@"ED SHEERAN - SAPPHIRE"], @[]);
+	XCTAssertEqualObjects([SRMetadataFormatter hyphenSplitsOfText:@"-ZUCCHERO"], @[]);
+}
+
+- (void)testCleanedText {
+	XCTAssertEqualObjects([SRMetadataFormatter cleanedText:@"LJUBI LJUBI-\uFEFFNASTJA GABOR"], @"LJUBI LJUBI-NASTJA GABOR");
+	XCTAssertEqualObjects([SRMetadataFormatter cleanedText:@"\uFEFFA\u200BB"], @"AB");
+	XCTAssertEqualObjects([SRMetadataFormatter cleanedText:@"Tinkara Kovač"], @"Tinkara Kovač");
+	XCTAssertNil([SRMetadataFormatter cleanedText:nil]);
+}
+
 - (void)testComparableText {
 	XCTAssertEqualObjects([SRMetadataFormatter comparableText:@"Tinkara Kovač"], @"tinkarakovac");
 	XCTAssertEqualObjects([SRMetadataFormatter comparableText:@"Simon & Garfunkel"], @"simonandgarfunkel");
