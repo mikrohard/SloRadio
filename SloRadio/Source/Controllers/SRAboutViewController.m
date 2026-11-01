@@ -49,6 +49,7 @@ static NSString * const SRAboutCellIdentifier = @"AboutCell";
 		headerView.frame = CGRectMake(0, 0, width, height);
 		self.tableView.tableHeaderView = headerView;
 	}
+	[SRAppearance fitSheetToTableViewController:self];
 }
 
 #pragma mark - Setup
@@ -125,6 +126,7 @@ static NSString * const SRAboutCellIdentifier = @"AboutCell";
 		content.image = [SRAppearance iconWithSymbolName:@"heart.fill" backgroundColor:[UIColor systemPinkColor]];
 		cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 	}
+	[SRAppearance adjustListContentForMac:content];
 	cell.contentConfiguration = content;
 	return cell;
 }

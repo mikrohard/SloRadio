@@ -178,8 +178,9 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 	subtitleLabel.text = @" ";
 	self.subtitleLabel = subtitleLabel;
 
-	CGFloat playSize = compact ? 30.f : 32.f;
-	CGFloat skipSize = compact ? 22.f : 24.f;
+	CGFloat scale = [self controlScale];
+	CGFloat playSize = compact ? 30.f : 32.f * scale;
+	CGFloat skipSize = compact ? 22.f : 24.f * scale;
 	self.previousButton = [self transportButtonWithSymbol:@"backward.fill" pointSize:skipSize action:@selector(previousButtonPressed:)];
 	self.previousButton.accessibilityLabel = NSLocalizedString(@"Previous", @"Previous");
 	self.playButton = [self transportButtonWithSymbol:@"play.fill" pointSize:playSize action:@selector(playButtonPressed:)];
@@ -187,7 +188,7 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 	self.nextButton = [self transportButtonWithSymbol:@"forward.fill" pointSize:skipSize action:@selector(nextButtonPressed:)];
 	self.nextButton.accessibilityLabel = NSLocalizedString(@"Next", @"Next");
 	// secondary buttons on both sides of the transport controls share one style
-	CGFloat secondarySize = compact ? 19.f : 21.f;
+	CGFloat secondarySize = compact ? 19.f : 21.f * scale;
 	self.favoriteButton = [self secondaryButtonWithSymbol:@"star" pointSize:secondarySize action:@selector(favoriteButtonPressed:)];
 	self.routeButton = [self secondaryButtonWithSymbol:@"airplay.audio" pointSize:secondarySize action:nil];
 	if (compact) {
@@ -258,6 +259,11 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 	self.transportRow = [self createTransportRow];
 }
 
+// The Mac interface draws at full size (unlike the scaled iPad interface), where the expanded controls look too big.
+- (CGFloat)controlScale {
+	return self.style == SRPlayerStyleExpanded && [SRAppearance isMacInterface] ? 0.75f : 1.f;
+}
+
 - (UIView *)createTransportRow {
 	// [favorite]  ...  [previous] [play] [next]  ...  [route picker]
 	UIView *leadingSpacer = [[UIView alloc] init];
@@ -275,7 +281,8 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 		[row setCustomSpacing:16.f afterView:self.playButton];
 	}
 	[leadingSpacer.widthAnchor constraintEqualToAnchor:trailingSpacer.widthAnchor].active = YES;
-	CGFloat size = compact ? 52.f : 56.f;
+	CGFloat scale = [self controlScale];
+	CGFloat size = compact ? 52.f : 56.f * scale;
 	for (UIButton *button in @[self.previousButton, self.playButton, self.nextButton]) {
 		// the transport buttons shrink when the row doesn't fit (but never below their symbol, which the button's
 		// background clips); they mustn't hug their symbol, or they would always shrink
@@ -285,14 +292,14 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 		preferredWidth.priority = UILayoutPriorityDefaultHigh;
 		[NSLayoutConstraint activateConstraints:@[
 			preferredWidth,
-			[button.widthAnchor constraintGreaterThanOrEqualToConstant:44.f],
+			[button.widthAnchor constraintGreaterThanOrEqualToConstant:44.f * scale],
 			[button.widthAnchor constraintLessThanOrEqualToConstant:size],
 			[button.heightAnchor constraintEqualToAnchor:button.widthAnchor],
 		]];
 	}
 	for (UIView *view in @[self.favoriteButton, self.routeContainer]) {
-		[view.widthAnchor constraintEqualToConstant:44.f].active = YES;
-		[view.heightAnchor constraintEqualToConstant:44.f].active = YES;
+		[view.widthAnchor constraintEqualToConstant:44.f * scale].active = YES;
+		[view.heightAnchor constraintEqualToConstant:44.f * scale].active = YES;
 	}
 	return row;
 }
@@ -377,7 +384,8 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 	labels.spacing = 4.f;
 
 	// controls platter
-	SRPlatterView *platter = [[SRPlatterView alloc] initWithCornerRadius:32.f];
+	CGFloat scale = [self controlScale];
+	SRPlatterView *platter = [[SRPlatterView alloc] initWithCornerRadius:32.f * scale];
 	platter.translatesAutoresizingMaskIntoConstraints = NO;
 	self.platter = platter;
 
@@ -390,7 +398,7 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 		[platterStack addArrangedSubview:[self createVolumeRow]];
 	}
 	platterStack.layoutMarginsRelativeArrangement = YES;
-	platterStack.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(12.f, 16.f, 12.f, 16.f);
+	platterStack.directionalLayoutMargins = NSDirectionalEdgeInsetsMake(12.f * scale, 16.f * scale, 12.f * scale, 16.f * scale);
 	platterStack.translatesAutoresizingMaskIntoConstraints = NO;
 	[platter.contentView addSubview:platterStack];
 
@@ -447,13 +455,14 @@ static NSTimeInterval const SRNowPlayingPauseInterval = 3.0;
 
 - (UIView *)createVolumeRow {
 	// [min] ---slider--- [max]
-	UIButton *minimumButton = [self secondaryButtonWithSymbol:@"speaker.fill" pointSize:13.f action:@selector(minimumVolumeButtonPressed:)];
+	CGFloat scale = [self controlScale];
+	UIButton *minimumButton = [self secondaryButtonWithSymbol:@"speaker.fill" pointSize:13.f * scale action:@selector(minimumVolumeButtonPressed:)];
 	minimumButton.accessibilityLabel = NSLocalizedString(@"Mute", @"Mute");
-	UIButton *maximumButton = [self secondaryButtonWithSymbol:@"speaker.wave.3.fill" pointSize:13.f action:@selector(maximumVolumeButtonPressed:)];
+	UIButton *maximumButton = [self secondaryButtonWithSymbol:@"speaker.wave.3.fill" pointSize:13.f * scale action:@selector(maximumVolumeButtonPressed:)];
 	maximumButton.accessibilityLabel = NSLocalizedString(@"MaximumVolume", @"Maximum volume");
 	for (UIButton *button in @[minimumButton, maximumButton]) {
-		[button.widthAnchor constraintEqualToConstant:32.f].active = YES;
-		[button.heightAnchor constraintEqualToConstant:32.f].active = YES;
+		[button.widthAnchor constraintEqualToConstant:32.f * scale].active = YES;
+		[button.heightAnchor constraintEqualToConstant:32.f * scale].active = YES;
 	}
 
 	UISlider *volumeSlider = [[UISlider alloc] init];

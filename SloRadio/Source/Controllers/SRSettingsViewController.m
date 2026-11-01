@@ -45,6 +45,11 @@ static NSString * const SRSliderCellIdentifier = @"SliderCell";
 	return self;
 }
 
+- (void)viewDidLayoutSubviews {
+	[super viewDidLayoutSubviews];
+	[SRAppearance fitSheetToTableViewController:self];
+}
+
 - (void)viewDidLoad {
 	[super viewDidLoad];
 	[self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:SRSettingsCellIdentifier];
@@ -117,7 +122,13 @@ static NSString * const SRSliderCellIdentifier = @"SliderCell";
 		content.secondaryText = [self titleForSleepTimerInterval:dataManager.sleepTimerInterval];
 		content.secondaryTextProperties.color = self.durationPickerVisible ? [SRAppearance mainColor] : [UIColor secondaryLabelColor];
 		content.image = [SRAppearance iconWithSymbolName:@"timer" backgroundColor:[UIColor systemIndigoColor]];
-		cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+		if ([SRAppearance isMacInterface]) {
+			// there are no picker wheels on the Mac, a pop-up button is the Mac way
+			content.secondaryText = nil;
+			cell.accessoryView = [self sleepTimerDurationButton];
+		} else {
+			cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+		}
 	}
 	else if (indexPath.section == SRSettingsSectionPlayer) {
 		content.text = NSLocalizedString(@"AdditionalCaching", nil);
@@ -131,6 +142,7 @@ static NSString * const SRSliderCellIdentifier = @"SliderCell";
 		content.image = [SRAppearance iconWithSymbolName:@"arrow.counterclockwise" backgroundColor:[UIColor systemRedColor]];
 		cell.selectionStyle = UITableViewCellSelectionStyleDefault;
 	}
+	[SRAppearance adjustListContentForMac:content];
 	cell.contentConfiguration = content;
 	return cell;
 }
@@ -164,13 +176,34 @@ static NSString * const SRSliderCellIdentifier = @"SliderCell";
 #pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-	if (indexPath.section == SRSettingsSectionSleepTimer && indexPath.row == SRSleepTimerDurationRow) {
+	if (indexPath.section == SRSettingsSectionSleepTimer && indexPath.row == SRSleepTimerDurationRow && ![SRAppearance isMacInterface]) {
 		[self toggleDurationPicker];
 	}
 	else if (indexPath.section == SRSettingsSectionStations) {
 		[self presentResetAction];
 	}
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (UIButton *)sleepTimerDurationButton {
+	SRDataManager *dataManager = [SRDataManager sharedManager];
+	NSMutableArray *actions = [NSMutableArray array];
+	for (NSNumber *interval in dataManager.selectableSleepTimerIntervals) {
+		UIAction *action = [UIAction actionWithTitle:[self titleForSleepTimerInterval:interval.doubleValue]
+											   image:nil
+										  identifier:nil
+											 handler:^(__kindof UIAction *action) {
+			[SRDataManager sharedManager].sleepTimerInterval = interval.doubleValue;
+		}];
+		action.state = interval.doubleValue == dataManager.sleepTimerInterval ? UIMenuElementStateOn : UIMenuElementStateOff;
+		[actions addObject:action];
+	}
+	UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
+	button.menu = [UIMenu menuWithChildren:actions];
+	button.showsMenuAsPrimaryAction = YES;
+	button.changesSelectionAsPrimaryAction = YES;
+	[button sizeToFit];
+	return button;
 }
 
 - (void)toggleDurationPicker {
