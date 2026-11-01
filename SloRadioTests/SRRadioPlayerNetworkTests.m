@@ -14,6 +14,8 @@
 #import "SRStreamResolver.h"
 #import "SRStreamInput.h"
 #import "SRByteQueue.h"
+#import "SRMetadataFormatter.h"
+#import "SRTrackLookup.h"
 
 static NSTimeInterval const SRNetworkTestTimeout = 30.0;
 
@@ -162,6 +164,34 @@ static NSTimeInterval const SRNetworkTestTimeout = 30.0;
 	[self playAndWaitForPlaying:@"http://193.105.67.24:8010/;?type=http&nocache=3804"];
 	XCTAssertEqualObjects([self engineClassName], @"SRFFmpegEngine");
 	[self assertTimeAdvances];
+}
+
+- (void)testTitleArtistWithoutSpacesIsSplit {
+	// Radio Rogla sends "TITLE-ARTIST", about every second update with a byte order mark before the artist
+	XCTestExpectation *metaDataExpectation = [self expectationWithDescription:@"now playing"];
+	self.metaDataExpectation = metaDataExpectation;
+	[self playAndWaitForPlaying:@"http://193.105.67.24:8010/stream"];
+	[self waitForExpectations:@[metaDataExpectation] timeout:SRNetworkTestTimeout];
+	NSString *raw = self.player.metaData[SRRadioPlayerMetaDataNowPlayingKey];
+	NSString *title = [SRMetadataFormatter cleanedText:raw];
+	XCTAssertEqual([title rangeOfString:@"\uFEFF"].location, NSNotFound);
+	NSString *first = nil;
+	NSString *second = nil;
+	NSArray *splits = nil;
+	if ([SRMetadataFormatter splitText:title firstPart:&first secondPart:&second]) {
+		splits = @[@[first, second]];
+	} else {
+		splits = [SRMetadataFormatter hyphenSplitsOfText:title];
+	}
+	XCTAssertGreaterThan(splits.count, 0u, @"%@", title);
+	XCTestExpectation *lookupExpectation = [self expectationWithDescription:@"lookup"];
+	[[SRTrackLookup sharedLookup] lookupSplits:splits completion:^(NSUInteger splitIndex, NSString *firstPart, NSString *secondPart, NSURL *artworkURL, NSURL *trackURL) {
+		NSLog(@"Radio Rogla raw: %@ (byte order mark: %@) splits: %@ -> %@ / %@ / %@ / %@", raw,
+			  [raw rangeOfString:@"\uFEFF"].location != NSNotFound ? @"yes" : @"no", splits,
+			  splitIndex == NSNotFound ? @"no catalog match" : @(splitIndex), firstPart, secondPart, trackURL);
+		[lookupExpectation fulfill];
+	}];
+	[self waitForExpectations:@[lookupExpectation] timeout:SRNetworkTestTimeout];
 }
 
 - (void)testVLCEngineCanStillBeSelected {
