@@ -1,6 +1,6 @@
 # SloRadio [![Download on the App Store](http://iphone.jernej.org/app_store.png)](https://itunes.apple.com/si/app/sloradio/id316264385?mt=8)
 
-Simple radio player app using MobileVLCKit library. It uses a simple API to fetch & update Slovenian radio stations. It also allows the user to freely add/remove/move radio stations.
+Simple radio player app with its own audio player built on the FFmpeg libraries (and AVPlayer for HLS streams). It uses a simple API to fetch & update Slovenian radio stations. It also allows the user to freely add/remove/move radio stations.
 
 [![](http://iphone.jernej.org/sloradio/sloradio1_thumb.png)](http://iphone.jernej.org/sloradio/sloradio1.png)
 [![](http://iphone.jernej.org/sloradio/sloradio2_thumb.png)](http://iphone.jernej.org/sloradio/sloradio2.png)
@@ -8,10 +8,9 @@ Simple radio player app using MobileVLCKit library. It uses a simple API to fetc
 
 ## How to build
 
-SloRadio depends on the MobileVLCKit framework. You can either compile it from source or download a precompiled version. Just drop a working version of "MobileVLCKit.framework" into the "Libraries" directory and you're ready to build SloRadio.
+SloRadio plays streams with the FFmpeg libraries, which are built from source the first time you build the app (Scripts/build-ffmpeg.sh, run by the scheme's pre-action; it takes about a minute). The build needs the Xcode command line tools and downloads the FFmpeg source from https://ffmpeg.org. The result is placed in "Libraries/FFmpeg", after that just build and run.
 
-* Source: https://code.videolan.org/videolan/VLCKit
-* Binary: http://download.videolan.org/pub/cocoapods/
+FFmpeg is used under the LGPLv2.1 and linked dynamically.
 
 ## License
 

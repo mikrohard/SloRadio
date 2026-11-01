@@ -118,8 +118,8 @@ static double const SRSampleRate = 48000.0;
 #pragma mark - Library
 
 - (void)testLinkedAgainstOwnFFmpeg {
-	// MobileVLCKit exports the symbols of its own, much older FFmpeg. When it comes first in the link order,
-	// the app silently calls into it and crashes.
+	// a library exporting the symbols of another (older) FFmpeg, as MobileVLCKit did, would silently take over
+	// FFmpeg's functions when linked first and crash the app
 	NSString *version = [SRFFmpegDecoder libraryVersion];
 	XCTAssertGreaterThanOrEqual(version.integerValue, 9, @"linked against FFmpeg %@", version);
 }

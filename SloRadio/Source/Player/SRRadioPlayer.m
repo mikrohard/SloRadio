@@ -12,7 +12,6 @@
 #import "SRPlaybackEngine.h"
 #import "SRStreamResolver.h"
 #import "SRAVPlayerEngine.h"
-#import "SRVLCEngine.h"
 #import "SRFFmpegEngine.h"
 #import "NSString+Additions.h"
 
@@ -22,9 +21,6 @@ NSString * const SRRadioPlayerMetaDataArtistKey = @"SRRadioPlayerMetaDataArtistK
 NSString * const SRRadioPlayerMetaDataTitleKey = @"SRRadioPlayerMetaDataTitleKey";
 NSString * const SRRadioPlayerMetaDataGenreKey = @"SRRadioPlayerMetaDataGenreKey";
 NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNowPlayingKey";
-
-// hidden setting: play progressive streams with MobileVLCKit instead of FFmpeg
-static NSString * const SRRadioPlayerUseVLCEngineKey = @"SRPlayerUseVLCEngine";
 
 // reconnect delays after consecutive stalls: immediately, then 1, 2, 4, 8, 10, 10, ... seconds
 static NSTimeInterval const SRRadioPlayerMaxReconnectDelay = 10.0;
@@ -127,10 +123,6 @@ static NSTimeInterval const SRRadioPlayerMaxReconnectDelay = 10.0;
 - (Class)engineClassForFormat:(SRStreamFormat)format {
 	if (format == SRStreamFormatHLS) {
 		return [SRAVPlayerEngine class];
-	}
-	// MobileVLCKit stays available for comparison until the FFmpeg engine has proven itself
-	if ([[NSUserDefaults standardUserDefaults] boolForKey:SRRadioPlayerUseVLCEngineKey]) {
-		return [SRVLCEngine class];
 	}
 	return [SRFFmpegEngine class];
 }

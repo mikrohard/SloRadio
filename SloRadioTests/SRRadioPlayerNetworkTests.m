@@ -194,16 +194,6 @@ static NSTimeInterval const SRNetworkTestTimeout = 30.0;
 	[self waitForExpectations:@[lookupExpectation] timeout:SRNetworkTestTimeout];
 }
 
-- (void)testVLCEngineCanStillBeSelected {
-	[[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"SRPlayerUseVLCEngine"];
-	[self addTeardownBlock:^{
-		[[NSUserDefaults standardUserDefaults] removeObjectForKey:@"SRPlayerUseVLCEngine"];
-	}];
-	[self playAndWaitForPlaying:@"http://mp3.rtvslo.si/ars"];
-	XCTAssertEqualObjects([self engineClassName], @"SRVLCEngine");
-	[self assertTimeAdvances];
-}
-
 // Plays every station of the stations API for a few seconds. Slow (several minutes), so it only runs with
 // SR_ALL_STATIONS=1 on top of SR_NETWORK_TESTS=1.
 - (void)testAllStationsPlay {

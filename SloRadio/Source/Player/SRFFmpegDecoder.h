@@ -25,7 +25,7 @@ extern uint32_t const SRFFmpegDecoderOutputChannels;
 - (instancetype)initWithInput:(SRByteQueue *)input output:(SRAudioBuffer *)output;
 
 // The version of the FFmpeg libraries the app is linked against, e.g. "9.0.2".
-// MobileVLCKit contains its own FFmpeg: this must not be its version (FFmpeg has to come first in the link order).
+// A library exporting the symbols of another FFmpeg must never be linked before FFmpeg.xcframework.
 + (NSString *)libraryVersion;
 
 // Delegate callbacks are made on the decoder thread.
