@@ -13,8 +13,12 @@
 // FFmpeg demuxing and decoding, AVAudioEngine output. Metadata changes are reported when the audio they belong to is heard.
 @interface SRFFmpegEngine : NSObject <SRPlaybackEngine>
 
-// The stream is reconnected (-playbackEngineDidStall:) when no audio was played for this long, 10 s by default.
-// Network silence alone doesn't count: buffered audio keeps playing. Set before -start.
+// The stream is reconnected (-playbackEngineDidStall:) only when that's needed:
+// - when nothing is left to play and no data arrived for networkStallTimeout (3 s by default),
+//   while buffered audio plays or data keeps arriving the stream is never interrupted
+// - as a fallback when no audio was played for stallTimeout (10 s by default), also while opening the stream
+// Set both before -start.
+@property (nonatomic, assign) NSTimeInterval networkStallTimeout;
 @property (nonatomic, assign) NSTimeInterval stallTimeout;
 
 @end

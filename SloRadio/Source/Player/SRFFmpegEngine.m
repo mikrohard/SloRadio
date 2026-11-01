@@ -21,8 +21,12 @@ static NSTimeInterval const SRFFmpegEngineDefaultBufferDuration = 1.0;
 static NSTimeInterval const SRFFmpegEngineExtraBufferDuration = 4.0;
 // compressed data read ahead of the decoder (about 30 s of a 128 kbit/s stream)
 static NSUInteger const SRFFmpegEngineQueueCapacity = 512 * 1024;
-// no audio played for this long (since the last played audio, or since starting) means the stream stalled
+// no data received for this long while there is nothing left to play means the connection is dead
+static NSTimeInterval const SRFFmpegEngineDefaultNetworkStallTimeout = 3.0;
+// fallback: no audio played for this long (since the last played audio, or since starting) means the stream stalled
 static NSTimeInterval const SRFFmpegEngineDefaultStallTimeout = 10.0;
+// the output counts as starved when it played nothing for this long
+static NSTimeInterval const SRFFmpegEngineStarvedInterval = 0.5;
 static NSTimeInterval const SRFFmpegEngineTickInterval = 0.05;
 
 @interface SRTimedMetadata : NSObject
@@ -57,7 +61,6 @@ static NSTimeInterval const SRFFmpegEngineTickInterval = 0.05;
 @property (nonatomic, assign) BOOL receivedStreamTitle;
 @property (nonatomic, assign) uint64_t lastRenderedFrames;
 @property (nonatomic, strong) NSDate *lastAudio;
-// only for the log: network silence alone isn't a stall as long as there is buffered audio to play
 @property (nonatomic, assign) uint64_t lastBytesReceived;
 @property (nonatomic, strong) NSDate *lastData;
 @property (nonatomic, strong) NSError *inputError;
@@ -68,6 +71,7 @@ static NSTimeInterval const SRFFmpegEngineTickInterval = 0.05;
 
 @synthesize delegate = _delegate;
 @synthesize stallTimeout = _stallTimeout;
+@synthesize networkStallTimeout = _networkStallTimeout;
 
 - (instancetype)initWithURL:(NSURL *)url bufferDuration:(NSTimeInterval)bufferDuration {
 	self = [super init];
@@ -76,6 +80,7 @@ static NSTimeInterval const SRFFmpegEngineTickInterval = 0.05;
 		_bufferDuration = bufferDuration;
 		_volume = 1.f;
 		_stallTimeout = SRFFmpegEngineDefaultStallTimeout;
+		_networkStallTimeout = SRFFmpegEngineDefaultNetworkStallTimeout;
 		_state = SRRadioPlayerStateStopped;
 		_timeline = [NSMutableArray array];
 		_metaData = [NSMutableDictionary dictionary];
@@ -174,14 +179,24 @@ static NSTimeInterval const SRFFmpegEngineTickInterval = 0.05;
 		self.lastBytesReceived = bytes;
 		self.lastData = now;
 	}
-	// The watchdog looks at the audio actually played, not at the network: a connection may go quiet for
-	// a while without anybody noticing as long as there is buffered audio. Only when nothing has been played
-	// for stallTimeout seconds (or since starting, while opening and buffering) the stream is reconnected.
+	// Watchdog. A reconnect interrupts the playback, so it's only done when it's needed:
+	// - right away when there is nothing left to play and nothing arrives (both the buffer and the network are empty),
+	//   a quiet network is fine as long as buffered audio is playing, and a slow one as long as data trickles in
+	// - as a fallback when no audio was played for stallTimeout (also while opening), e.g. data that can't be decoded
 	uint64_t rendered = self.output.renderedFrames;
 	if (rendered != self.lastRenderedFrames) {
 		self.lastRenderedFrames = rendered;
 		self.lastAudio = now;
-	} else if ([now timeIntervalSinceDate:self.lastAudio] >= self.stallTimeout) {
+	}
+	NSTimeInterval silentPlayback = [now timeIntervalSinceDate:self.lastAudio];
+	NSTimeInterval silentNetwork = [now timeIntervalSinceDate:self.lastData];
+	BOOL bufferEmpty = silentPlayback >= SRFFmpegEngineStarvedInterval && self.queue.length == 0;
+	BOOL networkEmpty = bytes > 0 && silentNetwork >= self.networkStallTimeout;
+	if (bufferEmpty && networkEmpty) {
+		[self stallBecause:[NSString stringWithFormat:@"buffer empty and no data for %.1f s", silentNetwork]];
+		return;
+	}
+	if (silentPlayback >= self.stallTimeout) {
 		NSString *reason = rendered > 0 ? @"no audio played" : (self.opened ? @"no audio since opening the stream" : @"couldn't open the stream");
 		[self stallBecause:[NSString stringWithFormat:@"%@ for %.0f s", reason, self.stallTimeout]];
 		return;

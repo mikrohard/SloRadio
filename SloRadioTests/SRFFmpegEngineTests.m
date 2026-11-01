@@ -6,7 +6,8 @@
 //  Copyright © 2026 Jernej Fijačko. All rights reserved.
 //
 //  Plays scripted streams from a local HTTP server through SRFFmpegEngine to test its stall detection:
-//  only a stall of the playback (no audio played) reconnects, network silence alone doesn't.
+//  the stream is only reconnected when both the buffer and the network are empty (or, as a fallback,
+//  when no audio was played for a long time).
 //
 
 #import <XCTest/XCTest.h>
@@ -127,10 +128,11 @@
 	return [NSData dataWithContentsOfURL:url];
 }
 
-- (void)playScript:(NSArray *)script closeAtEnd:(BOOL)closeAtEnd stallTimeout:(NSTimeInterval)stallTimeout {
+- (void)playScript:(NSArray *)script closeAtEnd:(BOOL)closeAtEnd networkStallTimeout:(NSTimeInterval)networkStallTimeout stallTimeout:(NSTimeInterval)stallTimeout {
 	self.server = [[SRTestStreamServer alloc] initWithScript:script closeAtEnd:closeAtEnd];
 	self.states = [NSMutableArray array];
 	self.engine = [[SRFFmpegEngine alloc] initWithURL:self.server.url bufferDuration:0];
+	self.engine.networkStallTimeout = networkStallTimeout;
 	self.engine.stallTimeout = stallTimeout;
 	self.engine.delegate = self;
 	[self.engine setVolume:0];
@@ -164,35 +166,56 @@
 #pragma mark - Tests
 
 - (void)testNetworkSilenceCoveredByTheBufferIsNotAStall {
-	// the server is silent for 4 s, twice the stall timeout, but 3 s of it are covered by buffered audio:
-	// the playback only waits about a second for the next data, so the stream must not be reconnected
+	// 6 s of audio, then the server is silent for 4 s (four times the network timeout): buffered audio keeps
+	// playing all the time, so the stream must not be interrupted
 	NSData *audio = [self audio];
-	[self playScript:@[audio, @4.0, audio, audio] closeAtEnd:NO stallTimeout:2.0];
+	[self playScript:@[audio, audio, @4.0, audio, audio] closeAtEnd:NO networkStallTimeout:1.0 stallTimeout:2.0];
 	[self runUntil:^BOOL{
-		return self.stalledAt != nil || self.engine.playbackTime >= 6.5;
+		return self.stalledAt != nil || self.engine.playbackTime >= 8.0;
 	} timeout:15];
 	XCTAssertNil(self.stalledAt, @"reconnected after %.1f s of audio", self.playbackTimeAtStall);
-	XCTAssertGreaterThanOrEqual(self.engine.playbackTime, 6.5);
-	XCTAssertTrue([self.states containsObject:@(SRRadioPlayerStatePlaying)]);
+	XCTAssertGreaterThanOrEqual(self.engine.playbackTime, 8.0);
+	XCTAssertEqualObjects(self.states.lastObject, @(SRRadioPlayerStatePlaying), @"never ran out of audio: %@", self.states);
 }
 
-- (void)testPlaybackStallReconnectsAfterTheBufferIsPlayed {
-	// the connection stays open but goes silent for good: play all buffered audio, then wait 2 s and reconnect
-	[self playScript:@[[self audio]] closeAtEnd:NO stallTimeout:2.0];
+- (void)testSlowNetworkRebuffersWithoutReconnecting {
+	// data arrives at half the stream's speed: the playback runs out and rebuffers again and again,
+	// but data keeps coming, so reconnecting wouldn't help
+	NSData *audio = [self audio];
+	NSMutableArray *script = [NSMutableArray array];
+	for (NSUInteger offset = 0; offset < audio.length; offset += 1600) {
+		[script addObject:[audio subdataWithRange:NSMakeRange(offset, MIN(1600, audio.length - offset))]];
+		[script addObject:@0.2];	// 8 KB/s, the stream needs 16 KB/s
+	}
+	[self playScript:script closeAtEnd:NO networkStallTimeout:1.0 stallTimeout:3.0];
+	[self runUntil:^BOOL{
+		return self.stalledAt != nil;
+	} timeout:5.5];
+	XCTAssertNil(self.stalledAt, @"reconnected after %.1f s of audio", self.playbackTimeAtStall);
+	XCTAssertGreaterThan(self.engine.playbackTime, 1.0);
+	NSUInteger playing = [self.states indexOfObject:@(SRRadioPlayerStatePlaying)];
+	XCTAssertNotEqual(playing, NSNotFound);
+	XCTAssertTrue([[self.states subarrayWithRange:NSMakeRange(playing, self.states.count - playing)] containsObject:@(SRRadioPlayerStateBuffering)],
+				  @"the playback ran out of audio in between: %@", self.states);
+}
+
+- (void)testDeadConnectionReconnectsAsSoonAsTheBufferIsPlayed {
+	// the connection stays open but goes silent for good: play all buffered audio, then reconnect right away
+	// instead of waiting for the 10 s fallback
+	[self playScript:@[[self audio]] closeAtEnd:NO networkStallTimeout:1.0 stallTimeout:10.0];
 	[self runUntil:^BOOL{
 		return self.stalledAt != nil;
 	} timeout:15];
 	XCTAssertNotNil(self.stalledAt);
 	XCTAssertEqualWithAccuracy(self.playbackTimeAtStall, 3.0, 0.3, @"the buffered audio is played before reconnecting");
 	NSTimeInterval elapsed = [self.stalledAt timeIntervalSinceDate:self.start];
-	XCTAssertGreaterThan(elapsed, 4.5, @"waits stallTimeout after the audio ran out");
-	XCTAssertLessThan(elapsed, 7.0);
-	XCTAssertEqualObjects(self.states.lastObject, @(SRRadioPlayerStateBuffering));
+	XCTAssertGreaterThan(elapsed, 3.0);
+	XCTAssertLessThan(elapsed, 5.0, @"didn't wait for the fallback");
 }
 
 - (void)testStreamEndReconnectsOnceTheBufferIsPlayed {
-	// the server closes the stream: no need to wait for the stall timeout once the buffer is played
-	[self playScript:@[[self audio]] closeAtEnd:YES stallTimeout:10.0];
+	// the server closes the stream: reconnect as soon as the buffer is played
+	[self playScript:@[[self audio]] closeAtEnd:YES networkStallTimeout:5.0 stallTimeout:10.0];
 	[self runUntil:^BOOL{
 		return self.stalledAt != nil;
 	} timeout:15];
@@ -202,7 +225,7 @@
 }
 
 - (void)testUnreachableServerStallsAfterTheTimeout {
-	// nothing ever arrives: the stream is reconnected stallTimeout after starting
+	// nothing ever arrives: the fallback reconnects stallTimeout after starting
 	self.server = [[SRTestStreamServer alloc] initWithScript:@[@30.0] closeAtEnd:NO];
 	self.engine = [[SRFFmpegEngine alloc] initWithURL:self.server.url bufferDuration:0];
 	self.engine.stallTimeout = 2.0;
