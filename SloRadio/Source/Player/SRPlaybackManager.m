@@ -276,6 +276,8 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 	}
 	_playbackInterrupted = NO;
 	_audioSessionInterrupted = NO;
+	// undo the fade of a sleep timer that ran out or was stopped while fading
+	[player setVolume:100];
 	[player playRadioStation:selectedStation];
 	[self setupBufferingTimeoutTimer];
 }
