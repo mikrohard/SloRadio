@@ -262,8 +262,14 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 	if ([[player currentRadioStation] isEqual:selectedStation] &&
 		([player state] == SRRadioPlayerStateBuffering ||
 		 [player state] == SRRadioPlayerStatePlaying)) {
-		// this radio station is already playing
-		// ignore this playback request
+		// this radio station is already playing, only (re)start the sleep timer if one was requested
+		if (sleepTimer) {
+			[self setupSleepTimer];
+			if ([player state] == SRRadioPlayerStatePlaying) {
+				// otherwise it starts once the playback does
+				[self startSleepTimer];
+			}
+		}
 		return;
 	}
 	[self setupAudioSession];
