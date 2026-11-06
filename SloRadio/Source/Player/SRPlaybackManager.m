@@ -475,7 +475,9 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 		[nowPlayingInfo setObject:selectedStation.name forKey:MPMediaItemPropertyArtist];
 	}
 	SRRadioPlayer *player = [SRRadioPlayer sharedPlayer];
-	float playRate = player.state == SRRadioPlayerStatePlaying ? 1.0 : 0.0;
+	// loading counts as playing, so the play/pause button shows "pause" while a station opens or buffers
+	BOOL playing = player.state == SRRadioPlayerStateOpening || player.state == SRRadioPlayerStateBuffering || player.state == SRRadioPlayerStatePlaying;
+	float playRate = playing ? 1.0 : 0.0;
 	[nowPlayingInfo setObject:@(playRate) forKey:MPNowPlayingInfoPropertyPlaybackRate];
 	[nowPlayingInfo setObject:@(YES) forKey:MPNowPlayingInfoPropertyIsLiveStream];
 	// never load artwork inside the artwork request handler: MediaPlayer calls it on a queue the main thread
@@ -521,8 +523,8 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 
 - (void)updateNowPlayingState {
 	MPNowPlayingInfoCenter *infoCenter = [MPNowPlayingInfoCenter defaultCenter];
-	if ([[SRRadioPlayer sharedPlayer] state] == SRRadioPlayerStateBuffering ||
-		[[SRRadioPlayer sharedPlayer] state] == SRRadioPlayerStatePlaying) {
+	SRRadioPlayerState state = [[SRRadioPlayer sharedPlayer] state];
+	if (state == SRRadioPlayerStateOpening || state == SRRadioPlayerStateBuffering || state == SRRadioPlayerStatePlaying) {
 		infoCenter.playbackState = MPNowPlayingPlaybackStatePlaying;
 	} else {
 		infoCenter.playbackState = MPNowPlayingPlaybackStateStopped;

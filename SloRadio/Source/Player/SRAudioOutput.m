@@ -89,7 +89,7 @@ typedef struct {
 		for (UInt32 c = 0; c < channelCount; c++) {
 			memset(channels[c] + read, 0, (frameCount - read) * sizeof(float));
 		}
-		*isSilence = read == 0;
+		// not flagged as silence: the output keeps counting as playing audio while it (re)buffers
 		return noErr;
 	}];
 
@@ -402,6 +402,52 @@ typedef struct {
 
 - (float)volume {
 	return _volumeValue;
+}
+
+@end
+
+#pragma mark - Silence
+
+@interface SRSilenceOutput ()
+@property (nonatomic, strong) AVAudioEngine *engine;
+@end
+
+@implementation SRSilenceOutput
+
+- (void)dealloc {
+	[self stop];
+}
+
+- (BOOL)isRunning {
+	return self.engine != nil;
+}
+
+- (void)start {
+	if (self.engine) {
+		return;
+	}
+	AVAudioFormat *format = [[AVAudioFormat alloc] initStandardFormatWithSampleRate:44100 channels:2];
+	AVAudioSourceNode *sourceNode = [[AVAudioSourceNode alloc] initWithFormat:format renderBlock:^OSStatus(BOOL *isSilence, const AudioTimeStamp *timestamp, AVAudioFrameCount frameCount, AudioBufferList *outputData) {
+		for (UInt32 b = 0; b < outputData->mNumberBuffers; b++) {
+			memset(outputData->mBuffers[b].mData, 0, outputData->mBuffers[b].mDataByteSize);
+		}
+		return noErr;
+	}];
+	AVAudioEngine *engine = [[AVAudioEngine alloc] init];
+	[engine attachNode:sourceNode];
+	[engine connect:sourceNode to:engine.mainMixerNode format:format];
+	[engine prepare];
+	NSError *error = nil;
+	if (![engine startAndReturnError:&error]) {
+		NSLog(@"Couldn't start the silence output: %@", error);
+		return;
+	}
+	self.engine = engine;
+}
+
+- (void)stop {
+	[self.engine stop];
+	self.engine = nil;
 }
 
 @end

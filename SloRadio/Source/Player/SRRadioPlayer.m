@@ -13,6 +13,7 @@
 #import "SRStreamResolver.h"
 #import "SRAVPlayerEngine.h"
 #import "SRFFmpegEngine.h"
+#import "SRAudioOutput.h"
 #import "NSString+Additions.h"
 
 NSString * const SRRadioPlayerStateDidChangeNotification = @"SRRadioPlayerStateDidChangeNotification";
@@ -34,6 +35,7 @@ static NSTimeInterval const SRRadioPlayerMaxReconnectDelay = 10.0;
 @property (nonatomic, strong) NSTimer *reconnectTimer;
 @property (nonatomic, assign) NSUInteger reconnectCount;
 @property (nonatomic, assign) int fadeVolume;
+@property (nonatomic, strong) SRSilenceOutput *silence;
 
 @end
 
@@ -234,11 +236,26 @@ static NSTimeInterval const SRRadioPlayerMaxReconnectDelay = 10.0;
 - (void)setStateAndNotify:(SRRadioPlayerState)state {
 	if (state != _state) {
 		_state = state;
+		[self updateSilence];
 		[[NSNotificationCenter defaultCenter] postNotificationName:SRRadioPlayerStateDidChangeNotification
 															object:self];
 		if ([self.delegate respondsToSelector:@selector(radioPlayer:didChangeState:)]) {
 			[self.delegate radioPlayer:self didChangeState:_state];
 		}
+	}
+}
+
+// Bridges the gaps without audio while a station is opened or buffered (see SRSilenceOutput).
+// Not needed on the Mac, where the now playing state is set explicitly.
+- (void)updateSilence {
+	BOOL loading = _state == SRRadioPlayerStateOpening || _state == SRRadioPlayerStateBuffering;
+	if (loading && ![NSProcessInfo processInfo].isMacCatalystApp) {
+		if (!self.silence) {
+			self.silence = [[SRSilenceOutput alloc] init];
+		}
+		[self.silence start];
+	} else {
+		[self.silence stop];
 	}
 }
 

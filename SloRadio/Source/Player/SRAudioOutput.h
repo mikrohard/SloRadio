@@ -38,3 +38,15 @@
 @property (nonatomic, readonly) uint64_t latencyFrames;
 
 @end
+
+// Plays silence. Keeps the app's audio running while a stream is opened or buffered: on iOS (and CarPlay)
+// the system shows the app as playing only while it outputs audio, so otherwise the play/pause button
+// switches to "play" while a station loads.
+@interface SRSilenceOutput : NSObject
+
+- (void)start;
+- (void)stop;
+
+@property (nonatomic, readonly, getter=isRunning) BOOL running;
+
+@end
