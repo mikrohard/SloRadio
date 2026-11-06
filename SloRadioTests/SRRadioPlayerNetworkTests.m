@@ -223,7 +223,7 @@ static NSTimeInterval const SRNetworkTestTimeout = 30.0;
 				if ([self isReachable:[NSURL URLWithString:station[@"url"]]]) {
 					[failed addObject:[NSString stringWithFormat:@"%@ (%@, states %@)", station[@"name"], station[@"url"], self.states]];
 				} else {
-					NSLog(@"STATION OFFLINE %@: the server can't be reached at all", station[@"name"]);
+					NSLog(@"STATION OFFLINE %@: the server can't be reached or answers with an error", station[@"name"]);
 				}
 			}
 			[self.player stop];
@@ -265,7 +265,8 @@ static NSTimeInterval const SRNetworkTestTimeout = 30.0;
 	XCTAssertGreaterThan(total, 280000);
 }
 
-// Whether the server responds at all (a station whose server is down isn't a player failure).
+// Whether the server serves the stream at all: a station whose server is down or answers with an HTTP error
+// (e.g. 404 while the station is off the air) isn't a player failure.
 - (BOOL)isReachable:(NSURL *)url {
 	NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration ephemeralSessionConfiguration];
 	configuration.timeoutIntervalForRequest = 8.0;
@@ -278,6 +279,9 @@ static NSTimeInterval const SRNetworkTestTimeout = 30.0;
 		[[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
 	}
 	BOOL reachable = task.response != nil;
+	if ([task.response isKindOfClass:[NSHTTPURLResponse class]] && ((NSHTTPURLResponse *)task.response).statusCode >= 400) {
+		reachable = NO;
+	}
 	[session invalidateAndCancel];
 	return reachable;
 }
