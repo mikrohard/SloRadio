@@ -21,6 +21,10 @@ uint32_t const SRFFmpegDecoderOutputChannels = 2;
 static int const SRFFmpegDecoderIOBufferSize = 16 * 1024;
 // enough to recognize every supported format, small enough to start quickly
 static int64_t const SRFFmpegDecoderProbeSize = 64 * 1024;
+// How much is read to detect the format. FFmpeg's default (1 MB) is far too much for a live stream: joined mid-frame,
+// MP3 is only detected with confidence after ~200 frames (5 s of audio), so stations that don't send a large burst on
+// connect took seconds to start. Detected the same at 4 KB for every station in the list.
+static int const SRFFmpegDecoderFormatProbeSize = 16 * 1024;
 static int64_t const SRFFmpegDecoderMaxAnalyzeDuration = AV_TIME_BASE / 2;
 // this many packets in a row that fail to decode end the stream (it gets reconnected)
 static int const SRFFmpegDecoderMaxDecodeErrors = 100;
@@ -193,6 +197,7 @@ static void SRDecoderStateFree(SRDecoderState *state) {
 	state->format->pb = state->io;
 	state->format->flags |= AVFMT_FLAG_CUSTOM_IO;
 	state->format->probesize = SRFFmpegDecoderProbeSize;
+	state->format->format_probesize = SRFFmpegDecoderFormatProbeSize;
 	state->format->max_analyze_duration = SRFFmpegDecoderMaxAnalyzeDuration;
 	state->format->interrupt_callback.callback = SRFFmpegDecoderInterrupt;
 	state->format->interrupt_callback.opaque = (__bridge void *)self;
