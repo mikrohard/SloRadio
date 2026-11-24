@@ -60,6 +60,25 @@
 	XCTAssertEqualObjects([SRMetadataFormatter hyphenSplitsOfText:@"-ZUCCHERO"], @[]);
 }
 
+- (void)testFormattedText {
+	XCTAssertEqualObjects([SRMetadataFormatter formattedText:@"TEČAJ"], @"Tečaj");
+	// mixed case is kept
+	XCTAssertEqualObjects([SRMetadataFormatter formattedText:@"Tinkara Kovač"], @"Tinkara Kovač");
+	XCTAssertEqualObjects([SRMetadataFormatter formattedText:@"ŠKODA"], @"Škoda");
+}
+
+- (void)testFormattedTextUppercasedOnlyInASCII {
+	// software that only uppercases English letters leaves "č", "š", "ž" lowercase
+	XCTAssertEqualObjects([SRMetadataFormatter formattedText:@"TEčAJ"], @"Tečaj");
+	XCTAssertEqualObjects([SRMetadataFormatter formattedText:@"UPAM, DA SI SREčNA"], @"Upam, da Si Srečna");
+	XCTAssertEqualObjects([SRMetadataFormatter formattedText:@"POSKOčNI MUZIKANTI & TILEN LOTRIč"], @"Poskočni Muzikanti & Tilen Lotrič");
+	// real mixed case is kept
+	XCTAssertEqualObjects([SRMetadataFormatter formattedText:@"Ćao"], @"Ćao");
+	XCTAssertEqualObjects([SRMetadataFormatter formattedText:@"DJ Žan"], @"DJ Žan");
+	// other alphabets are left alone
+	XCTAssertEqualObjects([SRMetadataFormatter formattedText:@"ABBA Пјесма"], @"ABBA Пјесма");
+}
+
 - (void)testCleanedText {
 	XCTAssertEqualObjects([SRMetadataFormatter cleanedText:@"LJUBI LJUBI-\uFEFFNASTJA GABOR"], @"LJUBI LJUBI-NASTJA GABOR");
 	XCTAssertEqualObjects([SRMetadataFormatter cleanedText:@"\uFEFFA\u200BB"], @"AB");

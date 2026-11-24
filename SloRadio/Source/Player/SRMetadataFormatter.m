@@ -50,7 +50,7 @@
 	}
 	BOOL hasUppercase = [text rangeOfCharacterFromSet:[NSCharacterSet uppercaseLetterCharacterSet]].location != NSNotFound;
 	BOOL hasLowercase = [text rangeOfCharacterFromSet:[NSCharacterSet lowercaseLetterCharacterSet]].location != NSNotFound;
-	if (hasUppercase && hasLowercase) {
+	if (hasUppercase && hasLowercase && ![self isASCIIUppercasedText:text]) {
 		// mixed case is (almost always) intentional
 		return text;
 	}
@@ -73,6 +73,28 @@
 		}
 	}
 	return [formattedWords componentsJoinedByString:@" "];
+}
+
+// Whether the text was uppercased by software that only knows English letters, which leaves letters like
+// "č", "š" or "ž" lowercase (e.g. "TEčAJ"): it has ASCII uppercase letters but no ASCII lowercase ones,
+// and its only lowercase letters are accented Latin ones.
++ (BOOL)isASCIIUppercasedText:(NSString *)text {
+	static NSCharacterSet *asciiUppercase;
+	static NSCharacterSet *asciiLowercase;
+	static NSCharacterSet *otherLowercase;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		asciiUppercase = [NSCharacterSet characterSetWithRange:NSMakeRange('A', 26)];
+		asciiLowercase = [NSCharacterSet characterSetWithRange:NSMakeRange('a', 26)];
+		// lowercase letters that aren't accented Latin ones (Latin-1 Supplement, Latin Extended-A and B)
+		NSMutableCharacterSet *set = [[NSCharacterSet lowercaseLetterCharacterSet] mutableCopy];
+		[set removeCharactersInRange:NSMakeRange('a', 26)];
+		[set removeCharactersInRange:NSMakeRange(0x00C0, 0x0250 - 0x00C0)];
+		otherLowercase = [set copy];
+	});
+	return [text rangeOfCharacterFromSet:asciiUppercase].location != NSNotFound &&
+		[text rangeOfCharacterFromSet:asciiLowercase].location == NSNotFound &&
+		[text rangeOfCharacterFromSet:otherLowercase].location == NSNotFound;
 }
 
 + (NSString *)formattedWord:(NSString *)word capitalizeSmallWords:(BOOL)capitalizeSmallWords {
