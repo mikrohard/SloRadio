@@ -224,6 +224,35 @@
 	XCTAssertLessThan([self.stalledAt timeIntervalSinceDate:self.start], 5.0);
 }
 
+- (void)testUnplayableStreamIsNotANetworkError {
+	// the server answers, but with something that isn't audio
+	NSMutableData *garbage = [NSMutableData dataWithLength:64 * 1024];
+	memset(garbage.mutableBytes, 0x5a, garbage.length);
+	[self playScript:@[garbage] closeAtEnd:YES networkStallTimeout:3.0 stallTimeout:10.0];
+	[self runUntil:^BOOL{
+		return [self.states containsObject:@(SRRadioPlayerStateError)];
+	} timeout:10];
+	XCTAssertEqualObjects(self.states.lastObject, @(SRRadioPlayerStateError));
+	XCTAssertNotNil(self.engine.error);
+	XCTAssertFalse(SRIsNetworkError(self.engine.error), @"%@", self.engine.error);
+}
+
+- (void)testRefusedConnectionIsANetworkError {
+	// nothing listens on the port any more
+	self.server = [[SRTestStreamServer alloc] initWithScript:@[] closeAtEnd:YES];
+	NSURL *url = self.server.url;
+	[self.server stop];
+	self.states = [NSMutableArray array];
+	self.engine = [[SRFFmpegEngine alloc] initWithURL:url bufferDuration:0];
+	self.engine.delegate = self;
+	[self.engine start];
+	[self runUntil:^BOOL{
+		return [self.states containsObject:@(SRRadioPlayerStateError)];
+	} timeout:10];
+	XCTAssertEqualObjects(self.states.lastObject, @(SRRadioPlayerStateError));
+	XCTAssertTrue(SRIsNetworkError(self.engine.error), @"%@", self.engine.error);
+}
+
 - (void)testUnreachableServerStallsAfterTheTimeout {
 	// nothing ever arrives: the fallback reconnects stallTimeout after starting
 	self.server = [[SRTestStreamServer alloc] initWithScript:@[@30.0] closeAtEnd:NO];

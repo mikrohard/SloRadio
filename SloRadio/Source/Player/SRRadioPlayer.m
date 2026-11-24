@@ -14,6 +14,7 @@
 #import "SRAVPlayerEngine.h"
 #import "SRFFmpegEngine.h"
 #import "SRAudioOutput.h"
+#import "SRStreamInput.h"
 #import "NSString+Additions.h"
 
 NSString * const SRRadioPlayerStateDidChangeNotification = @"SRRadioPlayerStateDidChangeNotification";
@@ -22,6 +23,26 @@ NSString * const SRRadioPlayerMetaDataArtistKey = @"SRRadioPlayerMetaDataArtistK
 NSString * const SRRadioPlayerMetaDataTitleKey = @"SRRadioPlayerMetaDataTitleKey";
 NSString * const SRRadioPlayerMetaDataGenreKey = @"SRRadioPlayerMetaDataGenreKey";
 NSString * const SRRadioPlayerMetaDataNowPlayingKey = @"SRRadioPlayerMetaDataNowPlayingKey";
+
+BOOL SRIsNetworkError(NSError *error) {
+	if (!error) {
+		return NO;
+	}
+	NSArray *networkDomains = @[NSURLErrorDomain, SRStreamInputErrorDomain, (__bridge NSString *)kCFErrorDomainCFNetwork];
+	if ([networkDomains containsObject:error.domain]) {
+		return YES;
+	}
+	// e.g. AVFoundation wraps the URL loading error of an HLS stream
+	if (SRIsNetworkError(error.userInfo[NSUnderlyingErrorKey])) {
+		return YES;
+	}
+	for (NSError *underlying in error.userInfo[NSMultipleUnderlyingErrorsKey]) {
+		if ([underlying isKindOfClass:[NSError class]] && SRIsNetworkError(underlying)) {
+			return YES;
+		}
+	}
+	return NO;
+}
 
 // reconnect delays after consecutive stalls: immediately, then 1, 2, 4, 8, 10, 10, ... seconds
 static NSTimeInterval const SRRadioPlayerMaxReconnectDelay = 10.0;
@@ -45,6 +66,7 @@ static NSTimeInterval const SRRadioPlayerMaxReconnectDelay = 10.0;
 @synthesize currentRadioStation = _currentRadioStation;
 @synthesize metaData = _metaData;
 @synthesize delegate = _delegate;
+@synthesize error = _error;
 
 #pragma mark - Singleton
 
@@ -87,8 +109,10 @@ static NSTimeInterval const SRRadioPlayerMaxReconnectDelay = 10.0;
 	[self tearDownPlayback];
 	self.streamURL = url;
 	self.reconnectCount = 0;
+	_error = nil;
 	[self setMetaDataAndNotify:@{}];
 	if (!url) {
+		_error = [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorBadURL userInfo:nil];
 		[self setStateAndNotify:SRRadioPlayerStateError];
 		return;
 	}
@@ -131,6 +155,7 @@ static NSTimeInterval const SRRadioPlayerMaxReconnectDelay = 10.0;
 
 - (void)stop {
 	[self tearDownPlayback];
+	_error = nil;
 	[self setStateAndNotify:SRRadioPlayerStateStopped];
 	_currentRadioStation = nil;
 	[self setMetaDataAndNotify:@{}];
@@ -196,6 +221,7 @@ static NSTimeInterval const SRRadioPlayerMaxReconnectDelay = 10.0;
 		self.reconnectCount = 0;
 	}
 	if (state == SRRadioPlayerStateError) {
+		_error = engine.error ?: [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorUnknown userInfo:nil];
 		[self tearDownPlayback];
 	}
 	if (state == SRRadioPlayerStateOpening && self.state == SRRadioPlayerStateBuffering) {

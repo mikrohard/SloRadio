@@ -19,6 +19,9 @@
 @property (nonatomic, weak) id<SRPlaybackEngineDelegate> delegate;
 // Seconds of audio played since playback started (0 while opening or buffering for the first time).
 @property (nonatomic, readonly) NSTimeInterval playbackTime;
+// Why playback failed, set before the Error state is reported. Network failures (the stream couldn't be
+// downloaded) keep their NSURLErrorDomain / SRStreamInputErrorDomain error, see SRIsNetworkError().
+@property (nonatomic, readonly) NSError *error;
 
 // bufferDuration: seconds of audio to buffer before playback starts, 0 for the engine's default.
 - (instancetype)initWithURL:(NSURL *)url bufferDuration:(NSTimeInterval)bufferDuration;
@@ -29,6 +32,10 @@
 - (void)setVolume:(float)volume;
 
 @end
+
+// Whether the error (or an error underlying it) means the stream couldn't be downloaded: no connection,
+// an unreachable server, an HTTP error status, ... rather than a stream the player couldn't play.
+BOOL SRIsNetworkError(NSError *error);
 
 @protocol SRPlaybackEngineDelegate <NSObject>
 

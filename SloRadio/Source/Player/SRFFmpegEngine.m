@@ -70,6 +70,7 @@ static NSTimeInterval const SRFFmpegEngineTickInterval = 0.05;
 @implementation SRFFmpegEngine
 
 @synthesize delegate = _delegate;
+@synthesize error = _error;
 @synthesize stallTimeout = _stallTimeout;
 @synthesize networkStallTimeout = _networkStallTimeout;
 
@@ -152,7 +153,10 @@ static NSTimeInterval const SRFFmpegEngineTickInterval = 0.05;
 }
 
 - (void)failWithError:(NSError *)error {
-	NSLog(@"FFmpeg engine failed to play %@: %@ (input: %@)", self.url, error.localizedDescription, self.inputError.localizedDescription ?: @"ok");
+	NSLog(@"FFmpeg engine failed to play %@: %@ (input: %@)", self.url, error.localizedDescription, self.queue.error.localizedDescription ?: @"ok");
+	// When the download failed the decoder only fails because its input ended: report the download's error.
+	// (The queue has it before the decoder notices, unlike inputError, which arrives on the main queue.)
+	_error = self.queue.error ?: error;
 	[self setStateAndNotify:SRRadioPlayerStateError];
 	[self stop];
 }

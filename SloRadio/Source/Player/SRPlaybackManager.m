@@ -9,6 +9,7 @@
 #import "SRPlaybackManager.h"
 #import "SRDataManager.h"
 #import "SRRadioPlayer.h"
+#import "SRPlaybackEngine.h"
 #import "SRRadioStation.h"
 #import "SRSleepTimer.h"
 #import "SRMetadataFormatter.h"
@@ -597,14 +598,17 @@ static NSTimeInterval const SRRadioBufferingTimeoutInterval = 10; // wait max 15
 	}
 	[[NSNotificationCenter defaultCenter] postNotificationName:SRPlaybackManagerDidFailPlayback object:station];
 
-	// Report error to Crashlytics
+	// Report streams the player couldn't play to Crashlytics. Network failures (no connection, a station that is
+	// off the air, HTTP errors) aren't reported: the stations are monitored separately.
+	NSError *error = [[SRRadioPlayer sharedPlayer] error];
 	BOOL internetReachable = [[Reachability reachabilityForInternetConnection] currentReachabilityStatus] != NotReachable;
 	if (internetReachable &&
+		error != nil && !SRIsNetworkError(error) &&
 		![[SRDataManager sharedManager] isCustomRadioStation:station] &&
 		station.url != nil) {
-		NSString *message = [NSString stringWithFormat:NSLocalizedString(@"PlaybackErrorStation", @""), station.name];
-		NSError *error = [NSError errorWithDomain:NSURLErrorDomain code:0 userInfo:@{NSLocalizedDescriptionKey : message, NSURLErrorKey: station.url}];
-		[[FIRCrashlytics crashlytics] recordError:error];
+		// grouped by the error's domain and code, the station tells which streams are affected
+		[[FIRCrashlytics crashlytics] recordError:error userInfo:@{@"station": station.name ?: @"",
+																	@"url": station.url.absoluteString ?: @""}];
 	}
 }
 

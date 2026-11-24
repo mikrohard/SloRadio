@@ -38,6 +38,7 @@ static void *SRAVPlayerEngineTimeControlStatusContext = &SRAVPlayerEngineTimeCon
 @implementation SRAVPlayerEngine
 
 @synthesize delegate = _delegate;
+@synthesize error = _error;
 
 - (instancetype)initWithURL:(NSURL *)url bufferDuration:(NSTimeInterval)bufferDuration {
 	self = [super init];
@@ -194,7 +195,8 @@ static void *SRAVPlayerEngineTimeControlStatusContext = &SRAVPlayerEngineTimeCon
 		self.waitingSince = nil;
 	}
 	if (state == SRRadioPlayerStateError) {
-		NSLog(@"AVPlayer failed to play %@: %@", self.url, self.item.error ?: self.player.error);
+		_error = self.item.error ?: self.player.error;
+		NSLog(@"AVPlayer failed to play %@: %@", self.url, _error);
 	}
 	[self setStateAndNotify:state];
 }

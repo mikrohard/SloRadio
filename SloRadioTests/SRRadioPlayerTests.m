@@ -13,6 +13,8 @@
 #import "SRPlaybackEngine.h"
 #import "SRStreamResolver.h"
 #import "SRDataManager.h"
+#import "SRStreamInput.h"
+#import <AVFoundation/AVFoundation.h>
 
 #pragma mark - Fake engine
 
@@ -23,6 +25,7 @@
 @property (nonatomic, assign) BOOL stopped;
 @property (nonatomic, assign) float volume;
 @property (nonatomic, assign) NSTimeInterval playbackTime;
+@property (nonatomic, strong) NSError *error;
 
 - (void)sendState:(SRRadioPlayerState)state;
 - (void)sendMetaData:(NSDictionary *)metaData;
@@ -169,6 +172,30 @@ static NSMutableArray<SRFakeEngine *> *SRFakeEngines;
 - (void)testMissingURLIsAnError {
 	[self.player playStreamAtUrl:nil];
 	XCTAssertEqual(self.player.state, SRRadioPlayerStateError);
+}
+
+- (void)testEngineErrorIsPassedOnUntilTheNextStart {
+	SRFakeEngine *engine = [self play];
+	XCTAssertNil(self.player.error);
+	engine.error = [NSError errorWithDomain:@"SRFFmpegErrorDomain" code:-1 userInfo:nil];
+	[engine sendState:SRRadioPlayerStateError];
+	XCTAssertEqualObjects(self.player.error, engine.error);
+	[self play];
+	XCTAssertNil(self.player.error);
+	[self.player stop];
+	XCTAssertNil(self.player.error);
+}
+
+- (void)testNetworkErrorsAreRecognized {
+	XCTAssertTrue(SRIsNetworkError([NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorTimedOut userInfo:nil]));
+	XCTAssertTrue(SRIsNetworkError([NSError errorWithDomain:SRStreamInputErrorDomain code:404 userInfo:nil]));
+	// AVFoundation wraps the URL loading error of an HLS stream
+	NSError *wrapped = [NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorUnknown
+									   userInfo:@{NSUnderlyingErrorKey: [NSError errorWithDomain:NSURLErrorDomain code:NSURLErrorCannotConnectToHost userInfo:nil]}];
+	XCTAssertTrue(SRIsNetworkError(wrapped));
+	XCTAssertFalse(SRIsNetworkError([NSError errorWithDomain:@"SRFFmpegErrorDomain" code:-1094995529 userInfo:nil]));
+	XCTAssertFalse(SRIsNetworkError([NSError errorWithDomain:AVFoundationErrorDomain code:AVErrorDecodeFailed userInfo:nil]));
+	XCTAssertFalse(SRIsNetworkError(nil));
 }
 
 - (void)testSwitchingStreamsStopsTheOldEngineWithoutReportingStopped {

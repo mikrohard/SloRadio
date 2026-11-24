@@ -34,6 +34,8 @@ extern NSString * const SRRadioPlayerMetaDataNowPlayingKey;
 @property (nonatomic, readonly) SRRadioStation *currentRadioStation;
 @property (nonatomic, readonly) NSDictionary *metaData;
 @property (nonatomic, readonly) NSTimeInterval timePlaying;
+// Why playback failed while the state is SRRadioPlayerStateError, otherwise nil.
+@property (nonatomic, readonly) NSError *error;
 @property (nonatomic, weak) id <SRRadioPlayerDelegate> delegate;
 
 + (SRRadioPlayer *)sharedPlayer;
